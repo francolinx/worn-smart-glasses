@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Point & Go · 285 Jay St</title>
+<style>
+:root{--bg:#0e1116;--fg:#e6e8eb;--mut:#9aa3ad;--card:#161b22;--line:#2a313b;--acc:#ffb020;--ok:#3fb950;--bad:#f85149}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px system-ui,-apple-system,sans-serif;padding-bottom:40px}
+header{display:flex;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}h1{font-size:17px;margin:0;flex:1}
+a{color:var(--acc)}button,select,input{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:9px 12px;font:inherit}
+button.on{border-color:var(--acc);color:var(--acc)}button.go{border-color:var(--ok);color:var(--ok);font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.mut{color:var(--mut);font-size:13px}.warn{color:var(--acc);font-size:13px;margin-top:4px}.big{font-size:21px;font-weight:700}
+.shoot{display:block;text-align:center;border:2px solid var(--ok);color:var(--ok);border-radius:12px;padding:16px;font-size:19px;font-weight:700;cursor:pointer}
+#cvbox{position:relative;background:#05070a;border-radius:8px;overflow:hidden;touch-action:none;height:56vh;display:none;margin-top:10px}
+canvas{display:block;width:100%}#cv{height:100%}
+.zoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px}.zoom button{width:42px;height:42px;padding:0;font-size:20px}
+#hint{position:absolute;left:8px;top:8px;background:rgba(14,17,22,.85);padding:6px 10px;border-radius:6px;font-size:13px;max-width:72%}
+.tap{display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}.tap b{min-width:20px;color:var(--acc)}.tap button{padding:5px 9px}
+#sheet{position:fixed;left:0;right:0;bottom:0;max-height:66vh;overflow:auto;background:var(--card);border-top:2px solid var(--acc);padding:10px;display:none;z-index:9}
+.opt{padding:11px 6px;border-bottom:1px solid var(--line)}.opt .mut{display:block}
+table{border-collapse:collapse;width:100%}td{padding:4px;border-bottom:1px solid var(--line);vertical-align:top}td.n{text-align:right;font-variant-numeric:tabular-nums}
+#map{border-radius:8px;background:#0b0d10;touch-action:manipulation}
+</style></head><body>
+<header><h1>Point &amp; Go <span class="mut">· 285 Jay St, Brooklyn</span></h1><a id="gl" href="glasses.html" target="_blank">glasses view ▸</a></header>
+
+<div class="card"><h2>1 · Point at the skyline and shoot</h2>
+ <label class="shoot">📷 Point &amp; shoot<input id="cap" type="file" accept="image/*" capture="environment" style="display:none"></label>
+ <div class="row" style="margin-top:10px"><span class="mut">Window faces:</span>
+  <button class="face" data-h="5">N · Tillary</button><button class="face" data-h="92">E · Bridge</button><button class="face" data-h="184">S · Tech Pl (Johnson)</button><button class="face" data-h="272">W · Jay</button></div>
+ <div class="mut" style="margin-top:6px">Hold the phone level, keep rooftops in frame. Then tap the <b>top</b> of 3 buildings and name them; the list is sorted by what should be there. No GPS, no compass.</div>
+ <div id="cvbox"><canvas id="cv"></canvas><div id="hint"></div>
+  <div class="zoom"><button id="zin">+</button><button id="zout">−</button><button id="zfit" style="font-size:13px">fit</button></div></div>
+ <div id="lensinfo" class="mut" style="margin-top:6px"></div>
+ <div id="taps"></div>
+</div>
+
+<div class="card" id="res" style="display:none"><h2>2 · Fix</h2><div id="resb"></div></div>
+
+<div class="card"><h2>3 · Map <span id="mapsrc"></span></h2>
+ <div class="row" style="margin-bottom:8px"><button id="mBlock" class="on">Block</button><button id="mArea">Area</button><button id="mFp">Footprints</button>
+  <span class="mut">tap sets:</span><button id="tDest" class="on">Destination</button><button id="tPos">My position</button></div>
+ <canvas id="map"></canvas>
+ <div class="mut" style="margin-top:6px">Aerial: NYS ITS orthoimagery (public domain). Streets/places: © OpenStreetMap contributors. Footprints + heights: NYC Open Data.</div>
+</div>
+
+<div class="card"><h2>4 · Go</h2>
+ <div class="row"><select id="dsel" style="flex:1;min-width:200px"></select><button class="go" id="go">GO ▸ glasses</button></div>
+ <div id="goinfo" style="margin-top:8px"></div><div id="syncinfo" class="mut"></div>
+</div>
+
+<div id="sheet"><div class="row" style="margin-bottom:6px"><input id="q" placeholder="search address or name…" style="flex:1"><button id="sx">✕</button></div><div id="opts"></div></div>
+
+<script src="js/solver.js"></script>
+<script src="js/sync.js"></script>
+<script>
+const $=id=>document.getElementById(id), cv=$('cv'), g=cv.getContext('2d');
+const CENTER=[40.695496,-73.986565];
+let IM=null, EXIF={}, LMS=[], LM={}, BLD=[], OSM=null, SAT=null, SATIMG={}, taps=[], view={s:1,x:0,y:0}, pending=null, moveIdx=null, SOL=null;
+let facing=null, FIX=null, DEST=null, mapMode='sat_block', showFp=false, tapSets='dest';
+const hint=t=>$('hint').textContent=t;
+$('gl').href='glasses.html?room='+PGSync.ROOM;
+
+/* ---------- EXIF (JPEG APP1): 35 mm-equivalent focal length ---------- */
+function readExif(buf){ const d=new DataView(buf), out={}; if(d.getUint16(0)!==0xFFD8) return out; let o=2;
+  while(o+4<d.byteLength){ const m=d.getUint16(o), len=d.getUint16(o+2); if(m===0xFFE1 && d.getUint32(o+4)===0x45786966){ const t=o+10, le=d.getUint16(t)===0x4949;
+      const u16=p=>d.getUint16(p,le), u32=p=>d.getUint32(p,le);
+      const ifd=(p,cb)=>{ const n=u16(p); for(let i=0;i<n;i++){ const e=p+2+i*12; cb(u16(e),u16(e+2),e+8); } };
+      let sub=null; ifd(t+u32(t+4),(tag,type,vp)=>{ if(tag===0x8769) sub=t+u32(vp); if(tag===0x0110){ try{ out.model=new TextDecoder().decode(new Uint8Array(buf,t+u32(vp),24)).split('\0')[0]; }catch(_){} } });
+      if(sub) ifd(sub,(tag,type,vp)=>{ if(tag===0xA405) out.f35=u16(vp); if(tag===0x920A){ const p=t+u32(vp); out.fmm=u32(p)/u32(p+4); } });
+      return out; }
+    if((m&0xFF00)!==0xFF00) break; o+=2+len; }
+  return out; }
+
+/* ---------- photo canvas ---------- */
+function fit(){ if(!IM) return; const r=cv.getBoundingClientRect(); view.s=Math.min(r.width/IM.width,r.height/IM.height); view.x=(r.width-IM.width*view.s)/2; view.y=(r.height-IM.height*view.s)/2; draw(); }
+function resize(){ const r=cv.getBoundingClientRect(), d=devicePixelRatio||1; cv.width=r.width*d; cv.height=r.height*d; draw(); }
+const i2s=(x,y)=>[x*view.s+view.x,y*view.s+view.y], s2i=(x,y)=>[(x-view.x)/view.s,(y-view.y)/view.s];
+function draw(){ const d=devicePixelRatio||1; g.setTransform(d,0,0,d,0,0); g.fillStyle='#05070a'; g.fillRect(0,0,cv.width,cv.height); if(!IM) return;
+  g.drawImage(IM,view.x,view.y,IM.width*view.s,IM.height*view.s);
+  if(SOL){ g.font='12px system-ui'; const named=new Set(taps.map(t=>t.id)); let n=0;      // where other known rooftops should be: a check on the fix
+    for(const L of LMS){ if(named.has(L.id)||n>14) continue; const p=PG.expectedPixel(SOL,L); if(!p||p.x<0||p.y<0||p.x>IM.width||p.y>IM.height||p.el<1.5) continue; n++;
+      const [a,b]=i2s(p.x,p.y); g.strokeStyle='rgba(60,255,160,.9)'; g.beginPath(); g.moveTo(a-7,b); g.lineTo(a+7,b); g.moveTo(a,b); g.lineTo(a,b+16); g.stroke(); g.fillStyle='rgba(60,255,160,.95)'; g.fillText(L.name.slice(0,22),a+5,b-4); } }
+  taps.forEach((t,i)=>{ const [a,b]=i2s(t.x,t.y); g.strokeStyle='#ffb020'; g.lineWidth=2; g.beginPath(); g.moveTo(a-14,b); g.lineTo(a+14,b); g.moveTo(a,b-14); g.lineTo(a,b+14); g.stroke();
+    g.fillStyle='#ffb020'; g.font='bold 14px system-ui'; g.fillText(`${i+1} ${LM[t.id].name.slice(0,26)}`,a+8,b-8); }); }
+let ptr=null, moved=false;
+cv.onpointerdown=e=>{ptr=[e.clientX,e.clientY]; moved=false; cv.setPointerCapture(e.pointerId);};
+cv.onpointermove=e=>{ if(!ptr) return; const dx=e.clientX-ptr[0], dy=e.clientY-ptr[1]; if(Math.abs(dx)+Math.abs(dy)>8) moved=true; if(moved){ view.x+=dx; view.y+=dy; ptr=[e.clientX,e.clientY]; draw(); } };
+cv.onpointerup=e=>{ const was=ptr; ptr=null; if(moved||!was||!IM) return; const r=cv.getBoundingClientRect(); const [x,y]=s2i(e.clientX-r.left,e.clientY-r.top); if(x<0||y<0||x>IM.width||y>IM.height) return;
+  if(moveIdx!==null){ taps[moveIdx].x=x; taps[moveIdx].y=y; moveIdx=null; afterTaps(); return; } pending={x,y}; openSheet(); };
+function zoomAt(k){ const r=cv.getBoundingClientRect(), cx=r.width/2, cy=r.height/2; view.x=cx-(cx-view.x)*k; view.y=cy-(cy-view.y)*k; view.s*=k; draw(); }
+$('zin').onclick=()=>zoomAt(1.6); $('zout').onclick=()=>zoomAt(1/1.6); $('zfit').onclick=fit;
+
+$('cap').onchange=async e=>{ const f=e.target.files[0]; if(!f) return; try{ EXIF=readExif(await f.arrayBuffer()); }catch(_){ EXIF={}; }
+  const im=new Image(); im.onload=()=>{ const L=Math.max(im.naturalWidth,im.naturalHeight), k=Math.min(1,2400/L), c=document.createElement('canvas'); c.width=Math.round(im.naturalWidth*k); c.height=Math.round(im.naturalHeight*k);
+      c.getContext('2d').drawImage(im,0,0,c.width,c.height); IM=c; taps=[]; SOL=null; $('cvbox').style.display='block'; resize(); fit(); renderTaps();
+      const lens=PG.focalPx(IM.width,IM.height,EXIF.f35); $('lensinfo').textContent=`${IM.width}×${IM.height} · ${EXIF.model||'camera'} · ${lens.how}`; hint('tap the TOP of a building you recognise'); };
+  im.onerror=()=>alert('Could not read that image. If it is HEIC, set Camera → Formats → Most Compatible, or shoot through this button.'); im.src=URL.createObjectURL(f); };
+document.querySelectorAll('.face').forEach(b=>b.onclick=()=>{ const on=!b.classList.contains('on'); document.querySelectorAll('.face').forEach(x=>x.classList.remove('on')); if(on) b.classList.add('on'); facing=on?+b.dataset.h:null; if(FIX&&FIX.src==='manual'){ FIX.heading=facing; drawMap(); } });
+
+/* ---------- naming a tap: rank landmarks by where they should appear ---------- */
+function ranked(x,y){ const P0=FIX||{lat:CENTER[0],lon:CENTER[1]}, h0=FIX&&FIX.h_asl||32, f=PG.focalPx(IM.width,IM.height,EXIF.f35).f, [az,el]=PG.azEl(x,y,IM.width,IM.height,f,0);
+  const loc=PG.Local(P0.lat,P0.lon), anchor=taps[0], used=new Set(taps.map(t=>t.id));
+  let aAz=null,aEl=null,aBrg=null,aApp=null; if(anchor){ [aAz,aEl]=PG.azEl(anchor.x,anchor.y,IM.width,IM.height,f,0); const A=LM[anchor.id], q=loc.en(A.lat,A.lon); aBrg=Math.atan2(q[0],q[1]); aApp=Math.atan2(A.top_asl_m-h0,Math.hypot(q[0],q[1]))*PG.R2D; }
+  return LMS.filter(l=>!used.has(l.id)).map(l=>{ const q=loc.en(l.lat,l.lon), d=Math.hypot(q[0],q[1]), brg=Math.atan2(q[0],q[1]), app=Math.atan2(l.top_asl_m-h0,d)*PG.R2D; let sc;
+    if(anchor) sc=Math.abs(PG.wrap((brg-aBrg)-(az-aAz)))*PG.R2D + 0.6*Math.abs((app-aApp)-(el-aEl)*PG.R2D);   // angle from the first named rooftop, plus relative height in frame
+    else if(facing!==null){ const err=Math.abs(PG.wrap(brg-facing*PG.D2R-az))*PG.R2D; sc=(err<=35?0:2*err)+(30-app); }   // facing is only +-30 deg: prefer what stands tallest in that sector
+    else sc=30-app;
+    return {l,sc:sc+(app<1?40:0)+(l.named?-1.5:0),d,brg:(brg*PG.R2D+360)%360,app}; }).sort((a,b)=>a.sc-b.sc); }
+function openSheet(idx){ $('sheet').style.display='block'; $('q').value=''; $('sheet').dataset.idx=idx??''; renderOpts(); }
+function renderOpts(){ const q=$('q').value.toLowerCase(), idx=$('sheet').dataset.idx; const p=idx!==''?taps[+idx]:pending; let R=ranked(p.x,p.y);
+  if(q) R=R.filter(r=>r.l.name.toLowerCase().includes(q)||(r.l.addr||'').toLowerCase().includes(q));
+  const card=b=>['N','NE','E','SE','S','SW','W','NW'][Math.round(b/45)%8];
+  $('opts').innerHTML=R.slice(0,40).map(r=>`<div class="opt" data-id="${r.l.id}"><b>${r.l.name}</b><span class="mut">${r.l.top_height_m.toFixed(0)} m tall${r.l.floors?' · '+(+r.l.floors).toFixed(0)+' fl':''} · ${Math.round(r.d)} m to the ${card(r.brg)}</span></div>`).join('')||'<div class="mut">no match</div>'; }
+$('q').oninput=renderOpts; $('sx').onclick=()=>{$('sheet').style.display='none'; pending=null;};
+$('opts').onclick=e=>{ const o=e.target.closest('.opt'); if(!o) return; const idx=$('sheet').dataset.idx;
+  if(idx!=='') taps[+idx].id=o.dataset.id; else if(pending){ taps.push({x:pending.x,y:pending.y,id:o.dataset.id,top:true}); pending=null; }
+  $('sheet').style.display='none'; afterTaps(); };
+function renderTaps(){ $('taps').innerHTML=taps.map((t,i)=>`<div class="tap"><b>${i+1}</b><span style="flex:1">${LM[t.id].name} <span class="mut">${LM[t.id].top_height_m.toFixed(0)} m</span></span>
+  <button onclick="openSheet(${i})">rename</button><button onclick="moveIdx=${i};hint('tap the new position')">move</button><button onclick="taps.splice(${i},1);afterTaps()">✕</button></div>`).join('')+
+  (IM&&taps.length<3?`<div class="mut" style="margin-top:6px">${3-taps.length} more to go. Spread them left-to-right across the frame.</div>`:''); }
+function afterTaps(){ renderTaps(); SOL=null; if(taps.length>=3) solve(); else { hint(taps.length?'next rooftop: the list is now ranked from the first one':'tap the TOP of a building'); draw(); } }
+
+/* ---------- solve ---------- */
+function groundAt(lat,lon){ let best=null,bd=1e9; for(const b of BLD){ const d=PG.haversine(lat,lon,b.c[0],b.c[1]); if(d<bd){bd=d;best=b;} } return best?best.g:11; }
+function solve(){ try{ SOL=PG.solve(taps,LM,IM.width,IM.height,{f35:EXIF.f35,groundFn:groundAt});
+    FIX={lat:SOL.lat,lon:SOL.lon,ring:SOL.ring_m,heading:SOL.heading_deg,floor:SOL.height?SOL.height.floor_est:null,h_asl:SOL.height?SOL.height.h_asl_m:null,src:'photo'};
+    showRes(); hint('green ticks = where other rooftops should be; if they sit on real roofs the fix is good'); }
+  catch(e){ SOL=null; $('res').style.display='block'; $('resb').innerHTML='<span class="warn">'+e.message+'</span>'; }
+  draw(); drawMap(); updateGo(); }
+function nearestStreet(lat,lon){ let best=null,bd=1e9; if(!OSM) return null; for(const s of OSM.streets){ if(!s.name) continue; for(const p of s.pts){ const d=PG.haversine(lat,lon,p[0],p[1]); if(d<bd){bd=d;best=s.name;} } } return best&&{name:best,d:bd}; }
+function insideWhich(lat,lon){ for(const b of BLD){ if(b.d>400) break; let ins=false; const r=b.ring; for(let i=0,j=r.length-1;i<r.length;j=i++){ if((r[i][0]>lat)!==(r[j][0]>lat) && lon<(r[j][1]-r[i][1])*(lat-r[i][0])/(r[j][0]-r[i][0])+r[i][1]) ins=!ins; } if(ins) return b; } return null; }
+function showRes(){ const s=SOL, h=s.height, b=insideWhich(s.lat,s.lon), st=nearestStreet(s.lat,s.lon), dv=PG.haversine(s.lat,s.lon,CENTER[0],CENTER[1]);
+  $('res').style.display='block';
+  $('resb').innerHTML=`<div class="big">${s.lat.toFixed(5)}, ${s.lon.toFixed(5)}</div><div>ring ±${isFinite(s.ring_m)?s.ring_m.toFixed(0):'∞'} m <span class="mut">(each angle ±0.5°)</span> · ${b?('inside <b>'+(b.addr||'BIN '+b.bin)+'</b>'):'not inside a footprint'}</div>
+  ${s.warnings.map(w=>`<div class="warn">⚠ ${w}</div>`).join('')}
+  <table style="margin-top:6px">
+  <tr><td>facing</td><td class="n"><b>${s.heading_deg.toFixed(0)}°</b></td></tr>
+  ${h?`<tr><td>height / floor</td><td class="n"><b>~floor ${h.floor_est}</b> <span class="mut">${h.above_street_m.toFixed(0)} m above street, ${h.m_per_floor} m per floor; rooftops agree to ${h.spread_m} m</span></td></tr>`:''}
+  <tr><td>camera tilt</td><td class="n mut">${s.pitch_how}</td></tr>
+  <tr><td>nearest street</td><td class="n">${st?st.name+' <span class="mut">'+Math.round(st.d)+' m</span>':'—'}</td></tr>
+  <tr><td>vs 285 Jay St address point</td><td class="n">${dv.toFixed(0)} m</td></tr>
+  <tr><td>lens</td><td class="n mut">${s.lens.how}; HFOV ${s.lens.hfov_long_deg}°</td></tr></table>
+  <div class="mut" style="margin-top:4px">${s.landmarks.map(l=>`${l.name}: ${l.bearing_deg.toFixed(0)}°, ${l.dist_m} m`).join(' · ')}</div>`; }
+
+/* ---------- map ---------- */
+const mc=$('map'), mg=mc.getContext('2d'), MX=20037508.342789244;
+const merc=(lat,lon)=>[lon*MX/180, Math.log(Math.tan(Math.PI/4+lat*Math.PI/360))*MX/Math.PI];
+const unmerc=(x,y)=>[(2*Math.atan(Math.exp(y*Math.PI/MX))-Math.PI/2)*180/Math.PI, x*180/MX];
+function mapGeom(){ const m=SAT[mapMode], W=mc.clientWidth, bb=m.merc_bbox; return {m,W,bb,P:(lat,lon)=>{const [x,y]=merc(lat,lon); return [(x-bb[0])/(bb[2]-bb[0])*W,(bb[3]-y)/(bb[3]-bb[1])*W];}, mpp:m.ground_m_per_px*m.px/W}; }
+function drawMap(){ if(!SAT) return; const d=devicePixelRatio||1, W=mc.clientWidth; mc.style.height=W+'px'; mc.width=W*d; mc.height=W*d; mg.setTransform(d,0,0,d,0,0);
+  const G=mapGeom(), P=G.P; mg.fillStyle='#0b0d10'; mg.fillRect(0,0,W,W); const img=SATIMG[mapMode]; if(img&&img.complete&&img.naturalWidth) mg.drawImage(img,0,0,W,W);
+  if(showFp||!(img&&img.complete&&img.naturalWidth)){ mg.strokeStyle='rgba(60,255,160,.85)'; mg.lineWidth=1; for(const b of BLD){ if(b.d>1100) continue; mg.beginPath(); b.ring.forEach((p,i)=>{const [x,y]=P(p[0],p[1]); i?mg.lineTo(x,y):mg.moveTo(x,y);}); mg.stroke(); } }
+  if(OSM){ mg.font='bold 12px system-ui'; const seen={}; for(const s of OSM.streets){ if(!s.name||['footway','steps','service','cycleway','path'].includes(s.kind)) continue; const m=s.pts[Math.floor(s.pts.length/2)], [x,y]=P(m[0],m[1]), k=s.name+Math.round(x/110)+'_'+Math.round(y/110);
+      if(seen[k]||x<4||y<12||x>W-60||y>W-4) continue; seen[k]=1; const t=s.name.replace(' Street',' St').replace(' Place',' Pl').replace(' Avenue',' Av'); mg.strokeStyle='rgba(0,0,0,.85)'; mg.lineWidth=3; mg.strokeText(t,x,y); mg.fillStyle='#ffe08a'; mg.fillText(t,x,y); }
+    for(const c of OSM.corners){ const [x,y]=P(c.lat,c.lon); mg.fillStyle='#3cc8ff'; mg.fillRect(x-4,y-4,8,8); } }
+  if(SOL) for(const l of SOL.landmarks){ const L=LM[l.id], [a,b]=P(L.lat,L.lon), [x,y]=P(FIX.lat,FIX.lon); mg.strokeStyle='rgba(255,176,32,.8)'; mg.lineWidth=1.5; mg.beginPath(); mg.moveTo(x,y); mg.lineTo(a,b); mg.stroke(); }
+  if(FIX){ const [x,y]=P(FIX.lat,FIX.lon);
+    if(DEST){ const [a,b]=P(DEST.lat,DEST.lon); mg.strokeStyle='#3fb950'; mg.lineWidth=3; mg.setLineDash([7,5]); mg.beginPath(); mg.moveTo(x,y); mg.lineTo(a,b); mg.stroke(); mg.setLineDash([]); }
+    mg.strokeStyle='#ff3b5c'; mg.lineWidth=2; mg.beginPath(); mg.arc(x,y,Math.max(5,Math.min(FIX.ring||0,2000)/G.mpp),0,7); mg.stroke(); mg.fillStyle='#ff3b5c'; mg.beginPath(); mg.arc(x,y,5,0,7); mg.fill();
+    if(typeof FIX.heading==='number'){ const hr=FIX.heading*Math.PI/180; mg.strokeStyle='#fff'; mg.lineWidth=2.5; mg.beginPath(); mg.moveTo(x,y); mg.lineTo(x+46*Math.sin(hr),y-46*Math.cos(hr)); mg.stroke(); } }
+  if(DEST){ const [a,b]=P(DEST.lat,DEST.lon); mg.fillStyle='#3fb950'; mg.beginPath(); mg.arc(a,b,8,0,7); mg.fill(); mg.strokeStyle='#000'; mg.lineWidth=2; mg.stroke(); }
+  $('mapsrc').textContent=`· ${Math.round(G.m.ground_m_per_px*G.m.px)} m across, north up`; }
+mc.onclick=e=>{ if(!SAT) return; const r=mc.getBoundingClientRect(), G=mapGeom(), bb=G.bb, fx=(e.clientX-r.left)/r.width, fy=(e.clientY-r.top)/r.height; const [lat,lon]=unmerc(bb[0]+fx*(bb[2]-bb[0]), bb[3]-fy*(bb[3]-bb[1]));
+  if(tapSets==='pos'){ FIX={lat,lon,ring:10,heading:facing,floor:null,src:'manual'}; SOL=null; $('res').style.display='block'; const b=insideWhich(lat,lon); $('resb').innerHTML=`<div class="big">${lat.toFixed(5)}, ${lon.toFixed(5)}</div><div class="mut">set by hand on the map${b?' · inside '+(b.addr||'BIN '+b.bin):''}${facing===null?' · pick which way the window faces for a heading':''}</div>`; }
+  else { let near=null, nd=25; for(const o of DESTS){ const d=PG.haversine(lat,lon,o.lat,o.lon); if(d<nd){nd=d;near=o;} } DEST=near||{name:'Map pin',lat,lon}; $('dsel').value=near?DESTS.indexOf(near):''; }
+  drawMap(); updateGo(); };
+const setMode=m=>{ mapMode=m; $('mBlock').classList.toggle('on',m==='sat_block'); $('mArea').classList.toggle('on',m==='sat_area'); loadSat(m); drawMap(); };
+$('mBlock').onclick=()=>setMode('sat_block'); $('mArea').onclick=()=>setMode('sat_area'); $('mFp').onclick=()=>{ showFp=!showFp; $('mFp').classList.toggle('on',showFp); drawMap(); };
+$('tDest').onclick=()=>{ tapSets='dest'; $('tDest').classList.add('on'); $('tPos').classList.remove('on'); }; $('tPos').onclick=()=>{ tapSets='pos'; $('tPos').classList.add('on'); $('tDest').classList.remove('on'); };
+function loadSat(m){ if(SATIMG[m]) return; const i=new Image(); i.onload=drawMap; i.src='pack/'+SAT[m].file; SATIMG[m]=i; }
+
+/* ---------- destination + go ---------- */
+let DESTS=[];
+function buildDests(){ const keep=['subway_entrance','station','cafe','restaurant','fast_food','park','library','university','college','school','hotel','courthouse','bank','convenience','supermarket','pharmacy','bicycle_rental','place_of_worship','events_venue'];
+  const pl=OSM.places.filter(p=>p.name&&keep.includes(p.kind)).map(p=>({...p,d:PG.haversine(CENTER[0],CENTER[1],p.lat,p.lon)})).filter(p=>p.d<650).sort((a,b)=>a.d-b.d);
+  const seen=new Set(); DESTS=[...OSM.corners.map(c=>({...c,grp:'Block corners'})), ...pl.filter(p=>{ const k=p.name+'|'+Math.round(p.d/40); if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,120).map(p=>({...p,name:p.name+(p.kind==='subway_entrance'&&p.ref?' '+p.ref:''),grp:'Nearby (OSM)'})),
+    ...LMS.filter(l=>l.named).map(l=>({name:l.name,lat:l.lat,lon:l.lon,grp:'Towers'}))];
+  let html='<option value="">Destination… (or tap the map)</option>', grp=null; DESTS.forEach((d,i)=>{ if(d.grp!==grp){ if(grp) html+='</optgroup>'; grp=d.grp; html+=`<optgroup label="${grp}">`; } html+=`<option value="${i}">${d.name}${d.d?' · '+Math.round(d.d)+' m':''}</option>`; }); $('dsel').innerHTML=html+'</optgroup>'; }
+$('dsel').onchange=e=>{ DEST=e.target.value===''?null:DESTS[+e.target.value]; drawMap(); updateGo(); };
+function updateGo(){ if(!FIX||!DEST){ $('goinfo').innerHTML=`<span class="mut">${FIX?'pick a destination':'get a fix first (photo, or set "My position" on the map)'}</span>`; return; }
+  const brg=PG.bearingLL(FIX.lat,FIX.lon,DEST.lat,DEST.lon), d=PG.haversine(FIX.lat,FIX.lon,DEST.lat,DEST.lon), card=['N','NE','E','SE','S','SW','W','NW'][Math.round(brg/45)%8];
+  let turn=''; if(typeof FIX.heading==='number'){ const rel=PG.wrap180(brg-FIX.heading); turn=Math.abs(rel)<20?' · straight ahead of the photo view':` · ${Math.abs(rel).toFixed(0)}° ${rel>0?'right':'left'} of the photo view`; }
+  $('goinfo').innerHTML=`<div class="big">${Math.round(d)} m · ${brg.toFixed(0)}° ${card}</div><div>${DEST.name}<span class="mut">${turn}</span></div>`; }
+$('go').onclick=async()=>{ if(!FIX||!DEST){ updateGo(); return; } $('syncinfo').textContent='sending…';
+  const st=await PGSync.publish({fix:{lat:FIX.lat,lon:FIX.lon,ring:FIX.ring,heading:FIX.heading,floor:FIX.floor,src:FIX.src},dest:{name:DEST.name,lat:DEST.lat,lon:DEST.lon}});
+  $('syncinfo').textContent=`sent to room "${PGSync.ROOM}" · app relay ${st.api?'✔':'✘'} · ntfy relay ${st.ntfy?'✔':'✘'}${!st.api&&!st.ntfy?' · no relay reachable: glasses on another device will not get it':''}`; };
+
+/* ---------- boot ---------- */
+(async()=>{ const J=u=>fetch(u).then(r=>r.json()); SAT=await J('pack/sat.json'); loadSat('sat_block'); drawMap();
+  const [l,b,o]=await Promise.all([J('pack/landmarks.json'),J('pack/buildings.json'),J('pack/osm.json')]); LMS=l.landmarks; LMS.forEach(x=>LM[x.id]=x); BLD=b.buildings; OSM=o; buildDests(); drawMap(); updateGo();
+  addEventListener('resize',()=>{ if(IM){resize();fit();} drawMap(); }); })();
+</script></body></html>

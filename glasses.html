@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=600, height=600, initial-scale=1">
+<title>Point & Go</title>
+<style>
+  html, body { margin: 0; padding: 0; width: 600px; height: 600px; background: #000; color: #fff;   /* black = transparent on waveguide */
+    font-family: -apple-system, system-ui, sans-serif; overflow: hidden; }
+  #arrowView { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding-bottom: 56px; }
+  #arrow { width: 250px; height: 250px; transition: transform .12s linear; }
+  #arrow path { fill: #fff; } #arrow.ahead path { fill: #3dff7a; } #arrow.lost path { fill: #555; }
+  #dist { font-size: 62px; font-weight: 700; letter-spacing: 1px; line-height: 1; }
+  #dest { font-size: 26px; color: #fff; max-width: 560px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #status { font-size: 24px; color: #aaa; min-height: 30px; } #status.ahead { color: #3dff7a; } #status.warn { color: #ffb84d; }
+  #hdg { position: absolute; top: 14px; left: 16px; font-size: 18px; color: #8a8a8a; }
+  #fixinfo { position: absolute; top: 14px; right: 16px; font-size: 18px; color: #8a8a8a; text-align: right; }
+  #map { position: absolute; inset: 0; width: 600px; height: 600px; display: none; }
+  #bar { position: absolute; bottom: 12px; left: 0; right: 0; display: flex; gap: 10px; justify-content: center; }
+  .focusable { background: none; border: 2px solid #444; color: #999; font-size: 18px; padding: 7px 14px; border-radius: 10px; }
+  .focusable:focus { border-color: #fff; color: #fff; outline: none; }
+</style>
+</head>
+<body>
+<div id="arrowView">
+  <svg id="arrow" class="lost" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 L86 56 L62 56 L62 96 L38 96 L38 56 L14 56 Z"/></svg>
+  <div id="dist">--</div>
+  <div id="dest"></div>
+  <div id="status" class="warn">Waiting for a fix from the phone…</div>
+</div>
+<canvas id="map" width="600" height="600"></canvas>
+<div id="hdg">HDG --</div>
+<div id="fixinfo"></div>
+<div id="bar">
+  <button id="bCal" class="focusable" tabindex="0">COMPASS</button>
+  <button id="bDest" class="focusable" tabindex="0">DEST ▸</button>
+  <button id="bMap" class="focusable" tabindex="0">MAP</button>
+</div>
+<script src="js/solver.js"></script>
+<script src="js/sync.js"></script>
+<script>
+/* Point & Go, glasses side. 600x600, black background, D-pad focus + Enter/pinch only.
+   Position comes from the phone's photo fix (no GPS). Heading: absolute compass if the device has one;
+   otherwise head-turn (relative) heading, zeroed to the photo's solved heading when the fix arrives
+   (you shot the photo facing that way) or when you press COMPASS while facing the same way.
+   ?demo=1 fakes a fix at 285 Jay St.   ?room=NAME pairs with a phone on the same room. */
+const $ = id => document.getElementById(id), params = new URLSearchParams(location.search);
+const AHEAD = 20, norm180 = PG.wrap180;
+let state = null, dests = [], destIdx = -1, mapOn = false, pack = null;
+let rawHeading = null, absolute = false, offset = 0, sensorsOn = false, lastOrient = 0, shown = 0;
+
+function onOrient(e) {
+  lastOrient = Date.now();
+  if (typeof e.webkitCompassHeading === 'number') { rawHeading = e.webkitCompassHeading; absolute = true; }
+  else if (e.absolute && typeof e.alpha === 'number') { rawHeading = (360 - e.alpha) % 360; absolute = true; }
+  else if (!absolute && typeof e.alpha === 'number') { rawHeading = (360 - e.alpha) % 360; }
+}
+const live = () => rawHeading !== null && Date.now() - lastOrient < 3000;
+const heading = () => !live() ? null : absolute ? rawHeading : (rawHeading + offset + 360) % 360;
+function zeroToFix() { if (state && live() && !absolute && typeof state.fix.heading === 'number') offset = state.fix.heading - rawHeading; }
+async function enableSensors() {
+  for (const Ev of [window.DeviceOrientationEvent, window.DeviceMotionEvent]) { try { if (Ev && typeof Ev.requestPermission === 'function') await Ev.requestPermission(); } catch (_) {} }
+  if (!sensorsOn) { addEventListener('deviceorientationabsolute', onOrient); addEventListener('deviceorientation', onOrient); sensorsOn = true; }
+}
+addEventListener('deviceorientationabsolute', onOrient); addEventListener('deviceorientation', onOrient);
+
+function onState(s) {
+  state = s; destIdx = -1; zeroToFix();
+  const t = new Date(s.t); $('fixinfo').innerHTML = `FIX ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')} ±${Math.round(s.fix.ring || 0)} m` + (s.fix.floor ? `<br>FLOOR ~${s.fix.floor}` : '');
+}
+const target = () => !state ? null : destIdx >= 0 ? dests[destIdx] : state.dest;
+
+function render() {
+  const d = target(), h = heading();
+  if (!state || !d) {
+    $('arrow').setAttribute('class', 'lost'); $('dist').textContent = '--'; $('dest').textContent = '';
+    $('status').textContent = state ? 'Pick a destination on the phone, or DEST ▸' : 'Waiting for a fix from the phone…'; $('status').className = 'warn';
+  } else {
+    const brg = PG.bearingLL(state.fix.lat, state.fix.lon, d.lat, d.lon), dist = PG.haversine(state.fix.lat, state.fix.lon, d.lat, d.lon);
+    const ref = h !== null ? h : (typeof state.fix.heading === 'number' ? state.fix.heading : 0), rel = norm180(brg - ref);
+    shown += norm180(rel - shown) * 0.35; $('arrow').style.transform = `rotate(${shown}deg)`;
+    const ahead = Math.abs(rel) <= AHEAD; $('arrow').setAttribute('class', ahead ? 'ahead' : '');
+    $('dist').textContent = dist >= 1000 ? (dist / 1000).toFixed(1) + ' km' : Math.round(dist) + ' m';
+    $('dest').textContent = d.name || '';
+    const card = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(brg / 45) % 8];
+    $('status').textContent = (ahead ? 'STRAIGHT AHEAD' : Math.abs(rel) > 150 ? 'TURN AROUND' : rel > 0 ? 'TURN RIGHT' : 'TURN LEFT') + ` · ${Math.round(brg)}° ${card}` + (h === null ? ' (from photo view)' : '');
+    $('status').className = ahead ? 'ahead' : '';
+  }
+  $('hdg').textContent = live() ? `HDG ${Math.round(heading())}°${absolute ? '' : ' rel'}` : sensorsOn ? 'HDG -- (no sensor)' : 'COMPASS to enable heading';
+  if (mapOn) drawMap();
+  requestAnimationFrame(render);
+}
+
+/* heading-up vector map of the block: streets + footprints from the offline pack, monochrome-friendly */
+async function loadPack() {
+  if (pack) return pack;
+  const [o, b] = await Promise.all([fetch('pack/osm.json').then(r => r.json()), fetch('pack/buildings.json').then(r => r.json())]);
+  pack = { streets: o.streets.filter(s => s.name && !['footway', 'steps', 'service', 'cycleway', 'path'].includes(s.kind)), bld: b.buildings.filter(x => x.d < 450), corners: o.corners, places: o.places };
+  return pack;
+}
+function drawMap() {
+  const cv = $('map'), g = cv.getContext('2d'); g.fillStyle = '#000'; g.fillRect(0, 0, 600, 600);
+  if (!pack || !state) return;
+  const loc = PG.Local(state.fix.lat, state.fix.lon), h = heading(), rot = -((h !== null ? h : state.fix.heading || 0) * PG.D2R), S = 1.25;   // px per metre
+  const P = (lat, lon) => { const [e, n] = loc.en(lat, lon), x = e * Math.cos(rot) - n * Math.sin(rot), y = e * Math.sin(rot) + n * Math.cos(rot); return [300 + x * S, 380 - y * S]; };
+  g.lineWidth = 1.5; g.strokeStyle = '#2f7d4c';
+  for (const b of pack.bld) { g.beginPath(); b.ring.forEach((p, i) => { const [x, y] = P(p[0], p[1]); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); }
+  g.strokeStyle = '#cfcfcf'; g.lineWidth = 2.5; const seen = {};
+  for (const s of pack.streets) {
+    g.beginPath(); s.pts.forEach((p, i) => { const [x, y] = P(p[0], p[1]); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+    const m = s.pts[Math.floor(s.pts.length / 2)], [x, y] = P(m[0], m[1]), k = s.name + Math.round(x / 150) + Math.round(y / 150);
+    if (!seen[k] && x > 30 && x < 520 && y > 60 && y < 520) { seen[k] = 1; g.fillStyle = '#fff'; g.font = '17px system-ui'; g.fillText(s.name.replace(' Street', ' St').replace(' Place', ' Pl').replace(' Avenue', ' Av'), x + 4, y - 4); }
+  }
+  const d = target();
+  if (d) { const [x, y] = P(d.lat, d.lon); g.strokeStyle = '#3dff7a'; g.lineWidth = 3; g.setLineDash([8, 6]); g.beginPath(); g.moveTo(300, 380); g.lineTo(x, y); g.stroke(); g.setLineDash([]); g.fillStyle = '#3dff7a'; g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill(); }
+  g.fillStyle = '#fff'; g.beginPath(); g.moveTo(300, 360); g.lineTo(313, 392); g.lineTo(300, 384); g.lineTo(287, 392); g.closePath(); g.fill();
+  g.strokeStyle = '#fff'; g.lineWidth = 1; g.beginPath(); g.arc(300, 380, Math.max(6, (state.fix.ring || 0) * S), 0, 7); g.stroke();
+}
+
+$('bCal').onclick = async () => { await enableSensors(); setTimeout(zeroToFix, 400); };
+$('bDest').onclick = async () => {
+  await loadPack(); if (!dests.length) dests = [...pack.corners, ...pack.places.filter(p => ['subway_entrance', 'station', 'cafe', 'park', 'library', 'university', 'hotel'].includes(p.kind) && p.name && state && PG.haversine(state.fix.lat, state.fix.lon, p.lat, p.lon) < 450).slice(0, 14)];
+  destIdx = (destIdx + 1) % dests.length;
+};
+$('bMap').onclick = async () => { await loadPack(); mapOn = !mapOn; $('map').style.display = mapOn ? 'block' : 'none'; $('arrowView').style.display = mapOn ? 'none' : 'flex'; $('bMap').textContent = mapOn ? 'ARROW' : 'MAP'; };
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.activeElement && document.activeElement.click && document.activeElement.tagName !== 'BUTTON') $('bCal').click(); });
+$('bCal').focus();
+
+if (params.get('demo') === '1') onState({ t: Date.now(), fix: { lat: 40.695496, lon: -73.986565, ring: 15, heading: 0, floor: 4 }, dest: { name: 'Jay & Tillary (NW corner)', lat: 40.696132, lon: -73.987103 } });
+PGSync.subscribe(onState);
+render();
+</script>
+</body>
+</html>
