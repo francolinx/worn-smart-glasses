@@ -8,6 +8,9 @@ and Tech Place to the south (OpenStreetMap's name for the former Johnson St alig
 
 ## Run it
 
+**Live (GitHub Pages, `gh-pages` branch = `web/`):** phone https://francolinx.github.io/worn-smart-glasses/ · glasses https://francolinx.github.io/worn-smart-glasses/glasses.html
+Pages has no relay function, so the hand-off there runs over the ntfy.sh topic only.
+
 Everything in `web/` is static and solves in the browser. Host `web/` at any HTTPS URL.
 
 | Page | Device | What it does |
