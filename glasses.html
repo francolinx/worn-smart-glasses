@@ -11,7 +11,7 @@
   #arrow { width: 250px; height: 250px; transition: transform .12s linear; }
   #arrow path { fill: #fff; } #arrow.ahead path { fill: #3dff7a; } #arrow.lost path { fill: #555; }
   #dist { font-size: 62px; font-weight: 700; letter-spacing: 1px; line-height: 1; }
-  #dest { font-size: 26px; color: #fff; max-width: 560px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #dest { font-size: 24px; color: #fff; max-width: 560px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #status { font-size: 24px; color: #aaa; min-height: 30px; } #status.ahead { color: #3dff7a; } #status.warn { color: #ffb84d; }
   #hdg { position: absolute; top: 14px; left: 16px; font-size: 18px; color: #8a8a8a; }
   #fixinfo { position: absolute; top: 14px; right: 16px; font-size: 18px; color: #8a8a8a; text-align: right; }
@@ -72,6 +72,7 @@ function onState(s) {
   const t = new Date(s.t); $('fixinfo').innerHTML = `FIX ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')} ±${Math.round(s.fix.ring || 0)} m` + (s.fix.floor ? `<br>FLOOR ~${s.fix.floor}` : '');
 }
 const target = () => !state ? null : destIdx >= 0 ? dests[destIdx] : state.dest;
+const route = () => state && state.route && destIdx < 0 ? state.route : null;      // corridor route from the phone; cycling DEST here drops back to a straight line
 
 function render() {
   const d = target(), h = heading();
@@ -79,12 +80,13 @@ function render() {
     $('arrow').setAttribute('class', 'lost'); $('dist').textContent = '--'; $('dest').textContent = '';
     $('status').textContent = state ? 'Pick a destination on the phone, or DEST ▸' : 'Waiting for a fix from the phone…'; $('status').className = 'warn';
   } else {
-    const brg = PG.bearingLL(state.fix.lat, state.fix.lon, d.lat, d.lon), dist = PG.haversine(state.fix.lat, state.fix.lon, d.lat, d.lon);
+    const R = route(), aim = R && R.pts.length > 1 ? R.pts[1] : d;                  // arrow points down the first leg of the route
+    const brg = PG.bearingLL(state.fix.lat, state.fix.lon, aim.lat, aim.lon), dist = R ? R.total : PG.haversine(state.fix.lat, state.fix.lon, d.lat, d.lon);
     const ref = h !== null ? h : (typeof state.fix.heading === 'number' ? state.fix.heading : 0), rel = norm180(brg - ref);
     shown += norm180(rel - shown) * 0.35; $('arrow').style.transform = `rotate(${shown}deg)`;
     const ahead = Math.abs(rel) <= AHEAD; $('arrow').setAttribute('class', ahead ? 'ahead' : '');
     $('dist').textContent = dist >= 1000 ? (dist / 1000).toFixed(1) + ' km' : Math.round(dist) + ' m';
-    $('dest').textContent = d.name || '';
+    $('dest').textContent = (d.name || '') + (R && R.steps.length > 1 ? ` · then ${R.steps[1].turn} after ${R.steps[0].m} m` : '');
     const card = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(brg / 45) % 8];
     $('status').textContent = (ahead ? 'STRAIGHT AHEAD' : Math.abs(rel) > 150 ? 'TURN AROUND' : rel > 0 ? 'TURN RIGHT' : 'TURN LEFT') + (state.fix.indoor ? '' : ` · ${Math.round(brg)}° ${card}`) + (h === null ? ' (from photo view)' : '');
     $('status').className = ahead ? 'ahead' : '';
@@ -116,7 +118,9 @@ function drawMap() {
     if (!seen[k] && x > 30 && x < 520 && y > 60 && y < 520) { seen[k] = 1; g.fillStyle = '#fff'; g.font = '17px system-ui'; g.fillText(s.name.replace(' Street', ' St').replace(' Place', ' Pl').replace(' Avenue', ' Av'), x + 4, y - 4); }
   }
   const d = target();
-  if (d) { const [x, y] = P(d.lat, d.lon); g.strokeStyle = '#3dff7a'; g.lineWidth = 3; g.setLineDash([8, 6]); g.beginPath(); g.moveTo(300, 380); g.lineTo(x, y); g.stroke(); g.setLineDash([]); g.fillStyle = '#3dff7a'; g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill(); }
+  const RT = route();
+  if (d && RT) { g.strokeStyle = '#3dff7a'; g.lineWidth = 5; g.lineJoin = 'round'; g.beginPath(); RT.pts.forEach((q, i) => { const [x, y] = P(q.lat, q.lon); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); }
+  if (d) { const [x, y] = P(d.lat, d.lon); if (!RT) { g.strokeStyle = '#3dff7a'; g.lineWidth = 3; g.setLineDash([8, 6]); g.beginPath(); g.moveTo(300, 380); g.lineTo(x, y); g.stroke(); g.setLineDash([]); } g.fillStyle = '#3dff7a'; g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill(); }
   g.fillStyle = '#fff'; g.beginPath(); g.moveTo(300, 360); g.lineTo(313, 392); g.lineTo(300, 384); g.lineTo(287, 392); g.closePath(); g.fill();
   g.strokeStyle = '#fff'; g.lineWidth = 1; g.beginPath(); g.arc(300, 380, Math.max(6, (state.fix.ring || 0) * S), 0, 7); g.stroke();
 }
