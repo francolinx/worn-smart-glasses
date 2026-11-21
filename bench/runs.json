@@ -2,7 +2,7 @@
  {
   "n": 1,
   "start": "S2 Information desk / turnstiles",
-  "dest": "Women's restroom (corridor)",
+  "dest": "A 106",
   "legs": [
    {
     "station": "S2 Information desk / turnstiles",
@@ -13,32 +13,32 @@
       "ms": null
      },
      {
-      "photo": 12,
+      "photo": 14,
       "matched": true,
-      "ms": 2876,
-      "conf": "high",
-      "inl": 61,
+      "ms": 2662,
+      "conf": "medium",
+      "inl": 19,
       "pos_err": 0.0,
-      "hdg_err": 8.2
+      "hdg_err": -1.3
      }
     ],
     "fix": {
-     "photo": 12,
+     "photo": 14,
      "matched": true,
-     "ms": 2876,
-     "conf": "high",
-     "inl": 61,
+     "ms": 2662,
+     "conf": "medium",
+     "inl": 19,
      "pos_err": 0.0,
-     "hdg_err": 8.2
+     "hdg_err": -1.3
     },
-    "route": "BEAR LEFT 5 m \u2192 BEAR RIGHT 15 m",
-    "total": 21,
+    "route": "LEFT 5 m \u2192 BEAR RIGHT 23 m \u2192 LEFT 11 m",
+    "total": 39,
     "via": null,
-    "first": "BEAR LEFT",
-    "true_first": "BEAR LEFT",
+    "first": "LEFT",
+    "true_first": "LEFT",
     "instr_ok": true,
     "good": true,
-    "dest": "Women's restroom (corridor)",
+    "dest": "A 106",
     "img": "m01_l1"
    }
   ],
@@ -47,6 +47,230 @@
  },
  {
   "n": 2,
+  "start": "S9 A 105 south-east corner (south door)",
+  "dest": "Information desk",
+  "legs": [
+   {
+    "station": "S9 A 105 south-east corner (south door)",
+    "shots": [
+     {
+      "photo": 66,
+      "matched": true,
+      "ms": 915,
+      "conf": "high",
+      "inl": 26,
+      "pos_err": 0.0,
+      "hdg_err": 3.0
+     }
+    ],
+    "fix": {
+     "photo": 66,
+     "matched": true,
+     "ms": 915,
+     "conf": "high",
+     "inl": 26,
+     "pos_err": 0.0,
+     "hdg_err": 3.0
+    },
+    "route": "AHEAD 2 m \u2192 LEFT 17 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "total": 19,
+    "via": "Door A 105 (north)",
+    "first": "AHEAD",
+    "true_first": "AHEAD",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Information desk",
+    "img": "m02_l1"
+   },
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 33,
+      "matched": true,
+      "ms": 524,
+      "conf": "high",
+      "inl": 32,
+      "pos_err": 0.0,
+      "hdg_err": 3.5
+     }
+    ],
+    "fix": {
+     "photo": 33,
+     "matched": true,
+     "ms": 524,
+     "conf": "high",
+     "inl": 32,
+     "pos_err": 0.0,
+     "hdg_err": 3.5
+    },
+    "route": "BEAR LEFT 11 m \u2192 BEAR LEFT 5 m \u2192 BEAR RIGHT 2 m",
+    "total": 19,
+    "via": null,
+    "first": "BEAR LEFT",
+    "true_first": "BEAR LEFT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Information desk",
+    "img": "m02_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 3,
+  "start": "S2 Information desk / turnstiles",
+  "dest": "South cabinets",
+  "legs": [
+   {
+    "station": "S2 Information desk / turnstiles",
+    "shots": [
+     {
+      "photo": 10,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 8,
+      "matched": true,
+      "ms": 2952,
+      "conf": "high",
+      "inl": 60,
+      "pos_err": 0.0,
+      "hdg_err": 19.5
+     }
+    ],
+    "fix": {
+     "photo": 8,
+     "matched": true,
+     "ms": 2952,
+     "conf": "high",
+     "inl": 60,
+     "pos_err": 0.0,
+     "hdg_err": 19.5
+    },
+    "route": "RIGHT 5 m \u2192 BEAR RIGHT 31 m \u2192 RIGHT 2 m \u2192 THROUGH DOOR A 105 (SOUTH), THEN SHOOT AGAIN",
+    "total": 39,
+    "via": "Door A 105 (south)",
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "South cabinets",
+    "img": "m03_l1"
+   },
+   {
+    "station": "S9 A 105 south-east corner (south door)",
+    "shots": [
+     {
+      "photo": 71,
+      "matched": true,
+      "ms": 2673,
+      "conf": "high",
+      "inl": 26,
+      "pos_err": 0.0,
+      "hdg_err": -6.0
+     }
+    ],
+    "fix": {
+     "photo": 71,
+     "matched": true,
+     "ms": 2673,
+     "conf": "high",
+     "inl": 26,
+     "pos_err": 0.0,
+     "hdg_err": -6.0
+    },
+    "route": "TURN AROUND 2 m \u2192 RIGHT 7 m",
+    "total": 9,
+    "via": null,
+    "first": "TURN AROUND",
+    "true_first": "TURN AROUND",
+    "instr_ok": true,
+    "good": true,
+    "dest": "South cabinets",
+    "img": "m03_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 4,
+  "start": "S7 A 105 north-west corner (windows)",
+  "dest": "A 106",
+  "legs": [
+   {
+    "station": "S7 A 105 north-west corner (windows)",
+    "shots": [
+     {
+      "photo": 50,
+      "matched": true,
+      "ms": 2823,
+      "conf": "medium",
+      "inl": 23,
+      "pos_err": 0.0,
+      "hdg_err": -16.6
+     }
+    ],
+    "fix": {
+     "photo": 50,
+     "matched": true,
+     "ms": 2823,
+     "conf": "medium",
+     "inl": 23,
+     "pos_err": 0.0,
+     "hdg_err": -16.6
+    },
+    "route": "AHEAD 13 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "total": 13,
+    "via": "Door A 105 (north)",
+    "first": "AHEAD",
+    "true_first": "AHEAD",
+    "instr_ok": true,
+    "good": true,
+    "dest": "A 106",
+    "img": "m04_l1"
+   },
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 37,
+      "matched": true,
+      "ms": 1639,
+      "conf": "high",
+      "inl": 41,
+      "pos_err": 0.0,
+      "hdg_err": -3.8
+     }
+    ],
+    "fix": {
+     "photo": 37,
+     "matched": true,
+     "ms": 1639,
+     "conf": "high",
+     "inl": 41,
+     "pos_err": 0.0,
+     "hdg_err": -3.8
+    },
+    "route": "BEAR LEFT 12 m \u2192 LEFT 11 m",
+    "total": 23,
+    "via": null,
+    "first": "BEAR LEFT",
+    "true_first": "BEAR LEFT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "A 106",
+    "img": "m04_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 5,
   "start": "S7 A 105 north-west corner (windows)",
   "dest": "Exit Stair E (by corridor doors)",
   "legs": [
@@ -56,21 +280,21 @@
      {
       "photo": 53,
       "matched": true,
-      "ms": 2128,
+      "ms": 2380,
       "conf": "high",
-      "inl": 87,
+      "inl": 38,
       "pos_err": 0.0,
-      "hdg_err": -1.2
+      "hdg_err": 3.9
      }
     ],
     "fix": {
      "photo": 53,
      "matched": true,
-     "ms": 2128,
+     "ms": 2380,
      "conf": "high",
-     "inl": 87,
+     "inl": 38,
      "pos_err": 0.0,
-     "hdg_err": -1.2
+     "hdg_err": 3.9
     },
     "route": "LEFT 13 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
     "total": 13,
@@ -80,240 +304,7 @@
     "instr_ok": true,
     "good": true,
     "dest": "Exit Stair E (by corridor doors)",
-    "img": "m02_l1"
-   },
-   {
-    "station": "S5 Corridor outside A 105",
-    "shots": [
-     {
-      "photo": 39,
-      "matched": true,
-      "ms": 2309,
-      "conf": "high",
-      "inl": 93,
-      "pos_err": 0.0,
-      "hdg_err": -4.3
-     }
-    ],
-    "fix": {
-     "photo": 39,
-     "matched": true,
-     "ms": 2309,
-     "conf": "high",
-     "inl": 93,
-     "pos_err": 0.0,
-     "hdg_err": -4.3
-    },
-    "route": "AHEAD 3 m",
-    "total": 3,
-    "via": null,
-    "first": "AHEAD",
-    "true_first": "AHEAD",
-    "instr_ok": true,
-    "good": true,
-    "dest": "Exit Stair E (by corridor doors)",
-    "img": "m02_l2"
-   }
-  ],
-  "ok": true,
-  "why": ""
- },
- {
-  "n": 3,
-  "start": "S9 A 105 south-east corner (south door)",
-  "dest": "A 106",
-  "legs": [
-   {
-    "station": "S9 A 105 south-east corner (south door)",
-    "shots": [
-     {
-      "photo": 65,
-      "matched": true,
-      "ms": 955,
-      "conf": "high",
-      "inl": 32,
-      "pos_err": 0.0,
-      "hdg_err": -5.8
-     }
-    ],
-    "fix": {
-     "photo": 65,
-     "matched": true,
-     "ms": 955,
-     "conf": "high",
-     "inl": 32,
-     "pos_err": 0.0,
-     "hdg_err": -5.8
-    },
-    "route": "RIGHT 3 m \u2192 THROUGH DOOR A 105 (SOUTH), THEN SHOOT AGAIN",
-    "total": 3,
-    "via": "Door A 105 (south)",
-    "first": "RIGHT",
-    "true_first": "BEAR RIGHT",
-    "instr_ok": false,
-    "good": true,
-    "dest": "A 106",
-    "img": "m03_l1"
-   }
-  ],
-  "ok": false,
-  "why": "no surveyed station on the far side of Door A 105 (south)"
- },
- {
-  "n": 4,
-  "start": "S9 A 105 south-east corner (south door)",
-  "dest": "Exit: Main Entrance (Jay St)",
-  "legs": [
-   {
-    "station": "S9 A 105 south-east corner (south door)",
-    "shots": [
-     {
-      "photo": 67,
-      "matched": false,
-      "ms": null
-     },
-     {
-      "photo": 65,
-      "matched": true,
-      "ms": 1275,
-      "conf": "high",
-      "inl": 29,
-      "pos_err": 0.0,
-      "hdg_err": -1.5
-     }
-    ],
-    "fix": {
-     "photo": 65,
-     "matched": true,
-     "ms": 1275,
-     "conf": "high",
-     "inl": 29,
-     "pos_err": 0.0,
-     "hdg_err": -1.5
-    },
-    "route": "BEAR RIGHT 2 m \u2192 LEFT 17 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
-    "total": 19,
-    "via": "Door A 105 (north)",
-    "first": "BEAR RIGHT",
-    "true_first": "BEAR RIGHT",
-    "instr_ok": true,
-    "good": true,
-    "dest": "Exit: Main Entrance (Jay St)",
-    "img": "m04_l1"
-   },
-   {
-    "station": "S5 Corridor outside A 105",
-    "shots": [
-     {
-      "photo": 38,
-      "matched": true,
-      "ms": 2630,
-      "conf": "high",
-      "inl": 73,
-      "pos_err": 0.0,
-      "hdg_err": 1.6
-     }
-    ],
-    "fix": {
-     "photo": 38,
-     "matched": true,
-     "ms": 2630,
-     "conf": "high",
-     "inl": 73,
-     "pos_err": 0.0,
-     "hdg_err": 1.6
-    },
-    "route": "RIGHT 6 m \u2192 LEFT 14 m",
-    "total": 20,
-    "via": null,
-    "first": "RIGHT",
-    "true_first": "RIGHT",
-    "instr_ok": true,
-    "good": true,
-    "dest": "Exit: Main Entrance (Jay St)",
-    "img": "m04_l2"
-   }
-  ],
-  "ok": true,
-  "why": ""
- },
- {
-  "n": 5,
-  "start": "S1 Atrium (Jay St glass, theater shell)",
-  "dest": "Exit: Main Entrance (Jay St)",
-  "legs": [
-   {
-    "station": "S1 Atrium (Jay St glass, theater shell)",
-    "shots": [
-     {
-      "photo": 2,
-      "matched": true,
-      "ms": 1863,
-      "conf": "low",
-      "inl": 11,
-      "pos_err": 0.0,
-      "hdg_err": -23.7
-     }
-    ],
-    "fix": {
-     "photo": 2,
-     "matched": true,
-     "ms": 1863,
-     "conf": "low",
-     "inl": 11,
-     "pos_err": 0.0,
-     "hdg_err": -23.7
-    },
-    "route": "RIGHT 19 m \u2192 RIGHT 6 m",
-    "total": 25,
-    "via": null,
-    "first": "RIGHT",
-    "true_first": "RIGHT",
-    "instr_ok": true,
-    "good": true,
-    "dest": "Exit: Main Entrance (Jay St)",
     "img": "m05_l1"
-   }
-  ],
-  "ok": true,
-  "why": ""
- },
- {
-  "n": 6,
-  "start": "S9 A 105 south-east corner (south door)",
-  "dest": "NEAREST EXIT",
-  "legs": [
-   {
-    "station": "S9 A 105 south-east corner (south door)",
-    "shots": [
-     {
-      "photo": 71,
-      "matched": true,
-      "ms": 2618,
-      "conf": "high",
-      "inl": 57,
-      "pos_err": 0.0,
-      "hdg_err": -2.2
-     }
-    ],
-    "fix": {
-     "photo": 71,
-     "matched": true,
-     "ms": 2618,
-     "conf": "high",
-     "inl": 57,
-     "pos_err": 0.0,
-     "hdg_err": -2.2
-    },
-    "route": "RIGHT 2 m \u2192 LEFT 17 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
-    "total": 19,
-    "via": "Door A 105 (north)",
-    "first": "RIGHT",
-    "true_first": "RIGHT",
-    "instr_ok": true,
-    "good": true,
-    "dest": "Exit Stair E (by corridor doors)",
-    "img": "m06_l1"
    },
    {
     "station": "S5 Corridor outside A 105",
@@ -324,33 +315,74 @@
       "ms": null
      },
      {
-      "photo": 36,
+      "photo": 39,
       "matched": true,
-      "ms": 2721,
-      "conf": "medium",
-      "inl": 22,
-      "pos_err": 5.3,
-      "hdg_err": 5.0
+      "ms": 1717,
+      "conf": "high",
+      "inl": 61,
+      "pos_err": 0.0,
+      "hdg_err": -1.8
      }
     ],
     "fix": {
-     "photo": 36,
+     "photo": 39,
      "matched": true,
-     "ms": 2721,
-     "conf": "medium",
-     "inl": 22,
-     "pos_err": 5.3,
-     "hdg_err": 5.0
+     "ms": 1717,
+     "conf": "high",
+     "inl": 61,
+     "pos_err": 0.0,
+     "hdg_err": -1.8
     },
-    "route": "BEAR RIGHT 3 m",
+    "route": "AHEAD 3 m",
     "total": 3,
     "via": null,
-    "first": "BEAR RIGHT",
-    "true_first": "TURN AROUND",
-    "instr_ok": false,
+    "first": "AHEAD",
+    "true_first": "AHEAD",
+    "instr_ok": true,
     "good": true,
     "dest": "Exit Stair E (by corridor doors)",
-    "img": "m06_l2"
+    "img": "m05_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 6,
+  "start": "S5 Corridor outside A 105",
+  "dest": "Courtyard doors",
+  "legs": [
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 38,
+      "matched": true,
+      "ms": 2596,
+      "conf": "high",
+      "inl": 60,
+      "pos_err": 0.0,
+      "hdg_err": 0.2
+     }
+    ],
+    "fix": {
+     "photo": 38,
+     "matched": true,
+     "ms": 2596,
+     "conf": "high",
+     "inl": 60,
+     "pos_err": 0.0,
+     "hdg_err": 0.2
+    },
+    "route": "RIGHT 6 m \u2192 RIGHT 10 m \u2192 AHEAD 12 m",
+    "total": 27,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Courtyard doors",
+    "img": "m06_l1"
    }
   ],
   "ok": true,
@@ -358,77 +390,40 @@
  },
  {
   "n": 7,
-  "start": "S1 Atrium (Jay St glass, theater shell)",
-  "dest": "South cabinets",
+  "start": "S4 Corridor doors / Exit Stair E",
+  "dest": "Escalator to 2nd floor",
   "legs": [
    {
-    "station": "S1 Atrium (Jay St glass, theater shell)",
+    "station": "S4 Corridor doors / Exit Stair E",
     "shots": [
      {
-      "photo": 4,
+      "photo": 25,
       "matched": true,
-      "ms": 2640,
+      "ms": 2614,
       "conf": "high",
-      "inl": 230,
+      "inl": 128,
       "pos_err": 0.0,
-      "hdg_err": 3.4
+      "hdg_err": -2.2
      }
     ],
     "fix": {
-     "photo": 4,
+     "photo": 25,
      "matched": true,
-     "ms": 2640,
+     "ms": 2614,
      "conf": "high",
-     "inl": 230,
+     "inl": 128,
      "pos_err": 0.0,
-     "hdg_err": 3.4
+     "hdg_err": -2.2
     },
-    "route": "AHEAD 19 m \u2192 LEFT 9 m \u2192 RIGHT 25 m \u2192 RIGHT 2 m \u2192 THROUGH DOOR A 105 (SOUTH), THEN SHOOT AGAIN",
-    "total": 56,
-    "via": "Door A 105 (south)",
-    "first": "AHEAD",
-    "true_first": "AHEAD",
-    "instr_ok": true,
-    "good": true,
-    "dest": "South cabinets",
-    "img": "m07_l1"
-   },
-   {
-    "station": "S9 A 105 south-east corner (south door)",
-    "shots": [
-     {
-      "photo": 67,
-      "matched": false,
-      "ms": null
-     },
-     {
-      "photo": 66,
-      "matched": true,
-      "ms": 1259,
-      "conf": "high",
-      "inl": 34,
-      "pos_err": 0.0,
-      "hdg_err": 2.9
-     }
-    ],
-    "fix": {
-     "photo": 66,
-     "matched": true,
-     "ms": 1259,
-     "conf": "high",
-     "inl": 34,
-     "pos_err": 0.0,
-     "hdg_err": 2.9
-    },
-    "route": "BEAR RIGHT 2 m \u2192 RIGHT 7 m",
-    "total": 9,
+    "route": "BEAR RIGHT 9 m \u2192 LEFT 5 m",
+    "total": 14,
     "via": null,
     "first": "BEAR RIGHT",
     "true_first": "BEAR RIGHT",
     "instr_ok": true,
     "good": true,
-    "dest": "South cabinets",
-    "img": "m07_l2"
+    "dest": "Escalator to 2nd floor",
+    "img": "m07_l1"
    }
   ],
   "ok": true,
@@ -436,39 +431,49 @@
  },
  {
   "n": 8,
-  "start": "S6 A 105 north-east corner (north door)",
-  "dest": "Whiteboards (front)",
+  "start": "S8 A 105 south-west corner (windows)",
+  "dest": "Windows (Jay St side)",
   "legs": [
    {
-    "station": "S6 A 105 north-east corner (north door)",
+    "station": "S8 A 105 south-west corner (windows)",
     "shots": [
      {
-      "photo": 45,
+      "photo": 61,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 60,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 57,
       "matched": true,
-      "ms": 2708,
+      "ms": 2747,
       "conf": "high",
-      "inl": 73,
+      "inl": 116,
       "pos_err": 0.0,
-      "hdg_err": 2.1
+      "hdg_err": -5.0
      }
     ],
     "fix": {
-     "photo": 45,
+     "photo": 57,
      "matched": true,
-     "ms": 2708,
+     "ms": 2747,
      "conf": "high",
-     "inl": 73,
+     "inl": 116,
      "pos_err": 0.0,
-     "hdg_err": 2.1
+     "hdg_err": -5.0
     },
-    "route": "LEFT 2 m \u2192 RIGHT 8 m",
+    "route": "BEAR LEFT 10 m",
     "total": 10,
     "via": null,
-    "first": "LEFT",
+    "first": "BEAR LEFT",
     "true_first": "LEFT",
-    "instr_ok": true,
+    "instr_ok": false,
     "good": true,
-    "dest": "Whiteboards (front)",
+    "dest": "Windows (Jay St side)",
     "img": "m08_l1"
    }
   ],
@@ -477,8 +482,49 @@
  },
  {
   "n": 9,
+  "start": "S4 Corridor doors / Exit Stair E",
+  "dest": "Theater (orchestra)",
+  "legs": [
+   {
+    "station": "S4 Corridor doors / Exit Stair E",
+    "shots": [
+     {
+      "photo": 31,
+      "matched": true,
+      "ms": 2917,
+      "conf": "high",
+      "inl": 113,
+      "pos_err": 0.0,
+      "hdg_err": -0.2
+     }
+    ],
+    "fix": {
+     "photo": 31,
+     "matched": true,
+     "ms": 2917,
+     "conf": "high",
+     "inl": 113,
+     "pos_err": 0.0,
+     "hdg_err": -0.2
+    },
+    "route": "BEAR LEFT 9 m \u2192 RIGHT 34 m \u2192 RIGHT 25 m",
+    "total": 68,
+    "via": null,
+    "first": "BEAR LEFT",
+    "true_first": "BEAR LEFT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Theater (orchestra)",
+    "img": "m09_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 10,
   "start": "S3 Behind the escalators / Elevator Bank B",
-  "dest": "Escalator to 2nd floor",
+  "dest": "Theater (orchestra)",
   "legs": [
    {
     "station": "S3 Behind the escalators / Elevator Bank B",
@@ -486,21 +532,67 @@
      {
       "photo": 19,
       "matched": true,
-      "ms": 1849,
+      "ms": 2265,
       "conf": "high",
-      "inl": 36,
+      "inl": 37,
       "pos_err": 0.0,
-      "hdg_err": -2.7
+      "hdg_err": -4.7
      }
     ],
     "fix": {
      "photo": 19,
      "matched": true,
-     "ms": 1849,
+     "ms": 2265,
      "conf": "high",
-     "inl": 36,
+     "inl": 37,
      "pos_err": 0.0,
-     "hdg_err": -2.7
+     "hdg_err": -4.7
+    },
+    "route": "RIGHT 8 m \u2192 AHEAD 19 m \u2192 RIGHT 34 m \u2192 RIGHT 25 m",
+    "total": 86,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Theater (orchestra)",
+    "img": "m10_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 11,
+  "start": "S3 Behind the escalators / Elevator Bank B",
+  "dest": "Escalator to 2nd floor",
+  "legs": [
+   {
+    "station": "S3 Behind the escalators / Elevator Bank B",
+    "shots": [
+     {
+      "photo": 16,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 20,
+      "matched": true,
+      "ms": 817,
+      "conf": "medium",
+      "inl": 15,
+      "pos_err": 0.0,
+      "hdg_err": 5.2
+     }
+    ],
+    "fix": {
+     "photo": 20,
+     "matched": true,
+     "ms": 817,
+     "conf": "medium",
+     "inl": 15,
+     "pos_err": 0.0,
+     "hdg_err": 5.2
     },
     "route": "RIGHT 7 m \u2192 RIGHT 5 m",
     "total": 12,
@@ -510,130 +602,6 @@
     "instr_ok": true,
     "good": true,
     "dest": "Escalator to 2nd floor",
-    "img": "m09_l1"
-   }
-  ],
-  "ok": true,
-  "why": ""
- },
- {
-  "n": 10,
-  "start": "S9 A 105 south-east corner (south door)",
-  "dest": "NEAREST EXIT",
-  "legs": [
-   {
-    "station": "S9 A 105 south-east corner (south door)",
-    "shots": [
-     {
-      "photo": 64,
-      "matched": true,
-      "ms": 2896,
-      "conf": "high",
-      "inl": 45,
-      "pos_err": 0.0,
-      "hdg_err": 3.3
-     }
-    ],
-    "fix": {
-     "photo": 64,
-     "matched": true,
-     "ms": 2896,
-     "conf": "high",
-     "inl": 45,
-     "pos_err": 0.0,
-     "hdg_err": 3.3
-    },
-    "route": "RIGHT 2 m \u2192 LEFT 17 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
-    "total": 19,
-    "via": "Door A 105 (north)",
-    "first": "RIGHT",
-    "true_first": "RIGHT",
-    "instr_ok": true,
-    "good": true,
-    "dest": "Exit Stair E (by corridor doors)",
-    "img": "m10_l1"
-   },
-   {
-    "station": "S5 Corridor outside A 105",
-    "shots": [
-     {
-      "photo": 34,
-      "matched": false,
-      "ms": null
-     },
-     {
-      "photo": 35,
-      "matched": false,
-      "ms": null
-     },
-     {
-      "photo": 32,
-      "matched": true,
-      "ms": 3034,
-      "conf": "medium",
-      "inl": 138,
-      "pos_err": 0.0,
-      "hdg_err": 5.4
-     }
-    ],
-    "fix": {
-     "photo": 32,
-     "matched": true,
-     "ms": 3034,
-     "conf": "medium",
-     "inl": 138,
-     "pos_err": 0.0,
-     "hdg_err": 5.4
-    },
-    "route": "AHEAD 3 m",
-    "total": 3,
-    "via": null,
-    "first": "AHEAD",
-    "true_first": "AHEAD",
-    "instr_ok": true,
-    "good": true,
-    "dest": "Exit Stair E (by corridor doors)",
-    "img": "m10_l2"
-   }
-  ],
-  "ok": true,
-  "why": ""
- },
- {
-  "n": 11,
-  "start": "S3 Behind the escalators / Elevator Bank B",
-  "dest": "Women's restroom (corridor)",
-  "legs": [
-   {
-    "station": "S3 Behind the escalators / Elevator Bank B",
-    "shots": [
-     {
-      "photo": 19,
-      "matched": true,
-      "ms": 2067,
-      "conf": "high",
-      "inl": 33,
-      "pos_err": 0.0,
-      "hdg_err": -5.4
-     }
-    ],
-    "fix": {
-     "photo": 19,
-     "matched": true,
-     "ms": 2067,
-     "conf": "high",
-     "inl": 33,
-     "pos_err": 0.0,
-     "hdg_err": -5.4
-    },
-    "route": "RIGHT 8 m \u2192 AHEAD 10 m \u2192 LEFT 10 m",
-    "total": 28,
-    "via": null,
-    "first": "RIGHT",
-    "true_first": "RIGHT",
-    "instr_ok": true,
-    "good": true,
-    "dest": "Women's restroom (corridor)",
     "img": "m11_l1"
    }
   ],
@@ -642,36 +610,36 @@
  },
  {
   "n": 12,
-  "start": "S5 Corridor outside A 105",
+  "start": "S1 Atrium (Jay St glass, theater shell)",
   "dest": "Elevator Bank B",
   "legs": [
    {
-    "station": "S5 Corridor outside A 105",
+    "station": "S1 Atrium (Jay St glass, theater shell)",
     "shots": [
      {
-      "photo": 38,
+      "photo": 5,
       "matched": true,
-      "ms": 2921,
+      "ms": 2894,
       "conf": "high",
-      "inl": 58,
+      "inl": 81,
       "pos_err": 0.0,
-      "hdg_err": 3.8
+      "hdg_err": 5.1
      }
     ],
     "fix": {
-     "photo": 38,
+     "photo": 5,
      "matched": true,
-     "ms": 2921,
+     "ms": 2894,
      "conf": "high",
-     "inl": 58,
+     "inl": 81,
      "pos_err": 0.0,
-     "hdg_err": 3.8
+     "hdg_err": 5.1
     },
-    "route": "RIGHT 6 m \u2192 RIGHT 10 m \u2192 RIGHT 5 m",
-    "total": 20,
+    "route": "BEAR LEFT 19 m \u2192 LEFT 19 m \u2192 RIGHT 5 m",
+    "total": 42,
     "via": null,
-    "first": "RIGHT",
-    "true_first": "RIGHT",
+    "first": "BEAR LEFT",
+    "true_first": "BEAR LEFT",
     "instr_ok": true,
     "good": true,
     "dest": "Elevator Bank B",
@@ -683,161 +651,6 @@
  },
  {
   "n": 13,
-  "start": "S2 Information desk / turnstiles",
-  "dest": "Exit Stair E (by corridor doors)",
-  "legs": [
-   {
-    "station": "S2 Information desk / turnstiles",
-    "shots": [
-     {
-      "photo": 13,
-      "matched": true,
-      "ms": 3114,
-      "conf": "high",
-      "inl": 67,
-      "pos_err": 0.0,
-      "hdg_err": 6.6
-     }
-    ],
-    "fix": {
-     "photo": 13,
-     "matched": true,
-     "ms": 3114,
-     "conf": "high",
-     "inl": 67,
-     "pos_err": 0.0,
-     "hdg_err": 6.6
-    },
-    "route": "LEFT 5 m \u2192 RIGHT 8 m",
-    "total": 13,
-    "via": null,
-    "first": "LEFT",
-    "true_first": "LEFT",
-    "instr_ok": true,
-    "good": true,
-    "dest": "Exit Stair E (by corridor doors)",
-    "img": "m13_l1"
-   }
-  ],
-  "ok": true,
-  "why": ""
- },
- {
-  "n": 14,
-  "start": "S4 Corridor doors / Exit Stair E",
-  "dest": "Exit: Main Entrance (Jay St)",
-  "legs": [
-   {
-    "station": "S4 Corridor doors / Exit Stair E",
-    "shots": [
-     {
-      "photo": 28,
-      "matched": true,
-      "ms": 2592,
-      "conf": "medium",
-      "inl": 22,
-      "pos_err": 5.3,
-      "hdg_err": -5.4
-     }
-    ],
-    "fix": {
-     "photo": 28,
-     "matched": true,
-     "ms": 2592,
-     "conf": "medium",
-     "inl": 22,
-     "pos_err": 5.3,
-     "hdg_err": -5.4
-    },
-    "route": "TURN AROUND 6 m \u2192 LEFT 14 m",
-    "total": 20,
-    "via": null,
-    "first": "TURN AROUND",
-    "true_first": "RIGHT",
-    "instr_ok": false,
-    "good": true,
-    "dest": "Exit: Main Entrance (Jay St)",
-    "img": "m14_l1"
-   }
-  ],
-  "ok": true,
-  "why": ""
- },
- {
-  "n": 15,
-  "start": "S6 A 105 north-east corner (north door)",
-  "dest": "Theater (orchestra)",
-  "legs": [
-   {
-    "station": "S6 A 105 north-east corner (north door)",
-    "shots": [
-     {
-      "photo": 43,
-      "matched": true,
-      "ms": 2040,
-      "conf": "high",
-      "inl": 28,
-      "pos_err": 0.0,
-      "hdg_err": 0.5
-     }
-    ],
-    "fix": {
-     "photo": 43,
-     "matched": true,
-     "ms": 2040,
-     "conf": "high",
-     "inl": 28,
-     "pos_err": 0.0,
-     "hdg_err": 0.5
-    },
-    "route": "LEFT 3 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
-    "total": 3,
-    "via": "Door A 105 (north)",
-    "first": "LEFT",
-    "true_first": "LEFT",
-    "instr_ok": true,
-    "good": true,
-    "dest": "Theater (orchestra)",
-    "img": "m15_l1"
-   },
-   {
-    "station": "S5 Corridor outside A 105",
-    "shots": [
-     {
-      "photo": 36,
-      "matched": true,
-      "ms": 2621,
-      "conf": "high",
-      "inl": 26,
-      "pos_err": 5.3,
-      "hdg_err": 5.4
-     }
-    ],
-    "fix": {
-     "photo": 36,
-     "matched": true,
-     "ms": 2621,
-     "conf": "high",
-     "inl": 26,
-     "pos_err": 5.3,
-     "hdg_err": 5.4
-    },
-    "route": "RIGHT 9 m \u2192 RIGHT 34 m \u2192 RIGHT 25 m",
-    "total": 68,
-    "via": null,
-    "first": "RIGHT",
-    "true_first": "TURN AROUND",
-    "instr_ok": false,
-    "good": true,
-    "dest": "Theater (orchestra)",
-    "img": "m15_l2"
-   }
-  ],
-  "ok": true,
-  "why": ""
- },
- {
-  "n": 16,
   "start": "S7 A 105 north-west corner (windows)",
   "dest": "Women's restroom (corridor)",
   "legs": [
@@ -845,65 +658,60 @@
     "station": "S7 A 105 north-west corner (windows)",
     "shots": [
      {
-      "photo": 48,
-      "matched": false,
-      "ms": null
-     },
-     {
-      "photo": 51,
+      "photo": 55,
       "matched": true,
-      "ms": 2464,
-      "conf": "high",
-      "inl": 41,
+      "ms": 823,
+      "conf": "medium",
+      "inl": 17,
       "pos_err": 0.0,
-      "hdg_err": -2.0
+      "hdg_err": 29.8
      }
     ],
     "fix": {
-     "photo": 51,
+     "photo": 55,
      "matched": true,
-     "ms": 2464,
-     "conf": "high",
-     "inl": 41,
+     "ms": 823,
+     "conf": "medium",
+     "inl": 17,
      "pos_err": 0.0,
-     "hdg_err": -2.0
+     "hdg_err": 29.8
     },
-    "route": "BEAR LEFT 13 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "route": "RIGHT 13 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
     "total": 13,
     "via": "Door A 105 (north)",
-    "first": "BEAR LEFT",
-    "true_first": "BEAR LEFT",
-    "instr_ok": true,
+    "first": "RIGHT",
+    "true_first": "TURN AROUND",
+    "instr_ok": false,
     "good": true,
     "dest": "Women's restroom (corridor)",
-    "img": "m16_l1"
+    "img": "m13_l1"
    },
    {
     "station": "S5 Corridor outside A 105",
     "shots": [
      {
-      "photo": 34,
+      "photo": 35,
       "matched": false,
       "ms": null
      },
      {
-      "photo": 32,
+      "photo": 39,
       "matched": true,
-      "ms": 2465,
-      "conf": "low",
-      "inl": 117,
+      "ms": 2630,
+      "conf": "high",
+      "inl": 100,
       "pos_err": 0.0,
-      "hdg_err": 7.7
+      "hdg_err": -1.4
      }
     ],
     "fix": {
-     "photo": 32,
+     "photo": 39,
      "matched": true,
-     "ms": 2465,
-     "conf": "low",
-     "inl": 117,
+     "ms": 2630,
+     "conf": "high",
+     "inl": 100,
      "pos_err": 0.0,
-     "hdg_err": 7.7
+     "hdg_err": -1.4
     },
     "route": "TURN AROUND 5 m",
     "total": 5,
@@ -913,7 +721,130 @@
     "instr_ok": true,
     "good": true,
     "dest": "Women's restroom (corridor)",
-    "img": "m16_l2"
+    "img": "m13_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 14,
+  "start": "S1 Atrium (Jay St glass, theater shell)",
+  "dest": "Escalator to 2nd floor",
+  "legs": [
+   {
+    "station": "S1 Atrium (Jay St glass, theater shell)",
+    "shots": [
+     {
+      "photo": 7,
+      "matched": true,
+      "ms": 2545,
+      "conf": "high",
+      "inl": 112,
+      "pos_err": 0.0,
+      "hdg_err": -6.2
+     }
+    ],
+    "fix": {
+     "photo": 7,
+     "matched": true,
+     "ms": 2545,
+     "conf": "high",
+     "inl": 112,
+     "pos_err": 0.0,
+     "hdg_err": -6.2
+    },
+    "route": "LEFT 5 m \u2192 AHEAD 15 m \u2192 LEFT 17 m \u2192 LEFT 5 m",
+    "total": 42,
+    "via": null,
+    "first": "LEFT",
+    "true_first": "LEFT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Escalator to 2nd floor",
+    "img": "m14_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 15,
+  "start": "S1 Atrium (Jay St glass, theater shell)",
+  "dest": "Elevator Bank B",
+  "legs": [
+   {
+    "station": "S1 Atrium (Jay St glass, theater shell)",
+    "shots": [
+     {
+      "photo": 1,
+      "matched": true,
+      "ms": 2589,
+      "conf": "high",
+      "inl": 94,
+      "pos_err": 0.0,
+      "hdg_err": 0.8
+     }
+    ],
+    "fix": {
+     "photo": 1,
+     "matched": true,
+     "ms": 2589,
+     "conf": "high",
+     "inl": 94,
+     "pos_err": 0.0,
+     "hdg_err": 0.8
+    },
+    "route": "RIGHT 19 m \u2192 LEFT 19 m \u2192 RIGHT 5 m",
+    "total": 42,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Elevator Bank B",
+    "img": "m15_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 16,
+  "start": "S1 Atrium (Jay St glass, theater shell)",
+  "dest": "A 103",
+  "legs": [
+   {
+    "station": "S1 Atrium (Jay St glass, theater shell)",
+    "shots": [
+     {
+      "photo": 0,
+      "matched": true,
+      "ms": 2398,
+      "conf": "high",
+      "inl": 96,
+      "pos_err": 0.0,
+      "hdg_err": 0.7
+     }
+    ],
+    "fix": {
+     "photo": 0,
+     "matched": true,
+     "ms": 2398,
+     "conf": "high",
+     "inl": 96,
+     "pos_err": 0.0,
+     "hdg_err": 0.7
+    },
+    "route": "TURN AROUND 19 m \u2192 LEFT 9 m \u2192 RIGHT 33 m \u2192 RIGHT 4 m",
+    "total": 65,
+    "via": null,
+    "first": "TURN AROUND",
+    "true_first": "TURN AROUND",
+    "instr_ok": true,
+    "good": true,
+    "dest": "A 103",
+    "img": "m16_l1"
    }
   ],
   "ok": true,
@@ -922,43 +853,38 @@
  {
   "n": 17,
   "start": "S9 A 105 south-east corner (south door)",
-  "dest": "NEAREST EXIT",
+  "dest": "Information desk",
   "legs": [
    {
     "station": "S9 A 105 south-east corner (south door)",
     "shots": [
      {
-      "photo": 68,
-      "matched": false,
-      "ms": null
-     },
-     {
-      "photo": 70,
+      "photo": 71,
       "matched": true,
-      "ms": 2847,
-      "conf": "low",
-      "inl": 13,
+      "ms": 2641,
+      "conf": "high",
+      "inl": 39,
       "pos_err": 0.0,
-      "hdg_err": -5.9
+      "hdg_err": -5.1
      }
     ],
     "fix": {
-     "photo": 70,
+     "photo": 71,
      "matched": true,
-     "ms": 2847,
-     "conf": "low",
-     "inl": 13,
+     "ms": 2641,
+     "conf": "high",
+     "inl": 39,
      "pos_err": 0.0,
-     "hdg_err": -5.9
+     "hdg_err": -5.1
     },
-    "route": "TURN AROUND 2 m \u2192 LEFT 17 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "route": "RIGHT 2 m \u2192 LEFT 17 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
     "total": 19,
     "via": "Door A 105 (north)",
-    "first": "TURN AROUND",
-    "true_first": "TURN AROUND",
+    "first": "RIGHT",
+    "true_first": "RIGHT",
     "instr_ok": true,
     "good": true,
-    "dest": "Exit Stair E (by corridor doors)",
+    "dest": "Information desk",
     "img": "m17_l1"
    },
    {
@@ -970,32 +896,37 @@
       "ms": null
      },
      {
-      "photo": 36,
+      "photo": 32,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 37,
       "matched": true,
-      "ms": 2537,
-      "conf": "medium",
-      "inl": 22,
-      "pos_err": 5.3,
-      "hdg_err": 6.4
+      "ms": 1962,
+      "conf": "high",
+      "inl": 40,
+      "pos_err": 0.0,
+      "hdg_err": -1.3
      }
     ],
     "fix": {
-     "photo": 36,
+     "photo": 37,
      "matched": true,
-     "ms": 2537,
-     "conf": "medium",
-     "inl": 22,
-     "pos_err": 5.3,
-     "hdg_err": 6.4
+     "ms": 1962,
+     "conf": "high",
+     "inl": 40,
+     "pos_err": 0.0,
+     "hdg_err": -1.3
     },
-    "route": "AHEAD 3 m",
-    "total": 3,
+    "route": "RIGHT 11 m \u2192 BEAR LEFT 5 m \u2192 BEAR RIGHT 2 m",
+    "total": 19,
     "via": null,
-    "first": "AHEAD",
-    "true_first": "TURN AROUND",
-    "instr_ok": false,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
     "good": true,
-    "dest": "Exit Stair E (by corridor doors)",
+    "dest": "Information desk",
     "img": "m17_l2"
    }
   ],
@@ -1004,39 +935,39 @@
  },
  {
   "n": 18,
-  "start": "S5 Corridor outside A 105",
-  "dest": "Women's restroom (corridor)",
+  "start": "S1 Atrium (Jay St glass, theater shell)",
+  "dest": "Courtyard doors",
   "legs": [
    {
-    "station": "S5 Corridor outside A 105",
+    "station": "S1 Atrium (Jay St glass, theater shell)",
     "shots": [
      {
-      "photo": 36,
+      "photo": 0,
       "matched": true,
-      "ms": 2261,
-      "conf": "medium",
-      "inl": 20,
-      "pos_err": 5.3,
-      "hdg_err": 6.5
+      "ms": 2466,
+      "conf": "high",
+      "inl": 88,
+      "pos_err": 0.0,
+      "hdg_err": 1.7
      }
     ],
     "fix": {
-     "photo": 36,
+     "photo": 0,
      "matched": true,
-     "ms": 2261,
-     "conf": "medium",
-     "inl": 20,
-     "pos_err": 5.3,
-     "hdg_err": 6.5
+     "ms": 2466,
+     "conf": "high",
+     "inl": 88,
+     "pos_err": 0.0,
+     "hdg_err": 1.7
     },
-    "route": "AHEAD 10 m",
-    "total": 10,
+    "route": "TURN AROUND 5 m \u2192 AHEAD 15 m \u2192 LEFT 18 m \u2192 AHEAD 12 m",
+    "total": 50,
     "via": null,
-    "first": "AHEAD",
-    "true_first": "AHEAD",
+    "first": "TURN AROUND",
+    "true_first": "TURN AROUND",
     "instr_ok": true,
     "good": true,
-    "dest": "Women's restroom (corridor)",
+    "dest": "Courtyard doors",
     "img": "m18_l1"
    }
   ],
@@ -1045,6 +976,186 @@
  },
  {
   "n": 19,
+  "start": "S5 Corridor outside A 105",
+  "dest": "Escalator to 2nd floor",
+  "legs": [
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 35,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 34,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 37,
+      "matched": true,
+      "ms": 2358,
+      "conf": "high",
+      "inl": 51,
+      "pos_err": 0.0,
+      "hdg_err": -3.5
+     }
+    ],
+    "fix": {
+     "photo": 37,
+     "matched": true,
+     "ms": 2358,
+     "conf": "high",
+     "inl": 51,
+     "pos_err": 0.0,
+     "hdg_err": -3.5
+    },
+    "route": "RIGHT 6 m \u2192 RIGHT 9 m \u2192 LEFT 5 m",
+    "total": 19,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Escalator to 2nd floor",
+    "img": "m19_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 20,
+  "start": "S5 Corridor outside A 105",
+  "dest": "Escalator to 2nd floor",
+  "legs": [
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 34,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 38,
+      "matched": true,
+      "ms": 2625,
+      "conf": "high",
+      "inl": 61,
+      "pos_err": 0.0,
+      "hdg_err": 9.7
+     }
+    ],
+    "fix": {
+     "photo": 38,
+     "matched": true,
+     "ms": 2625,
+     "conf": "high",
+     "inl": 61,
+     "pos_err": 0.0,
+     "hdg_err": 9.7
+    },
+    "route": "RIGHT 6 m \u2192 RIGHT 9 m \u2192 LEFT 5 m",
+    "total": 19,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Escalator to 2nd floor",
+    "img": "m20_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 21,
+  "start": "S9 A 105 south-east corner (south door)",
+  "dest": "Courtyard doors",
+  "legs": [
+   {
+    "station": "S9 A 105 south-east corner (south door)",
+    "shots": [
+     {
+      "photo": 69,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 66,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 71,
+      "matched": true,
+      "ms": 2570,
+      "conf": "high",
+      "inl": 39,
+      "pos_err": 0.0,
+      "hdg_err": -1.6
+     }
+    ],
+    "fix": {
+     "photo": 71,
+     "matched": true,
+     "ms": 2570,
+     "conf": "high",
+     "inl": 39,
+     "pos_err": 0.0,
+     "hdg_err": -1.6
+    },
+    "route": "RIGHT 2 m \u2192 LEFT 17 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "total": 19,
+    "via": "Door A 105 (north)",
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Courtyard doors",
+    "img": "m21_l1"
+   },
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 32,
+      "matched": true,
+      "ms": 2737,
+      "conf": "medium",
+      "inl": 124,
+      "pos_err": 0.0,
+      "hdg_err": 11.0
+     }
+    ],
+    "fix": {
+     "photo": 32,
+     "matched": true,
+     "ms": 2737,
+     "conf": "medium",
+     "inl": 124,
+     "pos_err": 0.0,
+     "hdg_err": 11.0
+    },
+    "route": "AHEAD 6 m \u2192 RIGHT 10 m \u2192 AHEAD 12 m",
+    "total": 27,
+    "via": null,
+    "first": "AHEAD",
+    "true_first": "AHEAD",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Courtyard doors",
+    "img": "m21_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 22,
   "start": "S7 A 105 north-west corner (windows)",
   "dest": "Courtyard doors",
   "legs": [
@@ -1052,23 +1163,816 @@
     "station": "S7 A 105 north-west corner (windows)",
     "shots": [
      {
+      "photo": 53,
+      "matched": true,
+      "ms": 1866,
+      "conf": "medium",
+      "inl": 21,
+      "pos_err": 0.0,
+      "hdg_err": 3.7
+     }
+    ],
+    "fix": {
+     "photo": 53,
+     "matched": true,
+     "ms": 1866,
+     "conf": "medium",
+     "inl": 21,
+     "pos_err": 0.0,
+     "hdg_err": 3.7
+    },
+    "route": "LEFT 13 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "total": 13,
+    "via": "Door A 105 (north)",
+    "first": "LEFT",
+    "true_first": "LEFT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Courtyard doors",
+    "img": "m22_l1"
+   },
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 37,
+      "matched": true,
+      "ms": 2607,
+      "conf": "high",
+      "inl": 55,
+      "pos_err": 0.0,
+      "hdg_err": -4.3
+     }
+    ],
+    "fix": {
+     "photo": 37,
+     "matched": true,
+     "ms": 2607,
+     "conf": "high",
+     "inl": 55,
+     "pos_err": 0.0,
+     "hdg_err": -4.3
+    },
+    "route": "RIGHT 6 m \u2192 RIGHT 10 m \u2192 AHEAD 12 m",
+    "total": 27,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Courtyard doors",
+    "img": "m22_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 23,
+  "start": "S1 Atrium (Jay St glass, theater shell)",
+  "dest": "Information desk",
+  "legs": [
+   {
+    "station": "S1 Atrium (Jay St glass, theater shell)",
+    "shots": [
+     {
+      "photo": 3,
+      "matched": true,
+      "ms": 2499,
+      "conf": "high",
+      "inl": 291,
+      "pos_err": 0.0,
+      "hdg_err": 0.8
+     }
+    ],
+    "fix": {
+     "photo": 3,
+     "matched": true,
+     "ms": 2499,
+     "conf": "high",
+     "inl": 291,
+     "pos_err": 0.0,
+     "hdg_err": 0.8
+    },
+    "route": "BEAR RIGHT 19 m \u2192 LEFT 9 m \u2192 LEFT 4 m \u2192 BEAR LEFT 5 m \u2192 BEAR RIGHT 2 m",
+    "total": 40,
+    "via": null,
+    "first": "BEAR RIGHT",
+    "true_first": "BEAR RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Information desk",
+    "img": "m23_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 24,
+  "start": "S3 Behind the escalators / Elevator Bank B",
+  "dest": "Exit Stair E (by corridor doors)",
+  "legs": [
+   {
+    "station": "S3 Behind the escalators / Elevator Bank B",
+    "shots": [
+     {
+      "photo": 19,
+      "matched": true,
+      "ms": 1588,
+      "conf": "high",
+      "inl": 36,
+      "pos_err": 0.0,
+      "hdg_err": -3.1
+     }
+    ],
+    "fix": {
+     "photo": 19,
+     "matched": true,
+     "ms": 1588,
+     "conf": "high",
+     "inl": 36,
+     "pos_err": 0.0,
+     "hdg_err": -3.1
+    },
+    "route": "RIGHT 8 m \u2192 AHEAD 10 m \u2192 LEFT 3 m",
+    "total": 21,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Exit Stair E (by corridor doors)",
+    "img": "m24_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 25,
+  "start": "S9 A 105 south-east corner (south door)",
+  "dest": "Whiteboards (front)",
+  "legs": [
+   {
+    "station": "S9 A 105 south-east corner (south door)",
+    "shots": [
+     {
+      "photo": 68,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 71,
+      "matched": true,
+      "ms": 2589,
+      "conf": "high",
+      "inl": 56,
+      "pos_err": 0.0,
+      "hdg_err": -3.8
+     }
+    ],
+    "fix": {
+     "photo": 71,
+     "matched": true,
+     "ms": 2589,
+     "conf": "high",
+     "inl": 56,
+     "pos_err": 0.0,
+     "hdg_err": -3.8
+    },
+    "route": "RIGHT 2 m \u2192 LEFT 8 m",
+    "total": 10,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Whiteboards (front)",
+    "img": "m25_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 26,
+  "start": "S9 A 105 south-east corner (south door)",
+  "dest": "Exit: Main Entrance (Jay St)",
+  "legs": [
+   {
+    "station": "S9 A 105 south-east corner (south door)",
+    "shots": [
+     {
+      "photo": 65,
+      "matched": true,
+      "ms": 586,
+      "conf": "high",
+      "inl": 29,
+      "pos_err": 0.0,
+      "hdg_err": -1.4
+     }
+    ],
+    "fix": {
+     "photo": 65,
+     "matched": true,
+     "ms": 586,
+     "conf": "high",
+     "inl": 29,
+     "pos_err": 0.0,
+     "hdg_err": -1.4
+    },
+    "route": "BEAR RIGHT 2 m \u2192 LEFT 17 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "total": 19,
+    "via": "Door A 105 (north)",
+    "first": "BEAR RIGHT",
+    "true_first": "BEAR RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Exit: Main Entrance (Jay St)",
+    "img": "m26_l1"
+   },
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 37,
+      "matched": true,
+      "ms": 2489,
+      "conf": "high",
+      "inl": 46,
+      "pos_err": 0.0,
+      "hdg_err": -6.6
+     }
+    ],
+    "fix": {
+     "photo": 37,
+     "matched": true,
+     "ms": 2489,
+     "conf": "high",
+     "inl": 46,
+     "pos_err": 0.0,
+     "hdg_err": -6.6
+    },
+    "route": "RIGHT 6 m \u2192 LEFT 14 m",
+    "total": 20,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Exit: Main Entrance (Jay St)",
+    "img": "m26_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 27,
+  "start": "S5 Corridor outside A 105",
+  "dest": "A 106",
+  "legs": [
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 38,
+      "matched": true,
+      "ms": 2801,
+      "conf": "high",
+      "inl": 68,
+      "pos_err": 0.0,
+      "hdg_err": 8.7
+     }
+    ],
+    "fix": {
+     "photo": 38,
+     "matched": true,
+     "ms": 2801,
+     "conf": "high",
+     "inl": 68,
+     "pos_err": 0.0,
+     "hdg_err": 8.7
+    },
+    "route": "LEFT 12 m \u2192 LEFT 11 m",
+    "total": 23,
+    "via": null,
+    "first": "LEFT",
+    "true_first": "LEFT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "A 106",
+    "img": "m27_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 28,
+  "start": "S3 Behind the escalators / Elevator Bank B",
+  "dest": "Exit Stair E (by corridor doors)",
+  "legs": [
+   {
+    "station": "S3 Behind the escalators / Elevator Bank B",
+    "shots": [
+     {
+      "photo": 21,
+      "matched": true,
+      "ms": 2169,
+      "conf": "high",
+      "inl": 149,
+      "pos_err": 0.0,
+      "hdg_err": -2.1
+     }
+    ],
+    "fix": {
+     "photo": 21,
+     "matched": true,
+     "ms": 2169,
+     "conf": "high",
+     "inl": 149,
+     "pos_err": 0.0,
+     "hdg_err": -2.1
+    },
+    "route": "AHEAD 8 m \u2192 AHEAD 10 m \u2192 LEFT 3 m",
+    "total": 21,
+    "via": null,
+    "first": "AHEAD",
+    "true_first": "AHEAD",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Exit Stair E (by corridor doors)",
+    "img": "m28_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 29,
+  "start": "S8 A 105 south-west corner (windows)",
+  "dest": "A 103",
+  "legs": [
+   {
+    "station": "S8 A 105 south-west corner (windows)",
+    "shots": [
+     {
+      "photo": 59,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 60,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 62,
+      "matched": false,
+      "ms": null
+     }
+    ],
+    "fix": null
+   }
+  ],
+  "ok": false,
+  "why": "no match in 3 photos at S8 A 105 south-west corner (windows)"
+ },
+ {
+  "n": 30,
+  "start": "S5 Corridor outside A 105",
+  "dest": "South cabinets",
+  "legs": [
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 36,
+      "matched": true,
+      "ms": 2743,
+      "conf": "medium",
+      "inl": 20,
+      "pos_err": 5.3,
+      "hdg_err": 5.0
+     }
+    ],
+    "fix": {
+     "photo": 36,
+     "matched": true,
+     "ms": 2743,
+     "conf": "medium",
+     "inl": 20,
+     "pos_err": 5.3,
+     "hdg_err": 5.0
+    },
+    "route": "AHEAD 26 m \u2192 RIGHT 2 m \u2192 THROUGH DOOR A 105 (SOUTH), THEN SHOOT AGAIN",
+    "total": 28,
+    "via": "Door A 105 (south)",
+    "first": "AHEAD",
+    "true_first": "AHEAD",
+    "instr_ok": true,
+    "good": true,
+    "dest": "South cabinets",
+    "img": "m30_l1"
+   },
+   {
+    "station": "S9 A 105 south-east corner (south door)",
+    "shots": [
+     {
+      "photo": 68,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 70,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 64,
+      "matched": true,
+      "ms": 2997,
+      "conf": "high",
+      "inl": 39,
+      "pos_err": 0.0,
+      "hdg_err": 0.1
+     }
+    ],
+    "fix": {
+     "photo": 64,
+     "matched": true,
+     "ms": 2997,
+     "conf": "high",
+     "inl": 39,
+     "pos_err": 0.0,
+     "hdg_err": 0.1
+    },
+    "route": "RIGHT 2 m \u2192 RIGHT 7 m",
+    "total": 9,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "South cabinets",
+    "img": "m30_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 31,
+  "start": "S4 Corridor doors / Exit Stair E",
+  "dest": "Exit: Main Entrance (Jay St)",
+  "legs": [
+   {
+    "station": "S4 Corridor doors / Exit Stair E",
+    "shots": [
+     {
+      "photo": 29,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 25,
+      "matched": true,
+      "ms": 2676,
+      "conf": "high",
+      "inl": 80,
+      "pos_err": 0.0,
+      "hdg_err": 1.2
+     }
+    ],
+    "fix": {
+     "photo": 25,
+     "matched": true,
+     "ms": 2676,
+     "conf": "high",
+     "inl": 80,
+     "pos_err": 0.0,
+     "hdg_err": 1.2
+    },
+    "route": "LEFT 15 m",
+    "total": 15,
+    "via": null,
+    "first": "LEFT",
+    "true_first": "LEFT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Exit: Main Entrance (Jay St)",
+    "img": "m31_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 32,
+  "start": "S6 A 105 north-east corner (north door)",
+  "dest": "Windows (Jay St side)",
+  "legs": [
+   {
+    "station": "S6 A 105 north-east corner (north door)",
+    "shots": [
+     {
+      "photo": 45,
+      "matched": true,
+      "ms": 2685,
+      "conf": "high",
+      "inl": 53,
+      "pos_err": 0.0,
+      "hdg_err": 1.4
+     }
+    ],
+    "fix": {
+     "photo": 45,
+     "matched": true,
+     "ms": 2685,
+     "conf": "high",
+     "inl": 53,
+     "pos_err": 0.0,
+     "hdg_err": 1.4
+    },
+    "route": "TURN AROUND 2 m \u2192 LEFT 12 m \u2192 LEFT 10 m",
+    "total": 24,
+    "via": null,
+    "first": "TURN AROUND",
+    "true_first": "TURN AROUND",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Windows (Jay St side)",
+    "img": "m32_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 33,
+  "start": "S8 A 105 south-west corner (windows)",
+  "dest": "Whiteboards (front)",
+  "legs": [
+   {
+    "station": "S8 A 105 south-west corner (windows)",
+    "shots": [
+     {
+      "photo": 58,
+      "matched": true,
+      "ms": 2815,
+      "conf": "high",
+      "inl": 65,
+      "pos_err": 0.0,
+      "hdg_err": -0.6
+     }
+    ],
+    "fix": {
+     "photo": 58,
+     "matched": true,
+     "ms": 2815,
+     "conf": "high",
+     "inl": 65,
+     "pos_err": 0.0,
+     "hdg_err": -0.6
+    },
+    "route": "AHEAD 12 m \u2192 LEFT 10 m",
+    "total": 21,
+    "via": null,
+    "first": "AHEAD",
+    "true_first": "AHEAD",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Whiteboards (front)",
+    "img": "m33_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 34,
+  "start": "S1 Atrium (Jay St glass, theater shell)",
+  "dest": "South cabinets",
+  "legs": [
+   {
+    "station": "S1 Atrium (Jay St glass, theater shell)",
+    "shots": [
+     {
+      "photo": 5,
+      "matched": true,
+      "ms": 2751,
+      "conf": "high",
+      "inl": 77,
+      "pos_err": 0.0,
+      "hdg_err": 5.5
+     }
+    ],
+    "fix": {
+     "photo": 5,
+     "matched": true,
+     "ms": 2751,
+     "conf": "high",
+     "inl": 77,
+     "pos_err": 0.0,
+     "hdg_err": 5.5
+    },
+    "route": "BEAR LEFT 19 m \u2192 LEFT 9 m \u2192 RIGHT 25 m \u2192 RIGHT 2 m \u2192 THROUGH DOOR A 105 (SOUTH), THEN SHOOT AGAIN",
+    "total": 56,
+    "via": "Door A 105 (south)",
+    "first": "BEAR LEFT",
+    "true_first": "BEAR LEFT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "South cabinets",
+    "img": "m34_l1"
+   },
+   {
+    "station": "S9 A 105 south-east corner (south door)",
+    "shots": [
+     {
+      "photo": 65,
+      "matched": true,
+      "ms": 851,
+      "conf": "medium",
+      "inl": 21,
+      "pos_err": 0.0,
+      "hdg_err": 6.0
+     }
+    ],
+    "fix": {
+     "photo": 65,
+     "matched": true,
+     "ms": 851,
+     "conf": "medium",
+     "inl": 21,
+     "pos_err": 0.0,
+     "hdg_err": 6.0
+    },
+    "route": "RIGHT 2 m \u2192 RIGHT 7 m",
+    "total": 9,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "South cabinets",
+    "img": "m34_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 35,
+  "start": "S1 Atrium (Jay St glass, theater shell)",
+  "dest": "Theater (orchestra)",
+  "legs": [
+   {
+    "station": "S1 Atrium (Jay St glass, theater shell)",
+    "shots": [
+     {
+      "photo": 5,
+      "matched": true,
+      "ms": 2689,
+      "conf": "high",
+      "inl": 76,
+      "pos_err": 0.0,
+      "hdg_err": 3.1
+     }
+    ],
+    "fix": {
+     "photo": 5,
+     "matched": true,
+     "ms": 2689,
+     "conf": "high",
+     "inl": 76,
+     "pos_err": 0.0,
+     "hdg_err": 3.1
+    },
+    "route": "RIGHT 2 m \u2192 BEAR RIGHT 15 m \u2192 RIGHT 24 m",
+    "total": 41,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Theater (orchestra)",
+    "img": "m35_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 36,
+  "start": "S1 Atrium (Jay St glass, theater shell)",
+  "dest": "Exit Stair E (by corridor doors)",
+  "legs": [
+   {
+    "station": "S1 Atrium (Jay St glass, theater shell)",
+    "shots": [
+     {
+      "photo": 0,
+      "matched": true,
+      "ms": 2538,
+      "conf": "high",
+      "inl": 99,
+      "pos_err": 0.0,
+      "hdg_err": -3.3
+     }
+    ],
+    "fix": {
+     "photo": 0,
+     "matched": true,
+     "ms": 2538,
+     "conf": "high",
+     "inl": 99,
+     "pos_err": 0.0,
+     "hdg_err": -3.3
+    },
+    "route": "TURN AROUND 19 m \u2192 LEFT 8 m \u2192 RIGHT 3 m",
+    "total": 30,
+    "via": null,
+    "first": "TURN AROUND",
+    "true_first": "TURN AROUND",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Exit Stair E (by corridor doors)",
+    "img": "m36_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 37,
+  "start": "S7 A 105 north-west corner (windows)",
+  "dest": "A 106",
+  "legs": [
+   {
+    "station": "S7 A 105 north-west corner (windows)",
+    "shots": [
+     {
+      "photo": 54,
+      "matched": true,
+      "ms": 2037,
+      "conf": "medium",
+      "inl": 21,
+      "pos_err": 0.0,
+      "hdg_err": -36.8
+     }
+    ],
+    "fix": {
+     "photo": 54,
+     "matched": true,
+     "ms": 2037,
+     "conf": "medium",
+     "inl": 21,
+     "pos_err": 0.0,
+     "hdg_err": -36.8
+    },
+    "route": "LEFT 13 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "total": 13,
+    "via": "Door A 105 (north)",
+    "first": "LEFT",
+    "true_first": "TURN AROUND",
+    "instr_ok": false,
+    "good": false,
+    "dest": "A 106",
+    "img": "m37_l1"
+   }
+  ],
+  "ok": false,
+  "why": "wrong fix at S7 A 105 north-west corner (windows) (0 m, -37 deg)"
+ },
+ {
+  "n": 38,
+  "start": "S7 A 105 north-west corner (windows)",
+  "dest": "Theater (orchestra)",
+  "legs": [
+   {
+    "station": "S7 A 105 north-west corner (windows)",
+    "shots": [
+     {
       "photo": 50,
       "matched": true,
-      "ms": 3050,
+      "ms": 2641,
       "conf": "medium",
-      "inl": 24,
+      "inl": 14,
       "pos_err": 0.0,
-      "hdg_err": -12.9
+      "hdg_err": -16.8
      }
     ],
     "fix": {
      "photo": 50,
      "matched": true,
-     "ms": 3050,
+     "ms": 2641,
      "conf": "medium",
-     "inl": 24,
+     "inl": 14,
      "pos_err": 0.0,
-     "hdg_err": -12.9
+     "hdg_err": -16.8
     },
     "route": "AHEAD 13 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
     "total": 13,
@@ -1077,8 +1981,122 @@
     "true_first": "AHEAD",
     "instr_ok": true,
     "good": true,
+    "dest": "Theater (orchestra)",
+    "img": "m38_l1"
+   },
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 38,
+      "matched": true,
+      "ms": 2491,
+      "conf": "high",
+      "inl": 77,
+      "pos_err": 0.0,
+      "hdg_err": 1.1
+     }
+    ],
+    "fix": {
+     "photo": 38,
+     "matched": true,
+     "ms": 2491,
+     "conf": "high",
+     "inl": 77,
+     "pos_err": 0.0,
+     "hdg_err": 1.1
+    },
+    "route": "RIGHT 6 m \u2192 LEFT 8 m \u2192 RIGHT 34 m \u2192 RIGHT 25 m",
+    "total": 73,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Theater (orchestra)",
+    "img": "m38_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 39,
+  "start": "S4 Corridor doors / Exit Stair E",
+  "dest": "Exit: Main Entrance (Jay St)",
+  "legs": [
+   {
+    "station": "S4 Corridor doors / Exit Stair E",
+    "shots": [
+     {
+      "photo": 31,
+      "matched": true,
+      "ms": 2729,
+      "conf": "high",
+      "inl": 129,
+      "pos_err": 0.0,
+      "hdg_err": -5.6
+     }
+    ],
+    "fix": {
+     "photo": 31,
+     "matched": true,
+     "ms": 2729,
+     "conf": "high",
+     "inl": 129,
+     "pos_err": 0.0,
+     "hdg_err": -5.6
+    },
+    "route": "BEAR LEFT 15 m",
+    "total": 15,
+    "via": null,
+    "first": "BEAR LEFT",
+    "true_first": "BEAR LEFT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Exit: Main Entrance (Jay St)",
+    "img": "m39_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 40,
+  "start": "S6 A 105 north-east corner (north door)",
+  "dest": "Courtyard doors",
+  "legs": [
+   {
+    "station": "S6 A 105 north-east corner (north door)",
+    "shots": [
+     {
+      "photo": 40,
+      "matched": true,
+      "ms": 1177,
+      "conf": "high",
+      "inl": 27,
+      "pos_err": 0.0,
+      "hdg_err": -1.9
+     }
+    ],
+    "fix": {
+     "photo": 40,
+     "matched": true,
+     "ms": 1177,
+     "conf": "high",
+     "inl": 27,
+     "pos_err": 0.0,
+     "hdg_err": -1.9
+    },
+    "route": "RIGHT 3 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "total": 3,
+    "via": "Door A 105 (north)",
+    "first": "RIGHT",
+    "true_first": "BEAR RIGHT",
+    "instr_ok": false,
+    "good": true,
     "dest": "Courtyard doors",
-    "img": "m19_l1"
+    "img": "m40_l1"
    },
    {
     "station": "S5 Corridor outside A 105",
@@ -1086,21 +2104,21 @@
      {
       "photo": 36,
       "matched": true,
-      "ms": 2633,
-      "conf": "medium",
-      "inl": 24,
+      "ms": 2468,
+      "conf": "high",
+      "inl": 25,
       "pos_err": 5.3,
-      "hdg_err": 5.2
+      "hdg_err": 5.0
      }
     ],
     "fix": {
      "photo": 36,
      "matched": true,
-     "ms": 2633,
-     "conf": "medium",
-     "inl": 24,
+     "ms": 2468,
+     "conf": "high",
+     "inl": 25,
      "pos_err": 5.3,
-     "hdg_err": 5.2
+     "hdg_err": 5.0
     },
     "route": "LEFT 21 m",
     "total": 21,
@@ -1110,14 +2128,60 @@
     "instr_ok": false,
     "good": true,
     "dest": "Courtyard doors",
-    "img": "m19_l2"
+    "img": "m40_l2"
    }
   ],
   "ok": true,
   "why": ""
  },
  {
-  "n": 20,
+  "n": 41,
+  "start": "S3 Behind the escalators / Elevator Bank B",
+  "dest": "Escalator to 2nd floor",
+  "legs": [
+   {
+    "station": "S3 Behind the escalators / Elevator Bank B",
+    "shots": [
+     {
+      "photo": 23,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 17,
+      "matched": true,
+      "ms": 2122,
+      "conf": "high",
+      "inl": 61,
+      "pos_err": 0.0,
+      "hdg_err": 9.7
+     }
+    ],
+    "fix": {
+     "photo": 17,
+     "matched": true,
+     "ms": 2122,
+     "conf": "high",
+     "inl": 61,
+     "pos_err": 0.0,
+     "hdg_err": 9.7
+    },
+    "route": "TURN AROUND 7 m \u2192 RIGHT 5 m",
+    "total": 12,
+    "via": null,
+    "first": "TURN AROUND",
+    "true_first": "TURN AROUND",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Escalator to 2nd floor",
+    "img": "m41_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 42,
   "start": "S6 A 105 north-east corner (north door)",
   "dest": "South cabinets",
   "legs": [
@@ -1125,33 +2189,546 @@
     "station": "S6 A 105 north-east corner (north door)",
     "shots": [
      {
-      "photo": 42,
+      "photo": 43,
       "matched": true,
-      "ms": 854,
-      "conf": "high",
-      "inl": 60,
+      "ms": 2093,
+      "conf": "medium",
+      "inl": 21,
       "pos_err": 0.0,
-      "hdg_err": 3.1
+      "hdg_err": 8.9
      }
     ],
     "fix": {
-     "photo": 42,
+     "photo": 43,
      "matched": true,
-     "ms": 854,
-     "conf": "high",
-     "inl": 60,
+     "ms": 2093,
+     "conf": "medium",
+     "inl": 21,
      "pos_err": 0.0,
-     "hdg_err": 3.1
+     "hdg_err": 8.9
     },
-    "route": "AHEAD 2 m \u2192 RIGHT 18 m \u2192 RIGHT 7 m",
+    "route": "BEAR LEFT 2 m \u2192 RIGHT 18 m \u2192 RIGHT 7 m",
     "total": 26,
+    "via": null,
+    "first": "BEAR LEFT",
+    "true_first": "BEAR LEFT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "South cabinets",
+    "img": "m42_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 43,
+  "start": "S9 A 105 south-east corner (south door)",
+  "dest": "Exit Stair E (by corridor doors)",
+  "legs": [
+   {
+    "station": "S9 A 105 south-east corner (south door)",
+    "shots": [
+     {
+      "photo": 66,
+      "matched": true,
+      "ms": 1132,
+      "conf": "high",
+      "inl": 25,
+      "pos_err": 0.0,
+      "hdg_err": -0.0
+     }
+    ],
+    "fix": {
+     "photo": 66,
+     "matched": true,
+     "ms": 1132,
+     "conf": "high",
+     "inl": 25,
+     "pos_err": 0.0,
+     "hdg_err": -0.0
+    },
+    "route": "AHEAD 2 m \u2192 LEFT 17 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "total": 19,
+    "via": "Door A 105 (north)",
+    "first": "AHEAD",
+    "true_first": "AHEAD",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Exit Stair E (by corridor doors)",
+    "img": "m43_l1"
+   },
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 32,
+      "matched": true,
+      "ms": 2860,
+      "conf": "medium",
+      "inl": 146,
+      "pos_err": 0.0,
+      "hdg_err": 9.7
+     }
+    ],
+    "fix": {
+     "photo": 32,
+     "matched": true,
+     "ms": 2860,
+     "conf": "medium",
+     "inl": 146,
+     "pos_err": 0.0,
+     "hdg_err": 9.7
+    },
+    "route": "AHEAD 3 m",
+    "total": 3,
     "via": null,
     "first": "AHEAD",
     "true_first": "AHEAD",
     "instr_ok": true,
     "good": true,
-    "dest": "South cabinets",
-    "img": "m20_l1"
+    "dest": "Exit Stair E (by corridor doors)",
+    "img": "m43_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 44,
+  "start": "S6 A 105 north-east corner (north door)",
+  "dest": "Elevator Bank B",
+  "legs": [
+   {
+    "station": "S6 A 105 north-east corner (north door)",
+    "shots": [
+     {
+      "photo": 45,
+      "matched": true,
+      "ms": 2862,
+      "conf": "high",
+      "inl": 48,
+      "pos_err": 0.0,
+      "hdg_err": 0.1
+     }
+    ],
+    "fix": {
+     "photo": 45,
+     "matched": true,
+     "ms": 2862,
+     "conf": "high",
+     "inl": 48,
+     "pos_err": 0.0,
+     "hdg_err": 0.1
+    },
+    "route": "TURN AROUND 3 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "total": 3,
+    "via": "Door A 105 (north)",
+    "first": "TURN AROUND",
+    "true_first": "TURN AROUND",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Elevator Bank B",
+    "img": "m44_l1"
+   },
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 38,
+      "matched": true,
+      "ms": 2437,
+      "conf": "high",
+      "inl": 83,
+      "pos_err": 0.0,
+      "hdg_err": 4.0
+     }
+    ],
+    "fix": {
+     "photo": 38,
+     "matched": true,
+     "ms": 2437,
+     "conf": "high",
+     "inl": 83,
+     "pos_err": 0.0,
+     "hdg_err": 4.0
+    },
+    "route": "RIGHT 6 m \u2192 RIGHT 10 m \u2192 RIGHT 5 m",
+    "total": 20,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Elevator Bank B",
+    "img": "m44_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 45,
+  "start": "S6 A 105 north-east corner (north door)",
+  "dest": "A 103",
+  "legs": [
+   {
+    "station": "S6 A 105 north-east corner (north door)",
+    "shots": [
+     {
+      "photo": 40,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 47,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 42,
+      "matched": true,
+      "ms": 628,
+      "conf": "high",
+      "inl": 49,
+      "pos_err": 0.0,
+      "hdg_err": 3.4
+     }
+    ],
+    "fix": {
+     "photo": 42,
+     "matched": true,
+     "ms": 628,
+     "conf": "high",
+     "inl": 49,
+     "pos_err": 0.0,
+     "hdg_err": 3.4
+    },
+    "route": "BEAR LEFT 3 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "total": 3,
+    "via": "Door A 105 (north)",
+    "first": "BEAR LEFT",
+    "true_first": "AHEAD",
+    "instr_ok": false,
+    "good": true,
+    "dest": "A 103",
+    "img": "m45_l1"
+   },
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 35,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 37,
+      "matched": true,
+      "ms": 2190,
+      "conf": "high",
+      "inl": 60,
+      "pos_err": 0.0,
+      "hdg_err": -0.4
+     }
+    ],
+    "fix": {
+     "photo": 37,
+     "matched": true,
+     "ms": 2190,
+     "conf": "high",
+     "inl": 60,
+     "pos_err": 0.0,
+     "hdg_err": -0.4
+    },
+    "route": "BEAR LEFT 28 m \u2192 RIGHT 4 m",
+    "total": 32,
+    "via": null,
+    "first": "BEAR LEFT",
+    "true_first": "BEAR LEFT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "A 103",
+    "img": "m45_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 46,
+  "start": "S8 A 105 south-west corner (windows)",
+  "dest": "Whiteboards (front)",
+  "legs": [
+   {
+    "station": "S8 A 105 south-west corner (windows)",
+    "shots": [
+     {
+      "photo": 62,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 57,
+      "matched": true,
+      "ms": 2915,
+      "conf": "high",
+      "inl": 122,
+      "pos_err": 0.0,
+      "hdg_err": 2.6
+     }
+    ],
+    "fix": {
+     "photo": 57,
+     "matched": true,
+     "ms": 2915,
+     "conf": "high",
+     "inl": 122,
+     "pos_err": 0.0,
+     "hdg_err": 2.6
+    },
+    "route": "BEAR RIGHT 12 m \u2192 LEFT 10 m",
+    "total": 21,
+    "via": null,
+    "first": "BEAR RIGHT",
+    "true_first": "BEAR RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Whiteboards (front)",
+    "img": "m46_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 47,
+  "start": "S1 Atrium (Jay St glass, theater shell)",
+  "dest": "Elevator Bank B",
+  "legs": [
+   {
+    "station": "S1 Atrium (Jay St glass, theater shell)",
+    "shots": [
+     {
+      "photo": 0,
+      "matched": true,
+      "ms": 2262,
+      "conf": "high",
+      "inl": 88,
+      "pos_err": 0.0,
+      "hdg_err": -1.2
+     }
+    ],
+    "fix": {
+     "photo": 0,
+     "matched": true,
+     "ms": 2262,
+     "conf": "high",
+     "inl": 88,
+     "pos_err": 0.0,
+     "hdg_err": -1.2
+    },
+    "route": "TURN AROUND 19 m \u2192 LEFT 19 m \u2192 RIGHT 5 m",
+    "total": 42,
+    "via": null,
+    "first": "TURN AROUND",
+    "true_first": "TURN AROUND",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Elevator Bank B",
+    "img": "m47_l1"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 48,
+  "start": "S6 A 105 north-east corner (north door)",
+  "dest": "NEAREST EXIT",
+  "legs": [
+   {
+    "station": "S6 A 105 north-east corner (north door)",
+    "shots": [
+     {
+      "photo": 45,
+      "matched": true,
+      "ms": 3014,
+      "conf": "high",
+      "inl": 38,
+      "pos_err": 0.0,
+      "hdg_err": -2.7
+     }
+    ],
+    "fix": {
+     "photo": 45,
+     "matched": true,
+     "ms": 3014,
+     "conf": "high",
+     "inl": 38,
+     "pos_err": 0.0,
+     "hdg_err": -2.7
+    },
+    "route": "TURN AROUND 3 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "total": 3,
+    "via": "Door A 105 (north)",
+    "first": "TURN AROUND",
+    "true_first": "TURN AROUND",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Exit Stair E (by corridor doors)",
+    "img": "m48_l1"
+   },
+   {
+    "station": "S5 Corridor outside A 105",
+    "shots": [
+     {
+      "photo": 38,
+      "matched": true,
+      "ms": 2445,
+      "conf": "high",
+      "inl": 75,
+      "pos_err": 0.0,
+      "hdg_err": 0.3
+     }
+    ],
+    "fix": {
+     "photo": 38,
+     "matched": true,
+     "ms": 2445,
+     "conf": "high",
+     "inl": 75,
+     "pos_err": 0.0,
+     "hdg_err": 0.3
+    },
+    "route": "RIGHT 3 m",
+    "total": 3,
+    "via": null,
+    "first": "RIGHT",
+    "true_first": "RIGHT",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Exit Stair E (by corridor doors)",
+    "img": "m48_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 49,
+  "start": "S4 Corridor doors / Exit Stair E",
+  "dest": "Windows (Jay St side)",
+  "legs": [
+   {
+    "station": "S4 Corridor doors / Exit Stair E",
+    "shots": [
+     {
+      "photo": 28,
+      "matched": true,
+      "ms": 2850,
+      "conf": "high",
+      "inl": 36,
+      "pos_err": 5.3,
+      "hdg_err": -5.2
+     }
+    ],
+    "fix": {
+     "photo": 28,
+     "matched": true,
+     "ms": 2850,
+     "conf": "high",
+     "inl": 36,
+     "pos_err": 5.3,
+     "hdg_err": -5.2
+    },
+    "route": "AHEAD 3 m \u2192 RIGHT 2 m \u2192 THROUGH DOOR A 105 (NORTH), THEN SHOOT AGAIN",
+    "total": 5,
+    "via": "Door A 105 (north)",
+    "first": "AHEAD",
+    "true_first": "AHEAD",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Windows (Jay St side)",
+    "img": "m49_l1"
+   },
+   {
+    "station": "S6 A 105 north-east corner (north door)",
+    "shots": [
+     {
+      "photo": 40,
+      "matched": false,
+      "ms": null
+     },
+     {
+      "photo": 41,
+      "matched": true,
+      "ms": 1789,
+      "conf": "high",
+      "inl": 127,
+      "pos_err": 0.0,
+      "hdg_err": -1.7
+     }
+    ],
+    "fix": {
+     "photo": 41,
+     "matched": true,
+     "ms": 1789,
+     "conf": "high",
+     "inl": 127,
+     "pos_err": 0.0,
+     "hdg_err": -1.7
+    },
+    "route": "AHEAD 2 m \u2192 LEFT 12 m \u2192 LEFT 10 m",
+    "total": 24,
+    "via": null,
+    "first": "AHEAD",
+    "true_first": "AHEAD",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Windows (Jay St side)",
+    "img": "m49_l2"
+   }
+  ],
+  "ok": true,
+  "why": ""
+ },
+ {
+  "n": 50,
+  "start": "S4 Corridor doors / Exit Stair E",
+  "dest": "Information desk",
+  "legs": [
+   {
+    "station": "S4 Corridor doors / Exit Stair E",
+    "shots": [
+     {
+      "photo": 24,
+      "matched": true,
+      "ms": 2868,
+      "conf": "high",
+      "inl": 140,
+      "pos_err": 0.0,
+      "hdg_err": 4.3
+     }
+    ],
+    "fix": {
+     "photo": 24,
+     "matched": true,
+     "ms": 2868,
+     "conf": "high",
+     "inl": 140,
+     "pos_err": 0.0,
+     "hdg_err": 4.3
+    },
+    "route": "AHEAD 5 m \u2192 BEAR LEFT 5 m \u2192 BEAR RIGHT 2 m",
+    "total": 13,
+    "via": null,
+    "first": "AHEAD",
+    "true_first": "AHEAD",
+    "instr_ok": true,
+    "good": true,
+    "dest": "Information desk",
+    "img": "m50_l1"
    }
   ],
   "ok": true,
