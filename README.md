@@ -17,6 +17,9 @@ GPS stops at the door. Inside, steel and wiring bend the compass: on our own sur
 
 See the surveyed floor in 3D: https://francolinx.github.io/worn-smart-glasses/floor3d.html
 
+20 simulated missions on the real survey photos, with the wearer's view for every leg: https://francolinx.github.io/worn-smart-glasses/benchmark.html
+(19 of 20 reached the target; in 14 every first arrow matched the true pose; no fix was more than one station off. `tools/bench_missions.py`.)
+
 Outdoors, the same idea works from the skyline: tap three rooftops in a photo and get position, heading and floor.
 
 **Venue pack:** 285 Jay St (City Tech), Downtown Brooklyn. Tillary St to the north, Jay St to the west, Bridge St to the east,
