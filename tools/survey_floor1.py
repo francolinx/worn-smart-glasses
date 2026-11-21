@@ -3,7 +3,8 @@ Positions are plan pixels; headings are degrees clockwise from plan-up (plan-up 
 Headings are a least-squares fit of three things: the rotation measured between overlapping photos at a station (ORB +
 homography, the strong term), a few views that are square-on to a wall or straight down a corridor (anchors), and the
 phone compass. The compass agreed with the building in the lobby, was 35-50 degrees out in the corridor and useless
-inside A 105, so it only counts in S1-S5. Expect about +-10 degrees where photos overlap, +-20 elsewhere, and +-2 m."""
+inside A 105, so it only counts in S1-S5. The first two S7 headings were then set by eye from what the
+photos share with their neighbours: the fit had them 30 degrees out, which the iPhone-profile benchmark caught. Expect about +-10 degrees where photos overlap, +-20 elsewhere, and +-2 m."""
 ST = [
  # name, plan, (x, y), first photo index, headings
  ("S1 Atrium (Jay St glass, theater shell)", "f1", (400, 1140), 0,  [271, 314, 1, 41, 84, 125, 178, 230]),
@@ -12,7 +13,7 @@ ST = [
  ("S4 Corridor doors / Exit Stair E",        "f1", (725, 1016), 24, [272, 325, 1, 35, 89, 144, 186, 229]),
  ("S5 Corridor outside A 105",               "f1", (810, 1020), 32, [266, 313, 350, 28, 87, 139, 177, 227]),
  ("S6 A 105 north-east corner (north door)", "a105", (300, 290), 40, [270, 308, 354, 45, 92, 134, 172, 240]),
- ("S7 A 105 north-west corner (windows)",    "a105", (215, 790), 48, [273, 329, 19, 61, 95, 133, 178, 204]),
+ ("S7 A 105 north-west corner (windows)",    "a105", (215, 790), 48, [243, 306, 19, 61, 95, 133, 178, 204]),
  ("S8 A 105 south-west corner (windows)",    "a105", (1185, 790), 56, [284, 326, 8, 55, 121, 168, 186, 247]),
  ("S9 A 105 south-east corner (south door)", "a105", (1100, 290), 64, [275, 328, 11, 44, 73, 137, 194, 241]),
  ("X1 A 105 front, looking at the boards (north half)", "a105", (700, 300), 72, [320]),

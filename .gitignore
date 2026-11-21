@@ -2,3 +2,22 @@ node_modules/
 .vercel/
 __pycache__/
 .DS_Store
+
+# MicroLumin SDK kit: confidential, never commit
+01_Start_Here/
+02_Android_SDK/
+03_iOS_SDK/
+04_Demo_Apps/
+05_Product_Docs/
+MLDemo/
+MLVisionM6SDK*/
+mainapp-main-sdk-oversea/
+*.xcframework
+*.aar
+Microlumin*/
+MicroLumin*/
+# build output
+m6/glasses-app/.gradle/
+m6/glasses-app/**/build/
+m6/ios/**/xcuserdata/
+m6/ios/**/DerivedData/

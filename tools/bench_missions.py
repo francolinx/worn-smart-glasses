@@ -31,10 +31,14 @@ def pov(im, i, hud_png, path):                   # what the wearer sees: the sce
 srv = subprocess.Popen([sys.executable, '-m', 'http.server', '8767', '-d', web], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); time.sleep(1); runs = []
 try:
   with sync_playwright() as p:
-    b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--no-sandbox']); cx = b.new_context(service_workers='block', viewport={'width': 430, 'height': 900})
-    cx.route('**/ntfy.sh/**', lambda r: r.abort()); cx.route('**/api/state**', lambda r: r.abort())
-    ph = cx.new_page(); ph.goto('http://localhost:8767/indoor.html?room=bench'); ph.wait_for_function("document.getElementById('packline').textContent.length>10", timeout=30000); ph.evaluate('window.ALL=REFS.slice()')
-    gl = cx.new_page(); gl.set_viewport_size({'width': 600, 'height': 600}); gl.goto('http://localhost:8767/glasses.html?room=bench')
+    b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--no-sandbox']); IOS = os.environ.get('ENGINE') == 'webkit'      # ENGINE=webkit: phone page in WebKit with an iPhone profile, glasses page at the M6's 640x480
+    if IOS: wb = p.webkit.launch(); cx = wb.new_context(**p.devices['iPhone 15 Pro']); gcx = b.new_context(service_workers='block', viewport={'width': 640, 'height': 480})
+    else: cx = b.new_context(service_workers='block', viewport={'width': 430, 'height': 900}); gcx = cx
+    for c in {cx, gcx}: c.route('**/ntfy.sh/**', lambda r: r.abort()); c.route('**/api/state**', lambda r: r.abort())
+    ph = cx.new_page(); perr = []; ph.on('pageerror', lambda e: perr.append(str(e))); ph.goto('http://localhost:8767/indoor.html?room=bench'); ph.wait_for_function("document.getElementById('packline').textContent.length>10", timeout=30000); ph.evaluate('window.ALL=REFS.slice()')
+    gl = gcx.new_page(); gerr = []; gl.on('pageerror', lambda e: gerr.append(str(e)))
+    if not IOS: gl.set_viewport_size({'width': 600, 'height': 600})
+    gl.goto('http://localhost:8767/glasses.html?room=bench' + ('&m6=1' if IOS else ''))
     for m in range(N):
         st = rnd.randrange(9)
         while True:
@@ -46,7 +50,10 @@ try:
             for shot in range(3):                                    # no match -> look another way, up to 3 photos
                 q = rnd.choice([x for x in BY[cur] if x['i'] not in tried]); tried.append(q['i']); f, im, yaw = degrade(q['i']); trueH = (q['heading'] + yaw) % 360
                 ph.evaluate("id=>{REFS=ALL.filter(r=>r.id!==id); FIX=null; document.getElementById('goStatus').textContent='';}", q['id'])
-                ph.set_input_files('#capGo', f); ph.wait_for_function("/Matched|No surveyed/.test(document.getElementById('goStatus').textContent)", timeout=90000)
+                if IOS and (m + shot) % 2:                 # every other photo arrives the way a native shell hands over a glasses photo
+                    import base64; ph.evaluate("u=>{window.PG_usePhoto(u)}", 'data:image/jpeg;base64,' + base64.b64encode(open(f, 'rb').read()).decode())
+                else: ph.set_input_files('#capGo', f)
+                ph.wait_for_function("/Matched|No surveyed/.test(document.getElementById('goStatus').textContent)", timeout=90000)
                 txt = ph.inner_text('#goStatus'); fx = ph.evaluate('FIX&&({floor:FIX.floor,x:FIX.x,y:FIX.y,h:FIX.heading,inl:FIX.inliers,conf:FIX.conf})'); ms = int(txt.split('Matched in ')[1].split(' ms')[0]) if 'Matched in' in txt else None
                 s = dict(photo=q['i'], matched=bool(fx), ms=ms)
                 if fx:
@@ -62,7 +69,11 @@ try:
             R = ph.evaluate("ROUTE&&({steps:ROUTE.steps,total:ROUTE.total,via:ROUTE.via||null,mapped:ROUTE.mapped,noLink:!!ROUTE.noLink,dest:DEST&&DEST.name,dfloor:DEST&&DEST.floor})")
             T = ph.evaluate("([t,keep])=>{FIX={...FIX,floor:t.floor,x:t.x,y:t.y,heading:t.h}; reroute(); const o=ROUTE&&({turn:ROUTE.steps[0]&&ROUTE.steps[0].turn,total:ROUTE.total}); FIX=keep; reroute(); return o;}", [dict(floor=q['floor'], x=q['x'], y=q['y'], h=trueH), fx | dict(heading=fx['h'], inliers=fx['inl'])])
             L.update(fix=s, route=' → '.join('%s%s' % (x['turn'], '' if x.get('vertical') else ' %d m' % x['m']) for x in R['steps']), total=round(R['total']), via=R['via'], first=R['steps'][0]['turn'] if R['steps'] else '', true_first=T['turn'], instr_ok=bool(R['steps']) and R['steps'][0]['turn'] == T['turn'], good=good, dest=R['dest'])
-            ph.click('#go'); ph.wait_for_function("/sent to room/.test(document.getElementById('syncinfo').textContent)", timeout=20000); time.sleep(0.9)
+            ph.click('#go'); ph.wait_for_function("/sent to room/.test(document.getElementById('syncinfo').textContent)", timeout=20000)
+            if IOS:                              # two different browsers: carry the relay message across by hand (stands in for the ntfy hop)
+                msg = ph.evaluate("localStorage.getItem('pg_state_bench')"); gl.evaluate("m=>{localStorage.setItem('pg_state_bench',m); window.dispatchEvent(new Event('storage'));}", msg); L['msg_bytes'] = len(msg)
+                time.sleep(0.9); L['glasses_ok'] = gl.evaluate("!!(state&&state.fix&&state.fix.plan&&mapOn&&SCH&&SCH[state.fix.plan])")
+            else: time.sleep(0.9)
             tag = '%s/m%02d_l%d' % (out, m + 1, leg + 1); gl.screenshot(path=tag + '_map.png'); pov(im, q['i'], tag + '_map.png', tag + '_pov.jpg')      # indoors the glasses open on the floor schematic
             ph.locator('#planbox').screenshot(path=tag + '_plan.png'); L['img'] = os.path.basename(tag); run['legs'].append(L)
             if not good: run['why'] = 'wrong fix at %s (%.0f m, %.0f deg)' % (S.ST[cur][0], s['pos_err'], s['hdg_err']); break
@@ -75,3 +86,4 @@ try:
     b.close()
 finally: srv.terminate()
 json.dump(runs, open(out + '/runs.json', 'w'), indent=1)
+if os.environ.get('ENGINE') == 'webkit': print('page errors: phone', perr[:5], 'glasses', gerr[:5])

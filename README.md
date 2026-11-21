@@ -28,6 +28,14 @@ photos yet, so those trials start from an injected position. `tools/bench_vertic
 Overnight handoff with 11 responder scenarios across floors 1 to 8 (fire rescue, police, paramedics), a glasses frame at every fix and turn:
 https://francolinx.github.io/worn-smart-glasses/handoff.html (`tools/run_stories.py`, `tools/build_handoff.py`). Upper-floor outlines are traced from the fire signs (`tools/trace_fireplans.py`).
 
+**MicroLumin M6 / iOS (demo day): start with [`DEMO_DAY.md`](DEMO_DAY.md).** `m6/glasses-app` is the display app for the glasses (Android web view shell,
+built by CI onto the `apk` branch), `m6/ios/PointGo` an iOS wrapper for the phone page. Neither contains SDK files.
+
+M6 rehearsal: phone page in WebKit with an iPhone profile, glasses page at 640×480, 50 missions with held-out, degraded survey photos.
+First pass 47 of 50 reached the target, worst heading error 34°. Two survey headings at the north-west window corner of A 105 were wrong;
+after correcting them, 48 of 50, worst heading 22°, no wrong-place fix, every fix drawn on the 640×480 schematic (63 of 63). The two failures
+are no-match at the south-west window corner. Not covered: a real iPhone, a real M6, the relay over the internet, the M6 camera.
+
 Outdoors, the same idea works from the skyline: tap three rooftops in a photo and get position, heading and floor.
 
 **Venue pack:** 285 Jay St (City Tech), Downtown Brooklyn. Tillary St to the north, Jay St to the west, Bridge St to the east,
