@@ -32,7 +32,7 @@
 <div id="hdg">HDG --</div>
 <div id="fixinfo"></div>
 <div id="bar">
-  <button id="bCal" class="focusable" tabindex="0">COMPASS</button>
+  <button id="bCal" class="focusable" tabindex="0">ALIGN</button>
   <button id="bDest" class="focusable" tabindex="0">DEST ▸</button>
   <button id="bMap" class="focusable" tabindex="0">MAP</button>
 </div>
@@ -40,14 +40,13 @@
 <script src="js/sync.js"></script>
 <script>
 /* Point & Go, glasses side. 600x600, black background, D-pad focus + Enter/pinch only.
-   Position comes from the phone's photo fix (no GPS). Heading: absolute compass if the device has one;
-   otherwise head-turn (relative) heading, zeroed to the photo's solved heading when the fix arrives
-   (you shot the photo facing that way) or when you press COMPASS while facing the same way.
+   Position comes from the phone's photo fix (no GPS). Heading: press ALIGN while facing the way the photo was shot,
+   and the arrow then follows head turns from the photo's solved heading. Until ALIGN, the device compass is used if it reports north.
    ?demo=1 fakes a fix at 285 Jay St.   ?room=NAME pairs with a phone on the same room. */
 const $ = id => document.getElementById(id), params = new URLSearchParams(location.search);
 const AHEAD = 20, norm180 = PG.wrap180;
 let state = null, dests = [], destIdx = -1, mapOn = false, pack = null;
-let rawHeading = null, absolute = false, offset = 0, sensorsOn = false, lastOrient = 0, shown = 0;
+let rawHeading = null, absolute = false, offset = 0, aligned = false, sensorsOn = false, lastOrient = 0, shown = 0;
 
 function onOrient(e) {
   lastOrient = Date.now();
@@ -56,8 +55,12 @@ function onOrient(e) {
   else if (!absolute && typeof e.alpha === 'number') { rawHeading = (360 - e.alpha) % 360; }
 }
 const live = () => rawHeading !== null && Date.now() - lastOrient < 3000;
-const heading = () => !live() ? null : absolute ? rawHeading : (rawHeading + offset + 360) % 360;
-function zeroToFix() { if (state && live() && !absolute && typeof state.fix.heading === 'number') offset = state.fix.heading - rawHeading; }
+/* Heading used for the arrow:
+     aligned  -> the photo's solved heading plus how far the head has turned since ALIGN (the sensor is used only for the change)
+     compass  -> the device's own north, when it reports one and ALIGN has not been pressed
+     none     -> arrow is drawn relative to the photo's view direction */
+const heading = () => !live() ? null : aligned ? (rawHeading + offset + 720) % 360 : absolute ? rawHeading : null;
+function align() { if (state && live() && typeof state.fix.heading === 'number') { offset = state.fix.heading - rawHeading; aligned = true; } }
 async function enableSensors() {
   for (const Ev of [window.DeviceOrientationEvent, window.DeviceMotionEvent]) { try { if (Ev && typeof Ev.requestPermission === 'function') await Ev.requestPermission(); } catch (_) {} }
   if (!sensorsOn) { addEventListener('deviceorientationabsolute', onOrient); addEventListener('deviceorientation', onOrient); sensorsOn = true; }
@@ -65,7 +68,7 @@ async function enableSensors() {
 addEventListener('deviceorientationabsolute', onOrient); addEventListener('deviceorientation', onOrient);
 
 function onState(s) {
-  state = s; destIdx = -1; zeroToFix();
+  state = s; destIdx = -1; dests = []; aligned = false;
   const t = new Date(s.t); $('fixinfo').innerHTML = `FIX ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')} ±${Math.round(s.fix.ring || 0)} m` + (s.fix.floor ? `<br>FLOOR ~${s.fix.floor}` : '');
 }
 const target = () => !state ? null : destIdx >= 0 ? dests[destIdx] : state.dest;
@@ -83,10 +86,10 @@ function render() {
     $('dist').textContent = dist >= 1000 ? (dist / 1000).toFixed(1) + ' km' : Math.round(dist) + ' m';
     $('dest').textContent = d.name || '';
     const card = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(brg / 45) % 8];
-    $('status').textContent = (ahead ? 'STRAIGHT AHEAD' : Math.abs(rel) > 150 ? 'TURN AROUND' : rel > 0 ? 'TURN RIGHT' : 'TURN LEFT') + ` · ${Math.round(brg)}° ${card}` + (h === null ? ' (from photo view)' : '');
+    $('status').textContent = (ahead ? 'STRAIGHT AHEAD' : Math.abs(rel) > 150 ? 'TURN AROUND' : rel > 0 ? 'TURN RIGHT' : 'TURN LEFT') + (state.fix.indoor ? '' : ` · ${Math.round(brg)}° ${card}`) + (h === null ? ' (from photo view)' : '');
     $('status').className = ahead ? 'ahead' : '';
   }
-  $('hdg').textContent = live() ? `HDG ${Math.round(heading())}°${absolute ? '' : ' rel'}` : sensorsOn ? 'HDG -- (no sensor)' : 'COMPASS to enable heading';
+  $('hdg').textContent = !live() ? (sensorsOn ? 'HDG -- (no sensor)' : 'ALIGN to enable heading') : aligned ? `HDG ${Math.round(heading())}° photo` : absolute ? `HDG ${Math.round(heading())}° compass` : 'Face where you shot, then ALIGN';
   if (mapOn) drawMap();
   requestAnimationFrame(render);
 }
@@ -100,13 +103,14 @@ async function loadPack() {
 }
 function drawMap() {
   const cv = $('map'), g = cv.getContext('2d'); g.fillStyle = '#000'; g.fillRect(0, 0, 600, 600);
-  if (!pack || !state) return;
-  const loc = PG.Local(state.fix.lat, state.fix.lon), h = heading(), rot = -((h !== null ? h : state.fix.heading || 0) * PG.D2R), S = 1.25;   // px per metre
+  if (!state || (!pack && !state.fix.indoor)) return;
+  const indoor = !!state.fix.indoor, loc = PG.Local(state.fix.lat, state.fix.lon), h = heading(), rot = -((h !== null ? h : state.fix.heading || 0) * PG.D2R), S = indoor ? 5 : 1.25;   // px per metre
   const P = (lat, lon) => { const [e, n] = loc.en(lat, lon), x = e * Math.cos(rot) - n * Math.sin(rot), y = e * Math.sin(rot) + n * Math.cos(rot); return [300 + x * S, 380 - y * S]; };
+  if (indoor) { g.font = '18px system-ui'; for (const d of state.dests || []) { const [x, y] = P(d.lat, d.lon); if (x < 10 || x > 590 || y < 40 || y > 540) continue; g.fillStyle = '#cfcfcf'; g.beginPath(); g.arc(x, y, 5, 0, 7); g.fill(); g.fillStyle = '#fff'; g.fillText(d.name.slice(0, 22), x + 9, y + 6); } }
   g.lineWidth = 1.5; g.strokeStyle = '#2f7d4c';
-  for (const b of pack.bld) { g.beginPath(); b.ring.forEach((p, i) => { const [x, y] = P(p[0], p[1]); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); }
+  for (const b of indoor ? [] : pack.bld) { g.beginPath(); b.ring.forEach((p, i) => { const [x, y] = P(p[0], p[1]); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); }
   g.strokeStyle = '#cfcfcf'; g.lineWidth = 2.5; const seen = {};
-  for (const s of pack.streets) {
+  for (const s of indoor ? [] : pack.streets) {
     g.beginPath(); s.pts.forEach((p, i) => { const [x, y] = P(p[0], p[1]); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
     const m = s.pts[Math.floor(s.pts.length / 2)], [x, y] = P(m[0], m[1]), k = s.name + Math.round(x / 150) + Math.round(y / 150);
     if (!seen[k] && x > 30 && x < 520 && y > 60 && y < 520) { seen[k] = 1; g.fillStyle = '#fff'; g.font = '17px system-ui'; g.fillText(s.name.replace(' Street', ' St').replace(' Place', ' Pl').replace(' Avenue', ' Av'), x + 4, y - 4); }
@@ -117,17 +121,19 @@ function drawMap() {
   g.strokeStyle = '#fff'; g.lineWidth = 1; g.beginPath(); g.arc(300, 380, Math.max(6, (state.fix.ring || 0) * S), 0, 7); g.stroke();
 }
 
-$('bCal').onclick = async () => { await enableSensors(); setTimeout(zeroToFix, 400); };
+$('bCal').onclick = async () => { await enableSensors(); setTimeout(align, live() ? 0 : 500); };
 $('bDest').onclick = async () => {
+  if (state && state.dests && state.dests.length) { dests = state.dests; destIdx = (destIdx + 1) % dests.length; return; }
   await loadPack(); if (!dests.length) dests = [...pack.corners, ...pack.places.filter(p => ['subway_entrance', 'station', 'cafe', 'park', 'library', 'university', 'hotel'].includes(p.kind) && p.name && state && PG.haversine(state.fix.lat, state.fix.lon, p.lat, p.lon) < 450).slice(0, 14)];
   destIdx = (destIdx + 1) % dests.length;
 };
-$('bMap').onclick = async () => { await loadPack(); mapOn = !mapOn; $('map').style.display = mapOn ? 'block' : 'none'; $('arrowView').style.display = mapOn ? 'none' : 'flex'; $('bMap').textContent = mapOn ? 'ARROW' : 'MAP'; };
+$('bMap').onclick = async () => { if (!(state && state.fix.indoor)) await loadPack(); mapOn = !mapOn; $('map').style.display = mapOn ? 'block' : 'none'; $('arrowView').style.display = mapOn ? 'none' : 'flex'; $('bMap').textContent = mapOn ? 'ARROW' : 'MAP'; };
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.activeElement && document.activeElement.click && document.activeElement.tagName !== 'BUTTON') $('bCal').click(); });
 $('bCal').focus();
 
 if (params.get('demo') === '1') onState({ t: Date.now(), fix: { lat: 40.695496, lon: -73.986565, ring: 15, heading: 0, floor: 4 }, dest: { name: 'Jay & Tillary (NW corner)', lat: 40.696132, lon: -73.987103 } });
 PGSync.subscribe(onState);
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 render();
 </script>
 </body>

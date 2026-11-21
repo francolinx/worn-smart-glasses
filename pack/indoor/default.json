@@ -1,0 +1,105 @@
+{
+ "id": "citytech-285jay-f1",
+ "name": "City Tech Academic Complex, 285 Jay St: 1st floor",
+ "image": "pack/indoor/citytech_f1.png",
+ "w": 1590,
+ "h": 1350,
+ "m_per_px": 0.0617,
+ "up_bearing_deg": 92,
+ "origin_px": [
+  720,
+  1270
+ ],
+ "origin_ll": [
+  40.6956,
+  -73.98708
+ ],
+ "georef_note": "Approximate. Scale from the Jay St frontage (~94 m in NYS orthoimagery) over the plan width; plan-up taken as east because Jay St, on the west side, is at the bottom. Origin = Main Entrance, placed by eye on Jay St. Distances are +-15%.",
+ "source": "The Theater at City Tech, AC_layout.pdf (citytech.cuny.edu/theater/docs/AC_layout.pdf), page 1",
+ "dests": [
+  {
+   "name": "Main Entrance (Jay St)",
+   "p": [
+    720,
+    1250
+   ]
+  },
+  {
+   "name": "A 105",
+   "p": [
+    1006,
+    1060
+   ]
+  },
+  {
+   "name": "A 103",
+   "p": [
+    1334,
+    1060
+   ]
+  },
+  {
+   "name": "A 106",
+   "p": [
+    902,
+    860
+   ]
+  },
+  {
+   "name": "A 104",
+   "p": [
+    1112,
+    860
+   ]
+  },
+  {
+   "name": "Bathrooms (by A 106)",
+   "p": [
+    902,
+    940
+   ]
+  },
+  {
+   "name": "Bathrooms (theater side)",
+   "p": [
+    304,
+    926
+   ]
+  },
+  {
+   "name": "Elevators",
+   "p": [
+    792,
+    826
+   ]
+  },
+  {
+   "name": "Escalator to 2nd floor",
+   "p": [
+    638,
+    840
+   ]
+  },
+  {
+   "name": "Theater (orchestra)",
+   "p": [
+    288,
+    760
+   ]
+  },
+  {
+   "name": "Stairs to gym",
+   "p": [
+    230,
+    1002
+   ]
+  },
+  {
+   "name": "Turnstiles",
+   "p": [
+    640,
+    1072
+   ]
+  }
+ ]
+}
