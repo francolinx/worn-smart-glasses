@@ -161,12 +161,20 @@ function reroute(){ ROUTE=null; if(!FIX||!DEST) return; const F=floor(FIX.floor)
   const plan=(to)=>{ const r=paths.length?route(a,to,paths,F.m_per_px):null, pts=r?r.pts:[a,to]; return {pts,...legsOf(pts,s,FIX.heading),mapped:!!r,offPath:r?r.offPath*s:0}; };
   if(DEST.floor===FIX.floor){ ROUTE=plan(DEST.p); return; }
   const here=destsOf(FIX.floor), there=destsOf(DEST.floor), T=floor(DEST.floor); let best=null;
-  const same=/^(Door|Stair)/.test(DEST.name)&&here.find(d=>d.name===DEST.name);       // never the elevator: responders take stairs if(same) best={...plan(same.p),via:same.name};     // the destination is itself a stair: use that one
-  if(!best) for(const kind of [/^Door/,/^Stair/,/^Elevator/]){ for(const c of here.filter(d=>kind.test(d.name)&&there.some(x=>x.name===d.name))){ const p=plan(c.p), t=there.find(x=>x.name===c.name), tp=pathsOf(DEST.floor), r2=tp.length?route(t.p,DEST.p,tp,T.m_per_px):null;
-      const after=legsOf(r2?r2.pts:[t.p,DEST.p],T.m_per_px||0,0).total, blind=!REFS.some(r=>r.floor===DEST.floor&&Math.hypot(r.x-t.p[0],r.y-t.p[1])*(T.m_per_px||0.1)<9), cost=p.total+after+(blind?20:0);   // a door with no surveyed photos beyond it costs 20 m: you could not re-fix there          // whole trip: this plan's leg plus what is left on the other plan
-      if(!best||cost<best.cost) best={...p,via:c.name,after,cost,blind}; } if(best) break; }
+  const same=/^(Door|Stair)/.test(DEST.name)&&here.find(d=>d.name===DEST.name); if(same) best={...plan(same.p),via:same.name};     // the destination is itself a stair: use that one
+  if(same) best.toPlan=DEST.floor;
+  const cross=(f1,p1,f2,p2)=>{ const tp=pathsOf(f1), r=tp.length?route(p1,p2,tp,floor(f1).m_per_px):null; return legsOf(r?r.pts:[p1,p2],floor(f1).m_per_px||0,0).total; };
+  const KINDS=[/^Door/,/^Stair/];                                                    // responders do not take elevators
+  if(!best) for(const c of here.filter(d=>KINDS.some(k=>k.test(d.name))&&there.some(x=>x.name===d.name))){ const p=plan(c.p), t=there.find(x=>x.name===c.name);
+      const after=cross(DEST.floor,t.p,DEST.floor,DEST.p), blind=/^Door/.test(c.name)&&!REFS.some(r=>r.floor===DEST.floor&&Math.hypot(r.x-t.p[0],r.y-t.p[1])*(T.m_per_px||0.1)<9), cost=p.total+after+(blind?20:0);   // a door with no surveyed photos beyond it costs 20 m: you could not re-fix there
+      if(!best||cost<best.cost) best={...p,via:c.name,after,cost,blind,toPlan:DEST.floor}; }
+  /* no door or stair joins the two plans directly: go through one plan in between (room -> floor 1 -> upper floor) */
+  if(!best) for(const M of FLOORS){ if(M.id===FIX.floor||M.id===DEST.floor) continue; const mid=destsOf(M.id);
+      for(const c of here.filter(d=>KINDS.some(k=>k.test(d.name))&&mid.some(x=>x.name===d.name))) for(const c2 of mid.filter(d=>KINDS.some(k=>k.test(d.name))&&there.some(x=>x.name===d.name))){
+        const p=plan(c.p), m1=mid.find(x=>x.name===c.name), t=there.find(x=>x.name===c2.name), after=cross(M.id,m1.p,M.id,c2.p)+cross(DEST.floor,t.p,DEST.floor,DEST.p), cost=p.total+after;
+        if(!best||cost<best.cost) best={...p,via:c.name,after,cost,toPlan:M.id,then:c2.name}; } }
   if(!best){ ROUTE={pts:[a],legs:[],steps:[],total:0,mapped:false,noLink:true}; return; }
-  const door=/^Door/.test(best.via); best.steps.push({turn:door?`THROUGH ${best.via.toUpperCase()}, THEN SHOOT AGAIN`:`TAKE ${best.via.toUpperCase()} TO FLOOR ${T.label}`,m:0,vertical:true}); best.toFloor=T.label; best.door=door; ROUTE=best; }
+  const door=/^Door/.test(best.via); const TL=floor(best.toPlan).label; best.steps.push({turn:door?`THROUGH ${best.via.toUpperCase()}, THEN SHOOT AGAIN`:`TAKE ${best.via.toUpperCase()} TO FLOOR ${TL}`,m:0,vertical:true}); best.toFloor=TL; best.door=door; ROUTE=best; }
 
 /* ---------- go ---------- */
 $('capGo').onchange=async e=>{ const file=e.target.files[0]; e.target.value=''; if(!file) return; if(!REFS.length){ $('goStatus').innerHTML='<span class="warn">No reference photos on this phone yet. Open Survey and add some, or import a pack.</span>'; return; }
