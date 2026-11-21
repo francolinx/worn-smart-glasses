@@ -1,6 +1,6 @@
 // Point & Go offline cache: network first (so fixes go live at once), cache as the fallback when there is no connection.
-const C = 'pg-v4';
-const SHELL = ['./', 'index.html', 'indoor.html', 'glasses.html', 'floor3d.html', 'js/three/three.module.min.js', 'js/three/OrbitControls.js', 'pack/indoor/refs.json', 'js/solver.js', 'js/sync.js', 'js/vpr.js', 'js/opencv.js',
+const C = 'pg-v5';
+const SHELL = ['./', 'index.html', 'indoor.html', 'glasses.html', 'floor3d.html', 'js/three/three.module.min.js', 'js/three/OrbitControls.js', 'pack/indoor/refs.json', 'pack/indoor/schematic.json', 'benchmark.html', 'js/solver.js', 'js/sync.js', 'js/vpr.js', 'js/opencv.js',
   'pack/sat.json', 'pack/sat_block.jpg', 'pack/landmarks.json', 'pack/buildings.json', 'pack/osm.json', 'pack/indoor/default.json', 'pack/indoor/citytech_f1.png', 'pack/indoor/a105.png',
   ...['f1s', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8'].map(f => `pack/indoor/${f}.jpg`)];
 self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(C).then(c => Promise.allSettled(SHELL.map(u => c.add(u))))); });

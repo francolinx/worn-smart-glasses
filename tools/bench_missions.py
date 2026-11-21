@@ -26,8 +26,8 @@ def degrade(i):
     f = '%s/q.jpg' % out; im.save(f, quality=rnd.randint(55, 75)); return f, im, yaw
 def pov(im, i, hud_png, path):                   # what the wearer sees: the scene with the display on top (black = transparent)
     if i in S.BLUR: im = im.filter(ImageFilter.GaussianBlur(S.BLUR[i] * 1.5))
-    base = im.resize((800, 600)); hud = Image.open(hud_png).convert('RGB').resize((420, 420)); layer = Image.new('RGB', base.size, 'black'); layer.paste(hud, (190, 90))
-    ImageChops.screen(ImageEnhance.Brightness(base).enhance(0.8), layer).save(path, quality=82)
+    base = im.resize((800, 600)); hud = Image.open(hud_png).convert('RGB').resize((460, 460)); layer = Image.new('RGB', base.size, 'black'); layer.paste(hud, (170, 70))
+    ImageChops.screen(ImageEnhance.Brightness(base).enhance(0.6), layer).save(path, quality=82)
 srv = subprocess.Popen([sys.executable, '-m', 'http.server', '8767', '-d', web], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); time.sleep(1); runs = []
 try:
   with sync_playwright() as p:
@@ -63,8 +63,7 @@ try:
             T = ph.evaluate("([t,keep])=>{FIX={...FIX,floor:t.floor,x:t.x,y:t.y,heading:t.h}; reroute(); const o=ROUTE&&({turn:ROUTE.steps[0]&&ROUTE.steps[0].turn,total:ROUTE.total}); FIX=keep; reroute(); return o;}", [dict(floor=q['floor'], x=q['x'], y=q['y'], h=trueH), fx | dict(heading=fx['h'], inliers=fx['inl'])])
             L.update(fix=s, route=' → '.join('%s%s' % (x['turn'], '' if x.get('vertical') else ' %d m' % x['m']) for x in R['steps']), total=round(R['total']), via=R['via'], first=R['steps'][0]['turn'] if R['steps'] else '', true_first=T['turn'], instr_ok=bool(R['steps']) and R['steps'][0]['turn'] == T['turn'], good=good, dest=R['dest'])
             ph.click('#go'); ph.wait_for_function("/sent to room/.test(document.getElementById('syncinfo').textContent)", timeout=20000); time.sleep(0.9)
-            tag = '%s/m%02d_l%d' % (out, m + 1, leg + 1); gl.screenshot(path=tag + '_hud.png'); pov(im, q['i'], tag + '_hud.png', tag + '_pov.jpg')
-            gl.click('#bMap'); time.sleep(0.4); gl.screenshot(path=tag + '_map.png'); gl.click('#bMap')
+            tag = '%s/m%02d_l%d' % (out, m + 1, leg + 1); gl.screenshot(path=tag + '_map.png'); pov(im, q['i'], tag + '_map.png', tag + '_pov.jpg')      # indoors the glasses open on the floor schematic
             ph.locator('#planbox').screenshot(path=tag + '_plan.png'); L['img'] = os.path.basename(tag); run['legs'].append(L)
             if not good: run['why'] = 'wrong fix at %s (%.0f m, %.0f deg)' % (S.ST[cur][0], s['pos_err'], s['hdg_err']); break
             if R['noLink'] or not R['mapped']: run['why'] = 'no route'; break
