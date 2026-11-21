@@ -81,7 +81,7 @@ async function enableSensors() {
 addEventListener('deviceorientationabsolute', onOrient); addEventListener('deviceorientation', onOrient);
 
 function onState(s) {
-  state = s; destIdx = -1; dests = [];                    // ALIGN is kept: the head-tracking offset stays valid between fixes
+  state = s; destIdx = -1; dests = []; aligned = false;
   if (s.fix.indoor && s.fix.plan && !mapOn) $('bMap').click();                      // indoors the floor schematic is the main view
   const t = new Date(s.t); $('fixinfo').innerHTML = `FIX ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')} ±${Math.round(s.fix.ring || 0)} m` + (s.fix.floor ? `<br>FLOOR ~${s.fix.floor}` : '');
 }
@@ -107,7 +107,6 @@ function render() {
   }
   $('hdg').textContent = !live() ? (sensorsOn ? 'HDG -- (no sensor)' : 'ALIGN to enable heading') : aligned ? `HDG ${Math.round(heading())}° photo` : absolute ? `HDG ${Math.round(heading())}° compass` : 'Face where you shot, then ALIGN';
   const sch = mapOn && state && state.fix.indoor && SCH && state.fix.px && SCH[state.fix.plan]; $('hdg').style.display = $('fixinfo').style.display = sch ? 'none' : '';
-  const hideDest = !!(state && state.route && destIdx < 0); if (hideDest !== ($('bDest').style.display === 'none')) $('bDest').style.display = hideDest ? 'none' : '';
   if (mapOn) drawMap();
   requestAnimationFrame(render);
 }
@@ -151,9 +150,7 @@ function drawSchematic(g) {
   const soft = t => t.split(',')[0], arrived = R && !st.some(x => x.vertical) && R.total <= 1.5;
   let top = '', col = '#3dff7a'; if (arrived) top = '✓ ARRIVED'; else if (s0) { top = s0.vertical ? soft(s0.turn) : `${ICON[s0.turn] || ''} ${s0.turn}${s0.m ? ' ' + s0.m + ' m' : ''}`; if (s0.turn === 'TURN AROUND' || s0.vertical) col = '#ffc400'; }
   g.textAlign = 'center'; g.font = `bold ${top.length > 22 ? 28 : 34}px system-ui`; g.fillStyle = col; g.fillText(top, 300, 40);
-  const shoot = x => !!(x && x.vertical && /SHOOT AGAIN/.test(x.turn));        // a door to another plan: the route continues after a new photo
-  if (s1 && !arrived) { g.font = '600 19px system-ui'; g.fillStyle = shoot(s1) ? '#ffc400' : '#cfd8dc'; g.fillText('then ' + (s1.vertical ? soft(s1.turn).replace(/^THROUGH/, 'through').replace(/^TAKE/, 'take').replace(' TO FLOOR ', ' to floor ') + (shoot(s1) ? ' · new photo' : '') : `${ICON[s1.turn] || ''} ${s1.turn.toLowerCase()}${s1.m ? ' ' + s1.m + ' m' : ''}`), 300, 70); }
-  else if (shoot(s0) && !arrived) { g.font = '600 19px system-ui'; g.fillStyle = '#ffc400'; g.fillText('then take a new photo', 300, 70); }
+  if (s1 && !arrived) { g.font = '600 19px system-ui'; g.fillStyle = '#cfd8dc'; g.fillText('then ' + (s1.vertical ? soft(s1.turn).replace(/^THROUGH/, 'through').replace(/^TAKE/, 'take').replace(' TO FLOOR ', ' to floor ') : `${ICON[s1.turn] || ''} ${s1.turn.toLowerCase()}${s1.m ? ' ' + s1.m + ' m' : ''}`), 300, 70); }
   if (d) { g.font = 'bold 22px system-ui'; g.fillStyle = '#ffc400'; const nm = (d.name || '').replace(/^.*→ /, '').replace(/^floor (\d+): /, 'F$1 · ').replace('Exit: ', 'EXIT · '); g.fillText(`${R && !arrived ? Math.round(R.total) + ' m · ' : ''}${nm.slice(0, 36)}`, 300, 516); }
   if (pl.floorLabel) { g.textAlign = 'left'; g.font = 'bold 18px system-ui'; g.fillStyle = '#8fdcff'; g.fillText('FLOOR ' + pl.floorLabel, 14, 22); }
   g.textAlign = 'left';
@@ -189,13 +186,11 @@ $('bDest').onclick = async () => {
 };
 $('bMap').onclick = async () => { if (!(state && state.fix.indoor)) await loadPack(); mapOn = !mapOn; $('map').style.display = mapOn ? 'block' : 'none'; $('arrowView').style.display = mapOn ? 'none' : 'flex'; $('bMap').textContent = mapOn ? 'ARROW' : 'MAP'; };
 /* fit the stage to whatever display this is; D-pad left/right moves between the three buttons (touchpad and ring on the M6 send these keys) */
-function fit() { var top = params.get('m6') === '1' ? 36 : 0;                 // the M6 draws its status bar over the top 36 px even in full screen
-  var k = Math.min(window.innerWidth / 600, (window.innerHeight - top) / 600) || 1, t = 'translateY(' + top / 2 + 'px) scale(' + k + ')';
-  $('stage').style.transform = t; $('stage').style.webkitTransform = t; }
+function fit() { var k = Math.min(window.innerWidth / 600, window.innerHeight / 600) || 1; $('stage').style.transform = 'scale(' + k + ')'; $('stage').style.webkitTransform = 'scale(' + k + ')'; }
 addEventListener('resize', fit); fit(); if (params.get('mono') === '1') $('stage').className = 'mono';
-document.addEventListener('keydown', e => { const B = [$('bCal'), $('bDest'), $('bMap')].filter(b => b.style.display !== 'none'), n = B.length, i = B.indexOf(document.activeElement), kc = e.keyCode;
-  if (e.key === 'ArrowRight' || kc === 39 || e.key === 'ArrowDown' || kc === 40) { B[(i + 1 + n) % n].focus(); e.preventDefault(); }
-  else if (e.key === 'ArrowLeft' || kc === 37 || e.key === 'ArrowUp' || kc === 38) { B[(i - 1 + n) % n].focus(); e.preventDefault(); }
+document.addEventListener('keydown', e => { const B = [$('bCal'), $('bDest'), $('bMap')], i = B.indexOf(document.activeElement), kc = e.keyCode;
+  if (e.key === 'ArrowRight' || kc === 39 || e.key === 'ArrowDown' || kc === 40) { B[(i + 1 + 3) % 3].focus(); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft' || kc === 37 || e.key === 'ArrowUp' || kc === 38) { B[(i - 1 + 3) % 3].focus(); e.preventDefault(); }
   else if ((kc === 23 || kc === 66) && document.activeElement && document.activeElement.click) document.activeElement.click(); });
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.activeElement && document.activeElement.click && document.activeElement.tagName !== 'BUTTON') $('bCal').click(); });
 $('bCal').focus();
