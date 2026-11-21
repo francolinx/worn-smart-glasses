@@ -1,7 +1,8 @@
 // Point & Go offline cache: network first (so fixes go live at once), cache as the fallback when there is no connection.
-const C = 'pg-v1';
+const C = 'pg-v2';
 const SHELL = ['./', 'index.html', 'indoor.html', 'glasses.html', 'js/solver.js', 'js/sync.js', 'js/vpr.js', 'js/opencv.js',
-  'pack/sat.json', 'pack/sat_block.jpg', 'pack/landmarks.json', 'pack/buildings.json', 'pack/osm.json', 'pack/indoor/default.json', 'pack/indoor/citytech_f1.png'];
+  'pack/sat.json', 'pack/sat_block.jpg', 'pack/landmarks.json', 'pack/buildings.json', 'pack/osm.json', 'pack/indoor/default.json', 'pack/indoor/citytech_f1.png',
+  ...['f1s', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8'].map(f => `pack/indoor/${f}.jpg`)];
 self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(C).then(c => Promise.allSettled(SHELL.map(u => c.add(u))))); });
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', e => {

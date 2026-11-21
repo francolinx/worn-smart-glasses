@@ -1,310 +1,1633 @@
 {
- "id": "citytech-285jay-f1",
- "name": "City Tech Academic Complex, 285 Jay St: 1st floor",
- "image": "pack/indoor/citytech_f1.png",
- "w": 1590,
- "h": 1350,
- "m_per_px": 0.0617,
- "up_bearing_deg": 92,
- "origin_px": [
-  720,
-  1270
- ],
- "origin_ll": [
-  40.6956,
-  -73.98708
- ],
- "georef_note": "Approximate. Scale from the Jay St frontage (~94 m in NYS orthoimagery) over the plan width; plan-up taken as east because Jay St, on the west side, is at the bottom. Origin = Main Entrance, placed by eye on Jay St. Distances are +-15%.",
- "source": "The Theater at City Tech, AC_layout.pdf (citytech.cuny.edu/theater/docs/AC_layout.pdf), page 1",
- "dests": [
+ "v": 2,
+ "building": "City Tech Academic Complex, 285 Jay St, Brooklyn",
+ "directory": {
+  "1": "Main Lobby, Auditorium, Classrooms",
+  "2": "Biology classrooms and labs",
+  "3": "Cafe and Lounge; Biology",
+  "4": "Biology; Radiology",
+  "5": "Biology; Chemistry",
+  "6": "Nursing; Restorative Dentistry",
+  "7": "Dental Hygiene Clinic",
+  "8": "Vision Care Clinic; Health Sciences offices"
+ },
+ "floors": [
   {
-   "name": "Exit: Main Entrance (Jay St)",
-   "p": [
-    716,
-    1260
-   ]
+   "image": "pack/indoor/citytech_f1.png",
+   "w": 1590,
+   "h": 1350,
+   "m_per_px": 0.0617,
+   "up_bearing_deg": 92,
+   "origin_px": [
+    720,
+    1270
+   ],
+   "origin_ll": [
+    40.6956,
+    -73.98708
+   ],
+   "georef_note": "Approximate. Scale from the Jay St frontage (~94 m in NYS orthoimagery) over the plan width; plan-up taken as east because Jay St, on the west side, is at the bottom. Origin = Main Entrance, placed by eye on Jay St. Distances are +-15%.",
+   "source": "The Theater at City Tech, AC_layout.pdf (citytech.cuny.edu/theater/docs/AC_layout.pdf), page 1",
+   "dests": [
+    {
+     "name": "Exit: Main Entrance (Jay St)",
+     "p": [
+      716,
+      1260
+     ]
+    },
+    {
+     "name": "A 105",
+     "p": [
+      860,
+      1072
+     ]
+    },
+    {
+     "name": "A 103",
+     "p": [
+      1284,
+      1072
+     ]
+    },
+    {
+     "name": "A 106",
+     "p": [
+      992,
+      840
+     ]
+    },
+    {
+     "name": "A 104",
+     "p": [
+      1032,
+      840
+     ]
+    },
+    {
+     "name": "Bathrooms (by A 106)",
+     "p": [
+      902,
+      950
+     ]
+    },
+    {
+     "name": "Bathrooms (theater side)",
+     "p": [
+      304,
+      950
+     ]
+    },
+    {
+     "name": "Elevator Bank B",
+     "p": [
+      792,
+      840
+     ]
+    },
+    {
+     "name": "Escalator to 2nd floor",
+     "p": [
+      638,
+      860
+     ]
+    },
+    {
+     "name": "Theater (orchestra)",
+     "p": [
+      140,
+      764
+     ]
+    },
+    {
+     "name": "Stairs to gym",
+     "p": [
+      206,
+      1002
+     ]
+    },
+    {
+     "name": "Turnstiles",
+     "p": [
+      640,
+      1072
+     ]
+    }
+   ],
+   "paths": [
+    [
+     [
+      716,
+      1260
+     ],
+     [
+      716,
+      1164
+     ],
+     [
+      716,
+      1016
+     ]
+    ],
+    [
+     [
+      636,
+      1016
+     ],
+     [
+      716,
+      1016
+     ],
+     [
+      860,
+      1016
+     ],
+     [
+      902,
+      1016
+     ],
+     [
+      1006,
+      1016
+     ],
+     [
+      1154,
+      1016
+     ],
+     [
+      1220,
+      1016
+     ],
+     [
+      1284,
+      1016
+     ],
+     [
+      1384,
+      1016
+     ]
+    ],
+    [
+     [
+      1006,
+      1016
+     ],
+     [
+      1006,
+      840
+     ]
+    ],
+    [
+     [
+      1220,
+      1016
+     ],
+     [
+      1220,
+      840
+     ]
+    ],
+    [
+     [
+      716,
+      1016
+     ],
+     [
+      716,
+      860
+     ],
+     [
+      792,
+      840
+     ]
+    ],
+    [
+     [
+      716,
+      860
+     ],
+     [
+      638,
+      860
+     ]
+    ],
+    [
+     [
+      716,
+      1164
+     ],
+     [
+      480,
+      1164
+     ],
+     [
+      390,
+      1164
+     ],
+     [
+      140,
+      1164
+     ]
+    ],
+    [
+     [
+      390,
+      1164
+     ],
+     [
+      390,
+      980
+     ],
+     [
+      304,
+      950
+     ]
+    ],
+    [
+     [
+      140,
+      1164
+     ],
+     [
+      140,
+      1002
+     ],
+     [
+      206,
+      1002
+     ]
+    ],
+    [
+     [
+      140,
+      1002
+     ],
+     [
+      140,
+      764
+     ]
+    ],
+    [
+     [
+      390,
+      980
+     ],
+     [
+      390,
+      764
+     ]
+    ],
+    [
+     [
+      860,
+      1016
+     ],
+     [
+      860,
+      1060
+     ]
+    ],
+    [
+     [
+      1154,
+      1016
+     ],
+     [
+      1154,
+      1060
+     ]
+    ],
+    [
+     [
+      1284,
+      1016
+     ],
+     [
+      1284,
+      1060
+     ]
+    ],
+    [
+     [
+      902,
+      1016
+     ],
+     [
+      902,
+      960
+     ]
+    ]
+   ],
+   "paths_note": "Traced by hand from the dotted circulation lines on the source plan. Approximate: walk them and redraw in Survey if they are wrong.",
+   "id": "f1",
+   "label": "1",
+   "name": "Floor 1 \u00b7 venue map"
   },
   {
-   "name": "A 105",
-   "p": [
-    860,
-    1072
-   ]
+   "id": "f1s",
+   "label": "1",
+   "name": "Floor 1 \u00b7 fire plan",
+   "image": "pack/indoor/f1s.jpg",
+   "w": 900,
+   "h": 1067,
+   "m_per_px": 0.0899,
+   "up_bearing_deg": 182,
+   "origin_px": [
+    586,
+    582
+   ],
+   "origin_ll": [
+    40.69556,
+    -73.98669
+   ],
+   "dests": [
+    {
+     "name": "Elevator Bank B",
+     "p": [
+      586,
+      582
+     ]
+    },
+    {
+     "name": "Stair A",
+     "p": [
+      700,
+      140
+     ]
+    },
+    {
+     "name": "Stair B",
+     "p": [
+      525,
+      373
+     ]
+    },
+    {
+     "name": "Stair C",
+     "p": [
+      830,
+      315
+     ]
+    },
+    {
+     "name": "Stair D",
+     "p": [
+      525,
+      470
+     ]
+    },
+    {
+     "name": "Stair E",
+     "p": [
+      828,
+      533
+     ]
+    },
+    {
+     "name": "Stair G",
+     "p": [
+      668,
+      738
+     ]
+    },
+    {
+     "name": "Stair H",
+     "p": [
+      655,
+      1000
+     ]
+    },
+    {
+     "name": "Stair J",
+     "p": [
+      325,
+      1005
+     ]
+    },
+    {
+     "name": "Stair K",
+     "p": [
+      175,
+      1005
+     ]
+    },
+    {
+     "name": "Exit: loading dock (south)",
+     "p": [
+      633,
+      24
+     ]
+    },
+    {
+     "name": "Exit: Jay St (by Stair C)",
+     "p": [
+      884,
+      345
+     ]
+    },
+    {
+     "name": "Exit: Jay St (by Stair E)",
+     "p": [
+      880,
+      565
+     ]
+    },
+    {
+     "name": "Exit: Jay St (main lobby)",
+     "p": [
+      880,
+      642
+     ]
+    },
+    {
+     "name": "Exit: east (by Stair B)",
+     "p": [
+      473,
+      343
+     ]
+    },
+    {
+     "name": "Exit: east (by Stair D)",
+     "p": [
+      473,
+      442
+     ]
+    },
+    {
+     "name": "Escalator",
+     "p": [
+      580,
+      653
+     ]
+    },
+    {
+     "name": "Auditorium",
+     "p": [
+      383,
+      835
+     ]
+    },
+    {
+     "name": "Courtyard",
+     "p": [
+      263,
+      640
+     ]
+    },
+    {
+     "name": "Loading dock",
+     "p": [
+      530,
+      133
+     ]
+    }
+   ],
+   "paths": [
+    [
+     [
+      586,
+      582
+     ],
+     [
+      708,
+      582
+     ],
+     [
+      708,
+      180
+     ],
+     [
+      688,
+      180
+     ],
+     [
+      688,
+      45
+     ],
+     [
+      633,
+      45
+     ],
+     [
+      633,
+      24
+     ]
+    ],
+    [
+     [
+      473,
+      345
+     ],
+     [
+      708,
+      345
+     ],
+     [
+      884,
+      345
+     ]
+    ],
+    [
+     [
+      473,
+      442
+     ],
+     [
+      708,
+      442
+     ]
+    ],
+    [
+     [
+      708,
+      565
+     ],
+     [
+      880,
+      565
+     ]
+    ],
+    [
+     [
+      708,
+      582
+     ],
+     [
+      708,
+      642
+     ],
+     [
+      880,
+      642
+     ]
+    ],
+    [
+     [
+      708,
+      140
+     ],
+     [
+      700,
+      140
+     ]
+    ],
+    [
+     [
+      586,
+      582
+     ],
+     [
+      586,
+      653
+     ]
+    ]
+   ],
+   "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
   },
   {
-   "name": "A 103",
-   "p": [
-    1284,
-    1072
-   ]
+   "id": "f2",
+   "label": "2",
+   "name": "Floor 2 \u00b7 fire plan",
+   "image": "pack/indoor/f2.jpg",
+   "w": 900,
+   "h": 1000,
+   "m_per_px": 0.0914,
+   "up_bearing_deg": 182,
+   "origin_px": [
+    565,
+    537
+   ],
+   "origin_ll": [
+    40.69556,
+    -73.98669
+   ],
+   "dests": [
+    {
+     "name": "Elevator Bank B",
+     "p": [
+      565,
+      537
+     ]
+    },
+    {
+     "name": "Stair A",
+     "p": [
+      688,
+      60
+     ]
+    },
+    {
+     "name": "Stair B",
+     "p": [
+      518,
+      333
+     ]
+    },
+    {
+     "name": "Stair D",
+     "p": [
+      518,
+      422
+     ]
+    },
+    {
+     "name": "Stair E",
+     "p": [
+      800,
+      505
+     ]
+    },
+    {
+     "name": "Stair G",
+     "p": [
+      650,
+      715
+     ]
+    },
+    {
+     "name": "Stair H",
+     "p": [
+      645,
+      955
+     ]
+    },
+    {
+     "name": "Stair K",
+     "p": [
+      200,
+      950
+     ]
+    },
+    {
+     "name": "Escalator",
+     "p": [
+      568,
+      590
+     ]
+    },
+    {
+     "name": "Auditorium (upper)",
+     "p": [
+      345,
+      835
+     ]
+    }
+   ],
+   "paths": [
+    [
+     [
+      565,
+      537
+     ],
+     [
+      687,
+      537
+     ],
+     [
+      687,
+      135
+     ],
+     [
+      688,
+      60
+     ]
+    ],
+    [
+     [
+      687,
+      318
+     ],
+     [
+      575,
+      318
+     ],
+     [
+      518,
+      333
+     ]
+    ],
+    [
+     [
+      687,
+      407
+     ],
+     [
+      575,
+      407
+     ],
+     [
+      518,
+      422
+     ]
+    ],
+    [
+     [
+      687,
+      520
+     ],
+     [
+      740,
+      520
+     ],
+     [
+      800,
+      505
+     ]
+    ],
+    [
+     [
+      565,
+      537
+     ],
+     [
+      568,
+      590
+     ]
+    ]
+   ],
+   "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
   },
   {
-   "name": "A 106",
-   "p": [
-    992,
-    840
-   ]
+   "id": "f3",
+   "label": "3",
+   "name": "Floor 3 \u00b7 fire plan",
+   "image": "pack/indoor/f3.jpg",
+   "w": 900,
+   "h": 1047,
+   "m_per_px": 0.0889,
+   "up_bearing_deg": 182,
+   "origin_px": [
+    588,
+    555
+   ],
+   "origin_ll": [
+    40.69556,
+    -73.98669
+   ],
+   "dests": [
+    {
+     "name": "Elevator Bank B",
+     "p": [
+      588,
+      555
+     ]
+    },
+    {
+     "name": "Stair A",
+     "p": [
+      697,
+      60
+     ]
+    },
+    {
+     "name": "Stair B",
+     "p": [
+      527,
+      343
+     ]
+    },
+    {
+     "name": "Stair D",
+     "p": [
+      527,
+      438
+     ]
+    },
+    {
+     "name": "Stair E",
+     "p": [
+      822,
+      518
+     ]
+    },
+    {
+     "name": "Stair G",
+     "p": [
+      668,
+      737
+     ]
+    },
+    {
+     "name": "Stair H",
+     "p": [
+      668,
+      985
+     ]
+    },
+    {
+     "name": "Stair K",
+     "p": [
+      217,
+      985
+     ]
+    },
+    {
+     "name": "Escalator",
+     "p": [
+      585,
+      610
+     ]
+    },
+    {
+     "name": "Auditorium (upper)",
+     "p": [
+      360,
+      853
+     ]
+    }
+   ],
+   "paths": [
+    [
+     [
+      588,
+      555
+     ],
+     [
+      707,
+      555
+     ],
+     [
+      707,
+      115
+     ],
+     [
+      697,
+      60
+     ]
+    ],
+    [
+     [
+      707,
+      325
+     ],
+     [
+      580,
+      325
+     ],
+     [
+      527,
+      343
+     ]
+    ],
+    [
+     [
+      707,
+      420
+     ],
+     [
+      580,
+      420
+     ],
+     [
+      527,
+      438
+     ]
+    ],
+    [
+     [
+      707,
+      537
+     ],
+     [
+      775,
+      537
+     ],
+     [
+      822,
+      518
+     ]
+    ],
+    [
+     [
+      588,
+      555
+     ],
+     [
+      585,
+      610
+     ]
+    ]
+   ],
+   "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
   },
   {
-   "name": "A 104",
-   "p": [
-    1032,
-    840
-   ]
+   "id": "f4",
+   "label": "4",
+   "name": "Floor 4 \u00b7 fire plan",
+   "image": "pack/indoor/f4.jpg",
+   "w": 900,
+   "h": 1004,
+   "m_per_px": 0.0696,
+   "up_bearing_deg": 182,
+   "origin_px": [
+    205,
+    695
+   ],
+   "origin_ll": [
+    40.69556,
+    -73.98669
+   ],
+   "dests": [
+    {
+     "name": "Elevator Bank B",
+     "p": [
+      205,
+      695
+     ]
+    },
+    {
+     "name": "Stair A",
+     "p": [
+      348,
+      80
+     ]
+    },
+    {
+     "name": "Stair B",
+     "p": [
+      130,
+      425
+     ]
+    },
+    {
+     "name": "Stair D",
+     "p": [
+      130,
+      545
+     ]
+    },
+    {
+     "name": "Stair E",
+     "p": [
+      505,
+      655
+     ]
+    },
+    {
+     "name": "Stair F",
+     "p": [
+      500,
+      943
+     ]
+    },
+    {
+     "name": "Escalator",
+     "p": [
+      200,
+      782
+     ]
+    }
+   ],
+   "paths": [
+    [
+     [
+      205,
+      695
+     ],
+     [
+      355,
+      695
+     ],
+     [
+      360,
+      175
+     ],
+     [
+      348,
+      80
+     ]
+    ],
+    [
+     [
+      362,
+      407
+     ],
+     [
+      205,
+      407
+     ],
+     [
+      130,
+      425
+     ]
+    ],
+    [
+     [
+      360,
+      525
+     ],
+     [
+      205,
+      525
+     ],
+     [
+      130,
+      545
+     ]
+    ],
+    [
+     [
+      355,
+      675
+     ],
+     [
+      425,
+      675
+     ],
+     [
+      505,
+      655
+     ]
+    ],
+    [
+     [
+      355,
+      695
+     ],
+     [
+      352,
+      920
+     ],
+     [
+      420,
+      920
+     ],
+     [
+      500,
+      943
+     ]
+    ],
+    [
+     [
+      205,
+      695
+     ],
+     [
+      200,
+      782
+     ]
+    ]
+   ],
+   "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
   },
   {
-   "name": "Bathrooms (by A 106)",
-   "p": [
-    902,
-    950
-   ]
+   "id": "f5",
+   "label": "5",
+   "name": "Floor 5 \u00b7 fire plan",
+   "image": "pack/indoor/f5.jpg",
+   "w": 900,
+   "h": 1007,
+   "m_per_px": 0.0711,
+   "up_bearing_deg": 182,
+   "origin_px": [
+    217,
+    700
+   ],
+   "origin_ll": [
+    40.69556,
+    -73.98669
+   ],
+   "dests": [
+    {
+     "name": "Elevator Bank B",
+     "p": [
+      217,
+      700
+     ]
+    },
+    {
+     "name": "Stair A",
+     "p": [
+      352,
+      75
+     ]
+    },
+    {
+     "name": "Stair B",
+     "p": [
+      137,
+      430
+     ]
+    },
+    {
+     "name": "Stair D",
+     "p": [
+      140,
+      550
+     ]
+    },
+    {
+     "name": "Stair E",
+     "p": [
+      517,
+      655
+     ]
+    },
+    {
+     "name": "Stair F",
+     "p": [
+      512,
+      942
+     ]
+    },
+    {
+     "name": "Escalator",
+     "p": [
+      215,
+      785
+     ]
+    }
+   ],
+   "paths": [
+    [
+     [
+      217,
+      700
+     ],
+     [
+      372,
+      700
+     ],
+     [
+      372,
+      172
+     ],
+     [
+      352,
+      75
+     ]
+    ],
+    [
+     [
+      372,
+      410
+     ],
+     [
+      215,
+      410
+     ],
+     [
+      137,
+      430
+     ]
+    ],
+    [
+     [
+      372,
+      530
+     ],
+     [
+      215,
+      530
+     ],
+     [
+      140,
+      550
+     ]
+    ],
+    [
+     [
+      372,
+      677
+     ],
+     [
+      438,
+      677
+     ],
+     [
+      517,
+      655
+     ]
+    ],
+    [
+     [
+      372,
+      700
+     ],
+     [
+      368,
+      920
+     ],
+     [
+      435,
+      920
+     ],
+     [
+      512,
+      942
+     ]
+    ],
+    [
+     [
+      217,
+      700
+     ],
+     [
+      215,
+      785
+     ]
+    ]
+   ],
+   "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
   },
   {
-   "name": "Bathrooms (theater side)",
-   "p": [
-    304,
-    950
-   ]
+   "id": "f6",
+   "label": "6",
+   "name": "Floor 6 \u00b7 fire plan (floor number assumed)",
+   "image": "pack/indoor/f6.jpg",
+   "w": 900,
+   "h": 1024,
+   "m_per_px": 0.0696,
+   "up_bearing_deg": 182,
+   "origin_px": [
+    225,
+    698
+   ],
+   "origin_ll": [
+    40.69556,
+    -73.98669
+   ],
+   "dests": [
+    {
+     "name": "Elevator Bank B",
+     "p": [
+      225,
+      698
+     ]
+    },
+    {
+     "name": "Stair A",
+     "p": [
+      352,
+      70
+     ]
+    },
+    {
+     "name": "Stair B",
+     "p": [
+      145,
+      428
+     ]
+    },
+    {
+     "name": "Stair D",
+     "p": [
+      148,
+      548
+     ]
+    },
+    {
+     "name": "Stair E",
+     "p": [
+      530,
+      650
+     ]
+    },
+    {
+     "name": "Stair F",
+     "p": [
+      530,
+      948
+     ]
+    }
+   ],
+   "paths": [
+    [
+     [
+      225,
+      698
+     ],
+     [
+      380,
+      698
+     ],
+     [
+      372,
+      165
+     ],
+     [
+      352,
+      70
+     ]
+    ],
+    [
+     [
+      372,
+      405
+     ],
+     [
+      222,
+      405
+     ],
+     [
+      145,
+      428
+     ]
+    ],
+    [
+     [
+      378,
+      523
+     ],
+     [
+      222,
+      523
+     ],
+     [
+      148,
+      548
+     ]
+    ],
+    [
+     [
+      380,
+      673
+     ],
+     [
+      450,
+      673
+     ],
+     [
+      530,
+      650
+     ]
+    ],
+    [
+     [
+      380,
+      698
+     ],
+     [
+      383,
+      925
+     ],
+     [
+      452,
+      925
+     ],
+     [
+      530,
+      948
+     ]
+    ]
+   ],
+   "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
   },
   {
-   "name": "Elevators",
-   "p": [
-    792,
-    840
-   ]
+   "id": "f7",
+   "label": "7",
+   "name": "Floor 7 \u00b7 fire plan",
+   "image": "pack/indoor/f7.jpg",
+   "w": 900,
+   "h": 1011,
+   "m_per_px": 0.0702,
+   "up_bearing_deg": 182,
+   "origin_px": [
+    208,
+    690
+   ],
+   "origin_ll": [
+    40.69556,
+    -73.98669
+   ],
+   "dests": [
+    {
+     "name": "Elevator Bank B",
+     "p": [
+      208,
+      690
+     ]
+    },
+    {
+     "name": "Stair A",
+     "p": [
+      352,
+      70
+     ]
+    },
+    {
+     "name": "Stair B",
+     "p": [
+      135,
+      420
+     ]
+    },
+    {
+     "name": "Stair D",
+     "p": [
+      135,
+      540
+     ]
+    },
+    {
+     "name": "Stair E",
+     "p": [
+      512,
+      648
+     ]
+    },
+    {
+     "name": "Stair F",
+     "p": [
+      505,
+      940
+     ]
+    }
+   ],
+   "paths": [
+    [
+     [
+      208,
+      690
+     ],
+     [
+      362,
+      690
+     ],
+     [
+      368,
+      165
+     ],
+     [
+      352,
+      70
+     ]
+    ],
+    [
+     [
+      368,
+      400
+     ],
+     [
+      210,
+      400
+     ],
+     [
+      135,
+      420
+     ]
+    ],
+    [
+     [
+      365,
+      520
+     ],
+     [
+      210,
+      520
+     ],
+     [
+      135,
+      540
+     ]
+    ],
+    [
+     [
+      362,
+      667
+     ],
+     [
+      432,
+      667
+     ],
+     [
+      512,
+      648
+     ]
+    ],
+    [
+     [
+      362,
+      690
+     ],
+     [
+      358,
+      915
+     ],
+     [
+      428,
+      915
+     ],
+     [
+      505,
+      940
+     ]
+    ]
+   ],
+   "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
   },
   {
-   "name": "Escalator to 2nd floor",
-   "p": [
-    638,
-    860
-   ]
-  },
-  {
-   "name": "Theater (orchestra)",
-   "p": [
-    140,
-    764
-   ]
-  },
-  {
-   "name": "Stairs to gym",
-   "p": [
-    206,
-    1002
-   ]
-  },
-  {
-   "name": "Turnstiles",
-   "p": [
-    640,
-    1072
-   ]
+   "id": "f8",
+   "label": "8",
+   "name": "Floor 8 \u00b7 fire plan",
+   "image": "pack/indoor/f8.jpg",
+   "w": 900,
+   "h": 1054,
+   "m_per_px": 0.0667,
+   "up_bearing_deg": 182,
+   "origin_px": [
+    225,
+    640
+   ],
+   "origin_ll": [
+    40.69556,
+    -73.98669
+   ],
+   "dests": [
+    {
+     "name": "Elevator Bank B",
+     "p": [
+      225,
+      640
+     ]
+    },
+    {
+     "name": "Stair D",
+     "p": [
+      140,
+      372
+     ]
+    },
+    {
+     "name": "Stair E",
+     "p": [
+      535,
+      550
+     ]
+    },
+    {
+     "name": "Stair F",
+     "p": [
+      525,
+      975
+     ]
+    }
+   ],
+   "paths": [
+    [
+     [
+      225,
+      640
+     ],
+     [
+      383,
+      640
+     ],
+     [
+      387,
+      352
+     ],
+     [
+      222,
+      352
+     ],
+     [
+      140,
+      372
+     ]
+    ],
+    [
+     [
+      385,
+      572
+     ],
+     [
+      455,
+      572
+     ],
+     [
+      535,
+      550
+     ]
+    ],
+    [
+     [
+      383,
+      640
+     ],
+     [
+      375,
+      950
+     ],
+     [
+      445,
+      950
+     ],
+     [
+      525,
+      975
+     ]
+    ]
+   ],
+   "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
   }
- ],
- "paths": [
-  [
-   [
-    716,
-    1260
-   ],
-   [
-    716,
-    1164
-   ],
-   [
-    716,
-    1016
-   ]
-  ],
-  [
-   [
-    636,
-    1016
-   ],
-   [
-    716,
-    1016
-   ],
-   [
-    860,
-    1016
-   ],
-   [
-    902,
-    1016
-   ],
-   [
-    1006,
-    1016
-   ],
-   [
-    1154,
-    1016
-   ],
-   [
-    1220,
-    1016
-   ],
-   [
-    1284,
-    1016
-   ],
-   [
-    1384,
-    1016
-   ]
-  ],
-  [
-   [
-    1006,
-    1016
-   ],
-   [
-    1006,
-    840
-   ]
-  ],
-  [
-   [
-    1220,
-    1016
-   ],
-   [
-    1220,
-    840
-   ]
-  ],
-  [
-   [
-    716,
-    1016
-   ],
-   [
-    716,
-    860
-   ],
-   [
-    792,
-    840
-   ]
-  ],
-  [
-   [
-    716,
-    860
-   ],
-   [
-    638,
-    860
-   ]
-  ],
-  [
-   [
-    716,
-    1164
-   ],
-   [
-    480,
-    1164
-   ],
-   [
-    390,
-    1164
-   ],
-   [
-    140,
-    1164
-   ]
-  ],
-  [
-   [
-    390,
-    1164
-   ],
-   [
-    390,
-    980
-   ],
-   [
-    304,
-    950
-   ]
-  ],
-  [
-   [
-    140,
-    1164
-   ],
-   [
-    140,
-    1002
-   ],
-   [
-    206,
-    1002
-   ]
-  ],
-  [
-   [
-    140,
-    1002
-   ],
-   [
-    140,
-    764
-   ]
-  ],
-  [
-   [
-    390,
-    980
-   ],
-   [
-    390,
-    764
-   ]
-  ],
-  [
-   [
-    860,
-    1016
-   ],
-   [
-    860,
-    1060
-   ]
-  ],
-  [
-   [
-    1154,
-    1016
-   ],
-   [
-    1154,
-    1060
-   ]
-  ],
-  [
-   [
-    1284,
-    1016
-   ],
-   [
-    1284,
-    1060
-   ]
-  ],
-  [
-   [
-    902,
-    1016
-   ],
-   [
-    902,
-    960
-   ]
-  ]
- ],
- "paths_note": "Traced by hand from the dotted circulation lines on the source plan. Approximate: walk them and redraw in Survey if they are wrong."
+ ]
 }
