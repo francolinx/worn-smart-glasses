@@ -21,7 +21,7 @@ canvas{display:block;width:100%}#cv{height:100%}
 table{border-collapse:collapse;width:100%}td{padding:4px;border-bottom:1px solid var(--line);vertical-align:top}td.n{text-align:right;font-variant-numeric:tabular-nums}
 #map{border-radius:8px;background:#0b0d10;touch-action:manipulation}
 </style></head><body>
-<header><h1>Point &amp; Go <span class="mut">· 285 Jay St, Brooklyn</span></h1><a id="gl" href="glasses.html" target="_blank">glasses view ▸</a></header>
+<header><h1>Point &amp; Go <span class="mut">· 285 Jay St, Brooklyn</span></h1><a href="indoor.html">indoor</a> <a id="gl" href="glasses.html" target="_blank">glasses ▸</a></header>
 
 <div class="card"><h2>1 · Point at the skyline and shoot</h2>
  <label class="shoot">📷 Point &amp; shoot<input id="cap" type="file" accept="image/*" capture="environment" style="display:none"></label>
@@ -183,10 +183,11 @@ function updateGo(){ if(!FIX||!DEST){ $('goinfo').innerHTML=`<span class="mut">$
   $('goinfo').innerHTML=`<div class="big">${Math.round(d)} m · ${brg.toFixed(0)}° ${card}</div><div>${DEST.name}<span class="mut">${turn}</span></div>`; }
 $('go').onclick=async()=>{ if(!FIX||!DEST){ updateGo(); return; } $('syncinfo').textContent='sending…';
   const st=await PGSync.publish({fix:{lat:FIX.lat,lon:FIX.lon,ring:FIX.ring,heading:FIX.heading,floor:FIX.floor,src:FIX.src},dest:{name:DEST.name,lat:DEST.lat,lon:DEST.lon}});
-  $('syncinfo').textContent=`sent to room "${PGSync.ROOM}" · app relay ${st.api?'✔':'✘'} · ntfy relay ${st.ntfy?'✔':'✘'}${!st.api&&!st.ntfy?' · no relay reachable: glasses on another device will not get it':''}`; };
+  $('syncinfo').textContent=`sent to room "${PGSync.ROOM}" · app relay ${st.api?'✔':'✘'} · ntfy relay ${st.ntfy?'✔':'✘'}${!st.api&&!st.ntfy?' · no relay reachable: glasses on another device will not get it':'. On the glasses: face the way you shot, then press ALIGN.'}`; };
 
 /* ---------- boot ---------- */
 (async()=>{ const J=u=>fetch(u).then(r=>r.json()); SAT=await J('pack/sat.json'); loadSat('sat_block'); drawMap();
   const [l,b,o]=await Promise.all([J('pack/landmarks.json'),J('pack/buildings.json'),J('pack/osm.json')]); LMS=l.landmarks; LMS.forEach(x=>LM[x.id]=x); BLD=b.buildings; OSM=o; buildDests(); drawMap(); updateGo();
   addEventListener('resize',()=>{ if(IM){resize();fit();} drawMap(); }); })();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script></body></html>

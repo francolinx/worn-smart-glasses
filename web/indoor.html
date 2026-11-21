@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Point & Go · indoor</title>
+<style>
+:root{--bg:#0e1116;--fg:#e6e8eb;--mut:#9aa3ad;--card:#161b22;--line:#2a313b;--acc:#ffb020;--ok:#3fb950;--bad:#f85149}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px system-ui,-apple-system,sans-serif;padding-bottom:40px}
+header{display:flex;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}h1{font-size:17px;margin:0;flex:1}a{color:var(--acc)}
+button,select,input{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:9px 12px;font:inherit}
+button.on{border-color:var(--acc);color:var(--acc)}button.go{border-color:var(--ok);color:var(--ok);font-weight:700}button.bad{border-color:var(--bad);color:var(--bad)}
+.tabs{display:flex;gap:8px;padding:10px 10px 0}.tabs button{flex:1}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px}.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.mut{color:var(--mut);font-size:13px}.warn{color:var(--acc);font-size:13px}.big{font-size:21px;font-weight:700}
+.shoot{display:block;text-align:center;border:2px solid var(--ok);color:var(--ok);border-radius:12px;padding:16px;font-size:19px;font-weight:700;cursor:pointer}
+#planbox{overflow:auto;border-radius:8px;background:#fff;max-height:70vh}#plan{display:block}
+#banner{position:sticky;top:0;z-index:5;background:var(--acc);color:#000;font-weight:700;padding:10px 12px;display:none}
+.ref{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}.ref img{width:72px;height:54px;object-fit:cover;border-radius:6px}
+.cand{display:flex;gap:8px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:8px;margin-top:6px}.cand img{width:96px;height:72px;object-fit:cover;border-radius:6px}
+</style></head><body>
+<header><h1>Point &amp; Go <span class="mut">· indoor</span></h1><a href="index.html">outdoor</a> <a id="gl" href="glasses.html" target="_blank">glasses ▸</a></header>
+<div id="banner"></div>
+<div class="tabs"><button id="tGo" class="on">Go</button><button id="tSurvey">Survey (build the map pack)</button></div>
+
+<div id="vGo">
+ <div class="card"><h2>1 · Point and shoot</h2>
+  <label class="shoot">📷 Point &amp; shoot<input id="capGo" type="file" accept="image/*" capture="environment" style="display:none"></label>
+  <div class="mut" style="margin-top:8px">Aim at something with detail (signs, doors, posters, furniture), not a blank wall. The photo is matched on this phone against the surveyed photos. No GPS, no compass, no upload.</div>
+  <div id="goStatus" class="mut" style="margin-top:8px"></div><div id="cands"></div></div>
+ <div class="card"><h2>2 · Go</h2>
+  <div class="row"><select id="dsel" style="flex:1;min-width:180px"></select><button class="go" id="go">GO ▸ glasses</button></div>
+  <div id="goinfo" style="margin-top:8px"></div><div id="syncinfo" class="mut"></div></div>
+</div>
+
+<div id="vSurvey" style="display:none">
+ <div class="card"><h2>Survey: do this once per building, before you need it</h2>
+  <div class="row"><label class="shoot" style="flex:1;font-size:16px;padding:12px">＋ Reference photo<input id="capRef" type="file" accept="image/*" capture="environment" style="display:none"></label>
+   <button id="addDest">＋ Destination</button></div>
+  <div class="mut" style="margin-top:8px">Each reference: shoot, tap where you stood, then tap a point in the direction you faced. Stand at doorways, corners and junctions; take 3 or 4 directions per spot. More photos means better matches.</div>
+  <div id="refs" style="margin-top:8px"></div>
+  <div class="row" style="margin-top:10px"><button id="exp">Export pack</button><label style="border:1px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer">Import pack<input id="imp" type="file" accept="application/json,.json" style="display:none"></label>
+   <label style="border:1px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer">Use my own floor plan<input id="planFile" type="file" accept="image/*" style="display:none"></label><button id="wipe" class="bad">Clear photos</button></div>
+  <div id="packinfo" class="mut" style="margin-top:6px"></div></div>
+</div>
+
+<div class="card"><h2 id="planTitle">Floor plan</h2>
+ <div class="row" style="margin-bottom:8px"><button id="zm">−</button><button id="zp">+</button><span class="mut" id="planNote"></span></div>
+ <div id="planbox"><canvas id="plan"></canvas></div></div>
+
+<script src="js/solver.js"></script><script src="js/sync.js"></script><script src="js/vpr.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+let PLAN=null, PIMG=null, REFS=[], DESTS=[], FIX=null, DEST=null, zoom=1, pending=null, lastRes=null;
+$('gl').href='glasses.html?room='+PGSync.ROOM;
+const banner=t=>{ $('banner').textContent=t||''; $('banner').style.display=t?'block':'none'; };
+
+/* ---------- storage (IndexedDB): the pack lives on the phone ---------- */
+const DB=new Promise((res,rej)=>{ const r=indexedDB.open('pg_indoor',1); r.onupgradeneeded=()=>{ r.result.createObjectStore('kv'); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
+const kvGet=async k=>{ const db=await DB; return new Promise(res=>{ const q=db.transaction('kv').objectStore('kv').get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>res(undefined); }); };
+const kvSet=async(k,v)=>{ const db=await DB; return new Promise((res,rej)=>{ const t=db.transaction('kv','readwrite'); t.objectStore('kv').put(v,k); t.oncomplete=res; t.onerror=()=>rej(t.error); }); };
+const save=()=>kvSet('pack',{plan:PLAN,refs:REFS,dests:DESTS}).catch(e=>alert('Could not save on this phone: '+e));
+
+/* ---------- photo helpers ---------- */
+function readF35(buf){ const d=new DataView(buf); if(d.byteLength<4||d.getUint16(0)!==0xFFD8) return null; let o=2;
+  while(o+4<d.byteLength){ const m=d.getUint16(o), len=d.getUint16(o+2); if(m===0xFFE1&&d.getUint32(o+4)===0x45786966){ const t=o+10, le=d.getUint16(t)===0x4949, u16=p=>d.getUint16(p,le), u32=p=>d.getUint32(p,le);
+      const ifd=(p,cb)=>{ const n=u16(p); for(let i=0;i<n;i++){ const e=p+2+i*12; cb(u16(e),e+8); } }; let sub=null, f=null; ifd(t+u32(t+4),(tag,vp)=>{ if(tag===0x8769) sub=t+u32(vp); }); if(sub) ifd(sub,(tag,vp)=>{ if(tag===0xA405) f=u16(vp); }); return f; }
+    if((m&0xFF00)!==0xFF00) break; o+=2+len; } return null; }
+async function loadPhoto(file){ let f35=null; try{ f35=readF35(await file.arrayBuffer()); }catch(_){}
+  const im=await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=()=>rej(new Error('could not read that image')); i.src=URL.createObjectURL(file); });
+  return {im,f35}; }
+
+/* ---------- plan drawing ---------- */
+const pc=$('plan'), pg=pc.getContext('2d');
+function drawPlan(){ if(!PIMG) return; const bw=$('planbox').clientWidth, k=bw/PLAN.w*zoom; pc.width=Math.round(PLAN.w*k); pc.height=Math.round(PLAN.h*k); pc.style.width=pc.width+'px';
+  pg.drawImage(PIMG,0,0,pc.width,pc.height); const S=p=>[p[0]*k,p[1]*k];
+  for(const d of DESTS){ const [x,y]=S(d.p); pg.fillStyle=DEST===d?'#12a150':'#0b6bcb'; pg.beginPath(); pg.arc(x,y,6,0,7); pg.fill(); pg.font='bold 12px system-ui'; pg.strokeStyle='#fff'; pg.lineWidth=3; pg.strokeText(d.name,x+8,y+4); pg.fillStyle='#0a2540'; pg.fillText(d.name,x+8,y+4); }
+  const wedge=(p,h,col,r)=>{ const [x,y]=S(p), a=(h-90)*Math.PI/180; pg.fillStyle=col; pg.globalAlpha=.35; pg.beginPath(); pg.moveTo(x,y); pg.arc(x,y,r,a-.5,a+.5); pg.closePath(); pg.fill(); pg.globalAlpha=1; pg.beginPath(); pg.arc(x,y,5,0,7); pg.fill(); };
+  REFS.forEach(r=>wedge([r.x,r.y],r.heading,'#b45f06',26));
+  if(pending&&pending.pos){ const [x,y]=S(pending.pos); pg.strokeStyle='#d00'; pg.lineWidth=3; pg.beginPath(); pg.arc(x,y,9,0,7); pg.stroke(); }
+  if(FIX){ if(DEST){ const [x,y]=S([FIX.x,FIX.y]), [a,b]=S(DEST.p); pg.strokeStyle='#12a150'; pg.lineWidth=4; pg.setLineDash([8,6]); pg.beginPath(); pg.moveTo(x,y); pg.lineTo(a,b); pg.stroke(); pg.setLineDash([]); } wedge([FIX.x,FIX.y],FIX.heading,'#e0002a',44); }
+  $('planTitle').textContent=PLAN.name; $('planNote').textContent=`${REFS.length} reference photos · ${DESTS.length} destinations · up = ${Math.round(PLAN.up_bearing_deg)}° true (approx.)`; }
+$('zp').onclick=()=>{ zoom=Math.min(4,zoom*1.5); drawPlan(); }; $('zm').onclick=()=>{ zoom=Math.max(1,zoom/1.5); drawPlan(); };
+pc.onclick=async e=>{ const r=pc.getBoundingClientRect(), k=pc.width/PLAN.w, p=[(e.clientX-r.left)/k,(e.clientY-r.top)/k];
+  if(pending&&pending.kind==='ref'){ if(!pending.pos){ pending.pos=p; banner('Now tap a point in the direction you were facing'); drawPlan(); return; }
+    const h=(Math.atan2(p[0]-pending.pos[0],-(p[1]-pending.pos[1]))*180/Math.PI+360)%360; REFS.push({id:'r'+Date.now(),x:pending.pos[0],y:pending.pos[1],heading:h,f35:pending.f35,f:pending.f}); pending=null; banner(''); await save(); renderRefs(); drawPlan(); return; }
+  if(pending&&pending.kind==='dest'){ const name=prompt('Name this destination (e.g. Exit, Restroom, Room A 105)'); pending=null; banner(''); if(name){ DESTS.push({name,p}); await save(); fillDests(); } drawPlan(); return; }
+  let near=null, nd=28/k; for(const d of DESTS){ const dd=Math.hypot(d.p[0]-p[0],d.p[1]-p[1]); if(dd<nd){nd=dd;near=d;} } if(near){ DEST=near; $('dsel').value=DESTS.indexOf(near); drawPlan(); updateGo(); } };
+
+/* ---------- survey ---------- */
+$('capRef').onchange=async e=>{ const file=e.target.files[0]; e.target.value=''; if(!file) return; banner('Reading the photo…'); try{ const {im,f35}=await loadPhoto(file), f=await VPR.features(im);
+    if(f.n<80){ banner(''); alert('That photo has too little detail to recognise later ('+f.n+' features). Aim at signs, doors, shelves or posters.'); return; }
+    pending={kind:'ref',f,f35}; banner('Tap where you were standing'); $('planbox').scrollIntoView({behavior:'smooth'}); }catch(err){ banner(''); alert(err.message); } };
+$('addDest').onclick=()=>{ pending={kind:'dest'}; banner('Tap the destination on the floor plan'); $('planbox').scrollIntoView({behavior:'smooth'}); };
+function renderRefs(){ $('refs').innerHTML=REFS.map((r,i)=>`<div class="ref"><img src="${r.f.thumb}"><span style="flex:1">#${i+1} <span class="mut">facing ${Math.round(r.heading)}° on the plan · ${r.f.n} features</span></span><button onclick="delRef(${i})">✕</button></div>`).join('')||'<div class="mut">No reference photos yet. Until there are some, Go has nothing to match against.</div>';
+  const bytes=REFS.reduce((a,r)=>a+r.f.desc.length+r.f.kp.length*4+r.f.thumb.length,0); $('packinfo').textContent=`Pack on this phone: ${REFS.length} photos, about ${(bytes/1e6).toFixed(1)} MB. Export it to share with a teammate or to have it built into the app.`; }
+window.delRef=async i=>{ REFS.splice(i,1); await save(); renderRefs(); drawPlan(); };
+$('wipe').onclick=async()=>{ if(confirm('Remove all '+REFS.length+' reference photos from this phone?')){ REFS=[]; await save(); renderRefs(); drawPlan(); } };
+const b64=u8=>{ let s=''; for(let i=0;i<u8.length;i+=0x8000) s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000)); return btoa(s); }, unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+$('exp').onclick=()=>{ const o={v:1,plan:PLAN,dests:DESTS,refs:REFS.map(r=>({...r,f:{...r.f,kp:b64(new Uint8Array(r.f.kp.buffer)),desc:b64(r.f.desc)}}))};
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'})); a.download='pointandgo-indoor-pack.json'; a.click(); };
+function unpack(o){ PLAN=o.plan; DESTS=o.dests||[]; REFS=(o.refs||[]).map(r=>({...r,f:{...r.f,kp:new Float32Array(unb64(r.f.kp).buffer),desc:unb64(r.f.desc)}})); }
+$('imp').onchange=async e=>{ const f=e.target.files[0]; if(!f) return; try{ unpack(JSON.parse(await f.text())); await save(); await loadPlanImg(); renderRefs(); fillDests(); drawPlan(); }catch(err){ alert('Not a Point & Go pack: '+err.message); } };
+$('planFile').onchange=async e=>{ const f=e.target.files[0]; if(!f) return; const {im}=await loadPhoto(f), L=Math.max(im.naturalWidth,im.naturalHeight), k=Math.min(1,1800/L), c=document.createElement('canvas'); c.width=Math.round(im.naturalWidth*k); c.height=Math.round(im.naturalHeight*k); c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+  const m=parseFloat(prompt('Roughly how many metres wide is the area this plan shows? (for distances; leave blank if unknown)')||'')||null;
+  PLAN={id:'custom-'+Date.now(),name:'My floor plan',image:c.toDataURL('image/jpeg',0.85),w:c.width,h:c.height,m_per_px:m?m/c.width:null,up_bearing_deg:0,origin_px:[c.width/2,c.height/2],origin_ll:[40.695496,-73.986565],custom:true}; REFS=[]; DESTS=[]; await save(); await loadPlanImg(); renderRefs(); fillDests(); drawPlan(); };
+
+/* ---------- go ---------- */
+$('capGo').onchange=async e=>{ const file=e.target.files[0]; e.target.value=''; if(!file) return; if(!REFS.length){ $('goStatus').innerHTML='<span class="warn">No reference photos on this phone yet. Open Survey and add some, or import a pack.</span>'; return; }
+  $('goStatus').textContent='Matching on this phone…'; $('cands').innerHTML=''; try{ const t0=performance.now(), {im,f35}=await loadPhoto(file), q=await VPR.features(im), fPx=PG.focalPx(q.w,q.h,f35).f;
+    lastRes=await VPR.locate(q,REFS,fPx); const ms=Math.round(performance.now()-t0), best=lastRes[0], far=lastRes.find(c=>Math.hypot(c.ref.x-best.ref.x,c.ref.y-best.ref.y)*(PLAN.m_per_px||0.1)>3), next=far?far.inliers:0;
+    const conf=best.inliers>=25&&best.inliers>=1.6*next?'high':best.inliers>=14&&best.inliers>=1.3*next?'medium':'low';
+    $('goStatus').innerHTML=best.inliers<10?`<span class="warn">No surveyed photo matches this view (best: ${best.inliers} matching points). Aim at something with more detail, or add a reference photo here.</span>`
+      :`Matched in ${ms} ms · confidence <b>${conf}</b> <span class="mut">(${best.inliers} matching points; next-best other spot ${next})</span>`;
+    $('cands').innerHTML=lastRes.slice(0,3).filter(c=>c.inliers>=8).map((c,i)=>`<div class="cand"><img src="${c.ref.f.thumb}"><span style="flex:1">${i?'or':'<b>best</b>'}: photo #${REFS.indexOf(c.ref)+1}<span class="mut"> · ${c.inliers} points</span></span><button onclick="pick(${i})" class="${i?'':'on'}">use</button></div>`).join('');
+    if(best.inliers>=10) pick(0,conf); else { FIX=null; drawPlan(); updateGo(); } }catch(err){ $('goStatus').innerHTML='<span class="warn">'+err.message+'</span>'; } };
+window.pick=(i,conf)=>{ const c=lastRes[i]; FIX={x:c.ref.x,y:c.ref.y,heading:(c.ref.heading+(c.yaw||0)+360)%360,inliers:c.inliers,conf:conf||'picked by hand'}; drawPlan(); updateGo(); $('planbox').scrollIntoView({behavior:'smooth'}); };
+function fillDests(){ $('dsel').innerHTML='<option value="">Destination… (or tap one on the plan)</option>'+DESTS.map((d,i)=>`<option value="${i}">${d.name}</option>`).join(''); }
+$('dsel').onchange=e=>{ DEST=e.target.value===''?null:DESTS[+e.target.value]; drawPlan(); updateGo(); };
+/* plan px -> true-north metres -> lat/lon, so the glasses page needs no special case */
+function toLL(p){ const s=PLAN.m_per_px||0.1, th=PLAN.up_bearing_deg*PG.D2R, u=(p[0]-PLAN.origin_px[0])*s, v=-(p[1]-PLAN.origin_px[1])*s, E=u*Math.cos(th)+v*Math.sin(th), N=-u*Math.sin(th)+v*Math.cos(th);
+  const L=PG.Local(PLAN.origin_ll[0],PLAN.origin_ll[1]).ll(E,N); return {lat:L[0],lon:L[1]}; }
+function updateGo(){ if(!FIX||!DEST){ $('goinfo').innerHTML=`<span class="mut">${FIX?'pick a destination':'shoot a photo first'}</span>`; return; }
+  const dx=DEST.p[0]-FIX.x, dy=DEST.p[1]-FIX.y, brg=(Math.atan2(dx,-dy)*PG.R2D+360)%360, rel=PG.wrap180(brg-FIX.heading), d=Math.hypot(dx,dy)*(PLAN.m_per_px||0);
+  $('goinfo').innerHTML=`<div class="big">${PLAN.m_per_px?'~'+Math.round(d)+' m · ':''}${Math.abs(rel)<20?'straight ahead':Math.abs(rel)>150?'behind you':Math.round(Math.abs(rel))+'° to your '+(rel>0?'right':'left')}</div><div>${DEST.name} <span class="mut">· straight-line, walls not considered</span></div>`; }
+$('go').onclick=async()=>{ if(!FIX||!DEST){ updateGo(); return; } $('syncinfo').textContent='sending…'; const a=toLL([FIX.x,FIX.y]), b=toLL(DEST.p);
+  const st=await PGSync.publish({fix:{lat:a.lat,lon:a.lon,ring:4,heading:(PLAN.up_bearing_deg+FIX.heading)%360,floor:1,src:'indoor-photo',indoor:true},dest:{name:DEST.name,lat:b.lat,lon:b.lon},dests:DESTS.slice(0,14).map(d=>({name:d.name,...toLL(d.p)}))});
+  $('syncinfo').textContent=`sent to room "${PGSync.ROOM}" · app relay ${st.api?'✔':'✘'} · ntfy relay ${st.ntfy?'✔':'✘'}. On the glasses: face the way you shot, then press ALIGN.`; };
+
+/* ---------- boot ---------- */
+const tab=g=>{ $('vGo').style.display=g?'block':'none'; $('vSurvey').style.display=g?'none':'block'; $('tGo').classList.toggle('on',g); $('tSurvey').classList.toggle('on',!g); };
+$('tGo').onclick=()=>tab(true); $('tSurvey').onclick=()=>tab(false);
+const loadPlanImg=()=>new Promise(res=>{ PIMG=new Image(); PIMG.onload=res; PIMG.onerror=res; PIMG.src=PLAN.image; });
+(async()=>{ const saved=await kvGet('pack'); const def=await fetch('pack/indoor/default.json').then(r=>r.json()).catch(()=>null);
+  if(saved&&saved.plan){ PLAN=saved.plan; REFS=saved.refs||[]; DESTS=saved.dests||[]; if(def&&PLAN.id===def.id){ PLAN=def; if(!DESTS.length) DESTS=def.dests; } }
+  else if(def){ PLAN=def; DESTS=def.dests.slice(); const pre=await fetch('pack/indoor/refs.json').then(r=>r.ok?r.json():null).catch(()=>null); if(pre){ unpack(pre); } }
+  if(!PLAN){ $('goStatus').textContent='No floor plan available offline yet. Open this page once with a connection.'; return; }
+  await loadPlanImg(); renderRefs(); fillDests(); drawPlan(); updateGo(); addEventListener('resize',drawPlan); if(!REFS.length) tab(false); VPR.load().catch(()=>{}); })();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script></body></html>
