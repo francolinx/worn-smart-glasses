@@ -48,9 +48,10 @@ const AHEAD = 20, norm180 = PG.wrap180;
 let state = null, dests = [], destIdx = -1, mapOn = false, pack = null, SCH = null;
 /* floors with traced walls come from schematic.json; every other plan gets a schematic built from its surveyed corridors, stairs and exits */
 Promise.all([fetch('pack/indoor/schematic.json').then(r => r.json()).catch(() => ({ plans: {} })), fetch('pack/indoor/default.json').then(r => r.json()).catch(() => ({ floors: [] }))]).then(([j, d]) => { const P = j.plans || {};
-  for (const f of d.floors) if (!P[f.id] && f.m_per_px) P[f.id] = { mpp: f.m_per_px, up: f.up_bearing_deg, walls: [], solid: [], furn: [], corr: f.paths || [], floorLabel: f.label,
-    exits: (f.dests || []).filter(x => /^(Stair|Exit)/.test(x.name)).map(x => ({ p: x.p, t: x.name.replace(/^Exit.*/, 'EXIT').toUpperCase() })),
-    labels: (f.dests || []).filter(x => !/^(Stair|Exit)/.test(x.name)).map(x => ({ t: x.name.replace('Elevator Bank B', 'ELEV').replace(/ \(.*/, '').toUpperCase(), p: x.p, pri: 2 })) };
+  for (const f of d.floors) { if (!f.m_per_px) continue; const t = P[f.id] || {}, traced = (t.walls && t.walls.length) || t.floor;
+    P[f.id] = { solid: [], furn: [], walls: [], ...t, mpp: f.m_per_px, up: f.up_bearing_deg, floorLabel: f.label, corr: traced ? null : f.paths || [],
+      exits: t.exits || (f.dests || []).filter(x => /^(Stair|Exit)/.test(x.name)).map(x => ({ p: x.p, t: x.name.replace(/^Exit.*/, 'EXIT').toUpperCase() })),
+      labels: t.labels || (f.dests || []).filter(x => !/^(Stair|Exit)/.test(x.name)).map(x => ({ t: x.name.replace('Elevator Bank B', 'ELEVATORS').replace(/ \(.*/, '').toUpperCase(), p: x.p, pri: 2 })) }; }
   SCH = P; });
 let rawHeading = null, absolute = false, offset = 0, aligned = false, sensorsOn = false, lastOrient = 0, shown = 0;
 
@@ -121,7 +122,8 @@ function drawSchematic(g) {
   g.save(); g.beginPath(); g.rect(0, 84, 600, 404); g.clip(); g.lineCap = 'round'; g.lineJoin = 'round';
   for (const poly of pl.solid) { g.fillStyle = 'rgba(255,140,60,.16)'; g.strokeStyle = '#a8592a'; g.lineWidth = 2; g.beginPath(); poly.forEach((q, i) => { const a = P(q[0], q[1]); i ? g.lineTo(a[0], a[1]) : g.moveTo(a[0], a[1]); }); g.closePath(); g.fill(); g.stroke(); }
   if (pl.corr) { const cor = (col, w) => { g.strokeStyle = col; g.lineWidth = w; for (const L of pl.corr) { g.beginPath(); L.forEach((q, i) => { const a = P(q[0], q[1]); i ? g.lineTo(a[0], a[1]) : g.moveTo(a[0], a[1]); }); g.stroke(); } }; cor('#8fdcff', 2.6 * S + 5); cor('#06141b', 2.6 * S); }   // corridors: outlined bands about 2.6 m wide
-  seg(pl.furn, '#3d5560', 1.5); seg(pl.walls, '#8fdcff', 3);
+  if (pl.floor) for (const poly of pl.floor) { g.fillStyle = 'rgba(143,220,255,.09)'; g.strokeStyle = '#8fdcff'; g.lineWidth = 3; g.beginPath(); poly.forEach((q, i) => { const a = P(q[0], q[1]); i ? g.lineTo(a[0], a[1]) : g.moveTo(a[0], a[1]); }); g.closePath(); g.fill(); g.stroke(); }   // floor area as drawn on the fire sign
+  seg(pl.furn, '#3d5560', 1.5); seg(pl.walls, pl.floor ? '#5aa0bd' : '#8fdcff', pl.floor ? 1.6 : 3);
   const R = route(), d = target(), boxes = [], free = (x, y, w, hh) => { if (x < 6 || x + w > 594 || y < 90 || y + hh > 484) return false; for (const b of boxes) if (x < b[0] + b[2] && x + w > b[0] && y < b[1] + b[3] && y + hh > b[1]) return false; boxes.push([x, y, w, hh]); return true; };
   boxes.push([cx - 26, cy - 30, 52, 60]);
   if (R && R.px && R.px.length > 1) { const pts = R.px.map(q => P(q[0], q[1]));
@@ -137,11 +139,13 @@ function drawSchematic(g) {
   g.restore();
   g.fillStyle = '#fff'; g.strokeStyle = '#000'; g.lineWidth = 3; g.beginPath(); g.moveTo(cx, cy - 24); g.lineTo(cx + 15, cy + 14); g.lineTo(cx, cy + 5); g.lineTo(cx - 15, cy + 14); g.closePath(); g.stroke(); g.fill();
   /* top: the next move, big. bottom line: how far, and to what */
-  const st = R && R.steps ? R.steps : [], s0 = st[0], s1 = st[1], ICON = { AHEAD: '↑', LEFT: '↰', RIGHT: '↱', 'BEAR LEFT': '↖', 'BEAR RIGHT': '↗', 'TURN AROUND': '↶' };
-  let top = '', col = '#3dff7a'; if (s0) { top = s0.vertical ? s0.turn.split(',')[0] : `${ICON[s0.turn] || ''} ${s0.turn}${s0.m ? ' ' + s0.m + ' m' : ''}`; if (s0.turn === 'TURN AROUND') col = '#ffc400'; }
-  g.textAlign = 'center'; g.font = 'bold 34px system-ui'; g.fillStyle = col; g.fillText(top, 300, 40);
-  if (s1) { g.font = '600 19px system-ui'; g.fillStyle = '#cfd8dc'; g.fillText('then ' + (s1.vertical ? s1.turn.split(',')[0].toLowerCase().replace(/\b(door a 105|stair)\b/g, m => m.toUpperCase()) : `${ICON[s1.turn] || ''} ${s1.turn.toLowerCase()}${s1.m ? ' ' + s1.m + ' m' : ''}`), 300, 70); }
-  if (d) { g.font = 'bold 22px system-ui'; g.fillStyle = '#ffc400'; const nm = (d.name || '').replace(/^.*→ /, ''); g.fillText(`${R ? Math.round(R.total) + ' m · ' : ''}${nm.slice(0, 30)}`, 300, 516); }
+  const st = R && R.steps ? R.steps : [], ICON = { AHEAD: '↑', LEFT: '↰', RIGHT: '↱', 'BEAR LEFT': '↖', 'BEAR RIGHT': '↗', 'TURN AROUND': '↶' }; let s0 = st[0], s1 = st[1];
+  if (s0 && !s0.vertical && s0.m < 1 && s1 && s1.vertical) { s0 = s1; s1 = null; }                      // standing at the door or stair: the door or stair is the next move
+  const soft = t => t.split(',')[0], arrived = R && !st.some(x => x.vertical) && R.total <= 1.5;
+  let top = '', col = '#3dff7a'; if (arrived) top = '✓ ARRIVED'; else if (s0) { top = s0.vertical ? soft(s0.turn) : `${ICON[s0.turn] || ''} ${s0.turn}${s0.m ? ' ' + s0.m + ' m' : ''}`; if (s0.turn === 'TURN AROUND' || s0.vertical) col = '#ffc400'; }
+  g.textAlign = 'center'; g.font = `bold ${top.length > 22 ? 28 : 34}px system-ui`; g.fillStyle = col; g.fillText(top, 300, 40);
+  if (s1 && !arrived) { g.font = '600 19px system-ui'; g.fillStyle = '#cfd8dc'; g.fillText('then ' + (s1.vertical ? soft(s1.turn).replace(/^THROUGH/, 'through').replace(/^TAKE/, 'take').replace(' TO FLOOR ', ' to floor ') : `${ICON[s1.turn] || ''} ${s1.turn.toLowerCase()}${s1.m ? ' ' + s1.m + ' m' : ''}`), 300, 70); }
+  if (d) { g.font = 'bold 22px system-ui'; g.fillStyle = '#ffc400'; const nm = (d.name || '').replace(/^.*→ /, '').replace(/^floor (\d+): /, 'F$1 · ').replace('Exit: ', 'EXIT · '); g.fillText(`${R && !arrived ? Math.round(R.total) + ' m · ' : ''}${nm.slice(0, 36)}`, 300, 516); }
   if (pl.floorLabel) { g.textAlign = 'left'; g.font = 'bold 18px system-ui'; g.fillStyle = '#8fdcff'; g.fillText('FLOOR ' + pl.floorLabel, 14, 22); }
   g.textAlign = 'left';
 }

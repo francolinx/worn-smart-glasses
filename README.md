@@ -25,6 +25,9 @@ Whole building, floors 1 to 8, on satellite imagery: https://francolinx.github.i
 checked by an independent shortest-path solver: 30 of 30 after one fix, the app no longer routes by elevator. Upper floors have no survey
 photos yet, so those trials start from an injected position. `tools/bench_vertical.py`.)
 
+Overnight handoff with 11 responder scenarios across floors 1 to 8 (fire rescue, police, paramedics), a glasses frame at every fix and turn:
+https://francolinx.github.io/worn-smart-glasses/handoff.html (`tools/run_stories.py`, `tools/build_handoff.py`). Upper-floor outlines are traced from the fire signs (`tools/trace_fireplans.py`).
+
 Outdoors, the same idea works from the skyline: tap three rooftops in a photo and get position, heading and floor.
 
 **Venue pack:** 285 Jay St (City Tech), Downtown Brooklyn. Tillary St to the north, Jay St to the west, Bridge St to the east,
