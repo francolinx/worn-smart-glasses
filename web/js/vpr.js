@@ -48,7 +48,13 @@
     const ms = cv.matFromArray(good, 1, cv.CV_32FC2, src), md = cv.matFromArray(good, 1, cv.CV_32FC2, dst), mask = new cv.Mat();
     const H = cv.findHomography(ms, md, cv.RANSAC, 4, mask);
     let inliers = 0, cx = null; for (let i = 0; i < mask.rows; i++) inliers += mask.data[i] ? 1 : 0;
-    if (!H.empty() && inliers >= 8) { const h = H.data64F, x = r.w / 2, y = r.h / 2, w = h[6] * x + h[7] * y + h[8]; if (Math.abs(w) > 1e-9) cx = (h[0] * x + h[1] * y + h[2]) / w; }
+    if (!H.empty() && inliers >= 8) { const h = H.data64F, P = (x, y) => { const w = h[6] * x + h[7] * y + h[8]; return Math.abs(w) > 1e-9 ? [(h[0] * x + h[1] * y + h[2]) / w, (h[3] * x + h[4] * y + h[5]) / w, w] : null; };
+      /* sanity: the part of the reference that the matches cover must land in the query as a convex quad of similar size.
+         A folded, mirrored or collapsed one is a chance match (plain doors, floor tiles). */
+      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let i = 0; i < mask.rows; i++) if (mask.data[i]) { const x = src[2 * i], y = src[2 * i + 1]; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+      const q4 = [P(x0, y0), P(x1, y0), P(x1, y1), P(x0, y1)]; let ok = x1 - x0 > 20 && y1 - y0 > 20 && q4.every(c => c && c[2] > 0 === q4[0][2] > 0), area = 0, sign = 0;
+      if (ok) for (let i = 0; i < 4; i++) { const a = q4[i], b = q4[(i + 1) % 4], c = q4[(i + 2) % 4], z = (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]); if (z <= 0) ok = false; area += a[0] * b[1] - b[0] * a[1]; }
+      area = Math.abs(area) / 2 / Math.max(1, (x1 - x0) * (y1 - y0)); if (!ok || area < 0.1 || area > 10) inliers = 0; else { const c = P(r.w / 2, r.h / 2); if (c && c[2] > 0 === q4[0][2] > 0) cx = c[0]; } }
     ms.delete(); md.delete(); mask.delete(); H.delete();
     return { inliers, good, cx };
   }

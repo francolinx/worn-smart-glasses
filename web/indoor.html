@@ -16,17 +16,21 @@ button.on{border-color:var(--acc);color:var(--acc)}button.go{border-color:var(--
 .ref{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}.ref img{width:72px;height:54px;object-fit:cover;border-radius:6px}
 .cand{display:flex;gap:8px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:8px;margin-top:6px}.cand img{width:96px;height:72px;object-fit:cover;border-radius:6px}
 </style></head><body>
-<header><h1>Point &amp; Go <span class="mut">· indoor</span></h1><a href="index.html">outdoor</a> <a id="gl" href="glasses.html" target="_blank">glasses ▸</a></header>
+<header><h1>Point &amp; Go <span class="mut">· indoor</span></h1><a href="floor3d.html">3D</a> <a href="index.html">outdoor</a> <a id="gl" href="glasses.html" target="_blank">glasses ▸</a></header>
 <div id="banner"></div><img id="bprev" style="display:none;position:sticky;top:44px;z-index:5;width:132px;border:3px solid var(--acc);border-radius:8px;margin:6px 10px 0">
 <div class="tabs"><button id="tGo" class="on">Go</button><button id="tSurvey">Survey (build the map pack)</button></div>
 
 <div id="vGo">
+ <div class="card" style="border-color:#f85149"><h2 style="color:#ff8a80">Fire rescue / police · GPS-denied interior</h2>
+  <div>You are inside. GPS stopped at the door and the compass is lying (steel, wiring). <b>Take one photo.</b> It is matched on this phone against the pre-incident survey of this building: floor, position and the way you face. Then follow the arrow.</div>
+  <div class="mut" id="packline" style="margin-top:6px"></div></div>
  <div class="card"><h2>1 · Point and shoot</h2>
   <label class="shoot">📷 Point &amp; shoot<input id="capGo" type="file" accept="image/*" capture="environment" style="display:none"></label>
   <div class="mut" style="margin-top:8px">Aim at something with detail (signs, doors, posters, furniture), not a blank wall. The photo is matched on this phone against the surveyed photos. No GPS, no compass, no upload.</div>
   <div id="goStatus" class="mut" style="margin-top:8px"></div><div id="cands"></div></div>
  <div class="card"><h2>2 · Go</h2>
-  <div class="row"><select id="dsel" style="flex:1;min-width:180px"></select><button class="go" id="go">GO ▸ glasses</button></div>
+  <div class="row"><button id="exitBtn" class="bad" style="font-weight:700">⛑ Nearest exit</button><button id="roomBtn">Room A 105</button></div>
+  <div class="row" style="margin-top:8px"><select id="dsel" style="flex:1;min-width:180px"></select><button class="go" id="go">GO ▸ glasses</button></div>
   <div id="goinfo" style="margin-top:8px"></div><div id="syncinfo" class="mut"></div></div>
 </div>
 
@@ -61,7 +65,7 @@ const floor=id=>FLOORS.find(f=>f.id===id);
 const DB=new Promise((res,rej)=>{ const r=indexedDB.open('pg_indoor',1); r.onupgradeneeded=()=>{ r.result.createObjectStore('kv'); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
 const kvGet=async k=>{ const db=await DB; return new Promise(res=>{ const q=db.transaction('kv').objectStore('kv').get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>res(undefined); }); };
 const kvSet=async(k,v)=>{ const db=await DB; return new Promise((res,rej)=>{ const t=db.transaction('kv','readwrite'); t.objectStore('kv').put(v,k); t.oncomplete=res; t.onerror=()=>rej(t.error); }); };
-const save=()=>kvSet('pack2',{v:2,cur:CUR,refs:REFS,dests:STORE.dests,paths:STORE.paths,custom:STORE.custom}).catch(e=>alert('Could not save on this phone: '+e));
+const save=()=>kvSet('pack2',{v:2,cur:CUR,pre:STORE.pre,refs:REFS,dests:STORE.dests,paths:STORE.paths,custom:STORE.custom}).catch(e=>alert('Could not save on this phone: '+e));
 
 /* ---------- photo helpers ---------- */
 function readF35(buf){ const d=new DataView(buf); if(d.byteLength<4||d.getUint16(0)!==0xFFD8) return null; let o=2;
@@ -121,7 +125,8 @@ $('wipe').onclick=async()=>{ if(confirm('Remove all '+REFS.length+' reference ph
 const b64=u8=>{ let s=''; for(let i=0;i<u8.length;i+=0x8000) s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000)); return btoa(s); }, unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 $('exp').onclick=()=>{ const o={v:2,dests:STORE.dests,paths:STORE.paths,custom:STORE.custom,refs:REFS.map(r=>({...r,f:{...r.f,kp:b64(new Uint8Array(r.f.kp.buffer)),desc:b64(r.f.desc)}}))};
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'})); a.download='pointandgo-indoor-pack.json'; a.click(); };
-function unpack(o){ const dec=r=>({...r,floor:r.floor||'f1',f:{...r.f,kp:typeof r.f.kp==='string'?new Float32Array(unb64(r.f.kp).buffer):r.f.kp,desc:typeof r.f.desc==='string'?unb64(r.f.desc):r.f.desc}});
+const dec=r=>({...r,floor:r.floor||'f1',f:{...r.f,kp:typeof r.f.kp==='string'?new Float32Array(unb64(r.f.kp).buffer):r.f.kp,desc:typeof r.f.desc==='string'?unb64(r.f.desc):r.f.desc}});
+function unpack(o){
   if(o.v===2){ REFS=(o.refs||[]).map(dec); STORE.dests=o.dests||{}; STORE.paths=o.paths||{}; STORE.custom=o.custom||[]; }
   else { REFS=(o.refs||[]).map(dec); if(o.dests&&o.dests.length) STORE.dests.f1=o.dests; if(o.paths&&o.paths.length) STORE.paths.f1=o.paths; }      // v1: single floor
   for(const c of STORE.custom) if(!floor(c.id)) FLOORS.push(c); }
@@ -194,14 +199,25 @@ $('go').onclick=async()=>{ if(!FIX||!DEST){ updateGo(); return; } if(ROUTE.noLin
     dests:destsOf(FIX.floor).slice(0,12).map(d=>({name:d.name.slice(0,28),...toLL(d.p,F)}))});
   $('syncinfo').textContent=`sent to room "${PGSync.ROOM}" · app relay ${st.api?'✔':'✘'} · ntfy relay ${st.ntfy?'✔':'✘'}. On the glasses: face the way you shot, then press ALIGN.`; };
 
+/* one-tap targets for the responder */
+function quick(pred){ if(!FIX){ $('goinfo').innerHTML='<span class="warn">Shoot a photo first, so the route starts where you are.</span>'; return; } let best=null;
+  for(const f of FLOORS){ const L=destsOf(f.id); L.forEach((d,i)=>{ if(!pred(d,f)) return; DEST={...d,floor:f.id}; reroute(); if(ROUTE&&!ROUTE.noLink){ const c=ROUTE.cost||ROUTE.total; if(!best||c<best.c) best={d,f,i,c}; } }); }
+  if(!best){ DEST=null; updateGo(); $('goinfo').innerHTML='<span class="warn">Nothing like that is marked on a plan that connects to where you are.</span>'; return; }
+  DEST={...best.d,floor:best.f.id}; $('dsel').value=best.f.id+'|'+best.i; updateGo(); drawPlan(); }
+$('exitBtn').onclick=()=>quick((d,f)=>/^Exit/.test(d.name)&&f.label===floor(FIX.floor).label&&f.id!=='f1s');
+$('roomBtn').onclick=()=>quick((d,f)=>FIX.floor==='a105'?d.name==='Whiteboards (front)':/^Door A 105/.test(d.name)&&f.id==='f1');
+
 /* ---------- boot ---------- */
 const tab=g=>{ $('vGo').style.display=g?'block':'none'; $('vSurvey').style.display=g?'none':'block'; $('tGo').classList.toggle('on',g); $('tSurvey').classList.toggle('on',!g); };
 $('tGo').onclick=()=>tab(true); $('tSurvey').onclick=()=>tab(false);
 (async()=>{ const def=await fetch('pack/indoor/default.json').then(r=>r.json()).catch(()=>null); if(!def){ $('goStatus').textContent='No floor plans available offline yet. Open this page once with a connection.'; return; }
   FLOORS=def.floors.slice(); const s2=await kvGet('pack2'), s1=s2?null:await kvGet('pack');
-  if(s2) { unpack(s2); CUR=s2.cur; }
+  if(s2) { unpack(s2); CUR=s2.cur; STORE.pre=s2.pre; }
   else if(s1&&s1.plan){ unpack({v:1,refs:s1.refs,dests:(s1.dests||[]).filter(d=>!def.floors[0].dests.some(x=>x.name===d.name)&&!/^(Main Entrance|Elevators$)/.test(d.name)),paths:[]}); if(STORE.dests.f1) STORE.dests.f1=def.floors[0].dests.map(d=>({...d})).concat(STORE.dests.f1); }   // carry over a survey made before floors existed
-  else { const pre=await fetch('pack/indoor/refs.json').then(r=>r.ok?r.json():null).catch(()=>null); if(pre) unpack(pre); }
-  if(!floor(CUR)) CUR=def.start||'f1'; fillDests(); await setFloor(CUR); updateGo(); addEventListener('resize',drawPlan); if(!REFS.length) tab(false); VPR.load().catch(()=>{}); })();
+  /* the survey that ships with the app: merged in once per revision, next to anything surveyed on this phone */
+  const pre=await fetch('pack/indoor/refs.json').then(r=>r.ok?r.json():null).catch(()=>null);
+  if(pre&&STORE.pre!==pre.rev){ REFS=REFS.filter(r=>!String(r.id).startsWith('pre:')).concat(pre.refs.map(dec)); for(const f of pre.resetFloors||[]){ delete STORE.dests[f]; delete STORE.paths[f]; } STORE.pre=pre.rev; if(!s2) CUR=def.start; await save(); }
+  if(pre) $('packline').textContent=`Survey on board: ${pre.stations.length} stations, ${pre.refs.length} photos of floor 1 (lobby, corridor, Room A 105), taken ${pre.surveyed}. Works with no signal.`;
+  if(!floor(CUR)) CUR=def.start||'f1'; fillDests(); await setFloor(CUR); updateGo(); addEventListener('resize',drawPlan); VPR.load().catch(()=>{}); })();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script></body></html>

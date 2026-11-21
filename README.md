@@ -1,7 +1,23 @@
 # Point & Go — Worn smart glasses hackathon (Nov 20–21, 2026)
 
-Point your phone at the skyline, tap three rooftops, and the glasses show an arrow and distance to where you want to go.
-No GPS and no compass: the position, the heading and the floor come from one photo.
+**One photo tells a firefighter or police officer where they are inside a building, which way they face, and which way to go.**
+No GPS, no compass, no signal needed for the fix.
+
+## Who it is for: fire rescue and police
+
+GPS stops at the door. Inside, steel and wiring bend the compass: on our own survey of this building the phone compass was
+35 to 50 degrees out in the first-floor corridor and useless inside Room A 105. Crews work from memory and radio.
+
+1. **Before the call (pre-incident survey).** A crew walks the building once: floor plan, plus eight photos at each junction.
+   That is a 17-minute job for the first floor here (9 stations, 75 photos, 20 Nov 2026).
+2. **On the call.** The responder takes one photo through the glasses. The phone matches it against the survey, offline:
+   floor, position, facing.
+3. **Go.** The glasses show an arrow and distance to the target room, or one tap for the nearest exit or stair.
+   Routes that cross to another plan hand off at a named door or stair.
+
+See the surveyed floor in 3D: https://francolinx.github.io/worn-smart-glasses/floor3d.html
+
+Outdoors, the same idea works from the skyline: tap three rooftops in a photo and get position, heading and floor.
 
 **Venue pack:** 285 Jay St (City Tech), Downtown Brooklyn. Tillary St to the north, Jay St to the west, Bridge St to the east,
 and Tech Place to the south (OpenStreetMap's name for the former Johnson St alignment).
@@ -17,6 +33,7 @@ Everything in `web/` is static and solves in the browser. Host `web/` at any HTT
 |---|---|---|
 | `index.html` | phone | Shoot a photo, tap 3 rooftops, get a fix, pick a destination, press **GO** |
 | `indoor.html` | phone | Indoor: survey a building once (reference photos pinned to a floor plan), then shoot one photo to get your spot and heading |
+| `floor3d.html` | any | 3D view of floor 1 built from the venue plan and the survey: rooms, the theater shell, Room A 105's interior, every photo station with its view wedges and photo rings, and the entry route. Tap a wedge to see that photo and its fix |
 | `glasses.html` | glasses (600×600, black = transparent) | Arrow, distance, heading-up map. Press ALIGN while facing the way you shot. `?demo=1` fakes a fix |
 
 Meta Ray-Ban Display (Developer Mode): Meta AI app → App settings → App connections → Web Apps → Add a Web App →
@@ -54,8 +71,28 @@ Bundled plans for the City Tech Academic Complex (`pack/indoor/default.json`): t
 stair and exit as a destination and the signs' dashed egress lines as walkable paths. One reference set spans all floors, so a photo
 also identifies the floor. A destination on another floor routes to the nearest stair both floors share. Scale and north are
 approximate on every plan, so distances are rough; the floor-6 sign's floor number is assumed from the order the photos were taken.
-Indoor matching has only been run on synthetic test images so far: right match and right turn direction on shifted, dimmed,
-rotated copies, and a clean "no match" on an unseen view. Real rooms with repeated furniture will be harder.
+### The floor-1 survey that ships with the app (`pack/indoor/refs.json`)
+
+71 reference photos from 9 stations (atrium, information desk, behind the escalators, corridor doors by Exit Stair E, corridor
+outside A 105, and the four corners of A 105) plus three from the front of the room. `tools/survey_floor1.py` holds each
+photo's spot and heading; `tools/build_indoor_pack.py` computes the features with the page's own matcher. The photos themselves
+are not in the repo; thumbnails with people in them are blurred.
+
+Headings are a least-squares fit of the rotation measured between overlapping photos, a few square-on anchor views, and the
+compass where it could be trusted (lobby only). Station spots were placed on the plans by eye from what the photos show.
+
+**Measured on the real photos (leave one out: each photo matched against the other 70):**
+
+| Area | Photos | Matched (14+ points) | Matched to the right or the adjacent station |
+|---|---|---|---|
+| Lobby and corridor | 38 | 35 | 35 |
+| Room A 105 | 33 | 22 | 22 |
+
+The 14 with no match are plain walls, glass, cabinet fronts and views that are mostly people. Two chance matches (a plain door,
+a crowd) were removed by a geometry check on the homography. A neighbouring photo is 45 degrees away, so this is a harder test
+than re-shooting a surveyed view, but it is still the same camera, the same evening and the same lighting. **No photo from the
+glasses camera has been matched yet.** Heading agreement between neighbours is about 1 degree median, which measures consistency,
+not truth: absolute headings are good to about 10 to 20 degrees and positions to about 2 m.
 
 ## Data in `web/pack/` (rebuild with `python3 tools/build_pack.py`)
 
@@ -68,8 +105,10 @@ rotated copies, and a clean "no match" on an unseen view. Real rooms with repeat
 
 ## Limits
 
-- Measured only on synthetic photos so far (exact with perfect taps; within the ring with 12–25 px tap noise). No real photo
-  from the venue has been scored yet.
+- Outdoor mode is measured only on synthetic photos so far (exact with perfect taps; within the ring with 12–25 px tap noise).
+- Indoor mode is measured on the survey phone's own photos (above), not yet on the glasses camera. Position is the nearest
+  surveyed station, not a continuous track. Aim at fixed things (doors, signs, boards, bins), not at people or blank walls.
+- The floor-1 plan is a venue map, not a survey drawing: the 3D view and the distances are approximate.
 - The glasses do not track you as you walk: position stays at the photo fix until the next photo.
 - Heading on the glasses: after ALIGN, the photo's solved heading plus head turn since then. Before ALIGN, the device compass if it reports north.
 - Roof heights are roof level, not spires or mechanical floors. Tap the roof line.

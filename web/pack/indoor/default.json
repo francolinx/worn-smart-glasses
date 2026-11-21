@@ -19,7 +19,7 @@
    "image": "pack/indoor/a105.png",
    "w": 1400,
    "h": 960,
-   "m_per_px": 0.0198,
+   "m_per_px": 0.02,
    "up_bearing_deg": 92,
    "origin_px": [
     700,
@@ -33,85 +33,102 @@
     {
      "name": "Door A 105 (north)",
      "p": [
-      232,
+      230,
       160
      ]
     },
     {
      "name": "Door A 105 (south)",
      "p": [
-      1154,
+      1170,
       160
      ]
     },
     {
-     "name": "North wall (centre)",
-     "p": [
-      180,
-      480
-     ]
-    },
-    {
-     "name": "South wall (centre)",
-     "p": [
-      1220,
-      480
-     ]
-    },
-    {
-     "name": "Jay St wall (centre)",
+     "name": "Whiteboards (front)",
      "p": [
       700,
-      790
+      210
+     ]
+    },
+    {
+     "name": "North cabinets",
+     "p": [
+      200,
+      540
+     ]
+    },
+    {
+     "name": "South cabinets",
+     "p": [
+      1200,
+      540
+     ]
+    },
+    {
+     "name": "Windows (Jay St side)",
+     "p": [
+      700,
+      815
      ]
     }
    ],
    "paths": [
     [
      [
-      180,
-      210
+      215,
+      215
      ],
      [
-      1220,
-      210
+      1185,
+      215
      ],
      [
-      1220,
-      790
+      1185,
+      815
      ],
      [
-      180,
-      790
+      215,
+      815
      ],
      [
-      180,
-      210
+      215,
+      215
      ]
     ],
     [
      [
-      232,
+      230,
       160
      ],
      [
-      232,
-      210
+      230,
+      215
      ]
     ],
     [
      [
-      1154,
+      1170,
       160
      ],
      [
-      1154,
-      210
+      1170,
+      215
+     ]
+    ],
+    [
+     [
+      700,
+      215
+     ],
+     [
+      700,
+      240
      ]
     ]
    ],
-   "source": "Schematic drawn for the demo. Size and door positions are read off the venue map; the room has not been measured.",
-   "georef_note": "Approximate: a rectangle about 23 m by 14 m with the two doors on the corridor wall. Numbered circles are suggested photo spots, nothing more. Walkable paths are a loop just inside the walls; redraw them to match the real aisles."
+   "source": "Redrawn from the 20 Nov 2026 site survey photos (36 photos from the four corners and the front).",
+   "georef_note": "Approximate: about 23 m by 14 m, taken from the venue map. Doors, boards, cabinets, bins and windows are placed from the photos; nothing was measured. The walkable loop is the aisle just inside the walls."
   },
   {
    "image": "pack/indoor/citytech_f1.png",
@@ -218,14 +235,42 @@
      "name": "Door A 105 (north)",
      "p": [
       860,
-      1060
+      1050
      ]
     },
     {
      "name": "Door A 105 (south)",
      "p": [
       1154,
-      1060
+      1050
+     ]
+    },
+    {
+     "name": "Information desk",
+     "p": [
+      545,
+      1090
+     ]
+    },
+    {
+     "name": "Exit Stair E (by corridor doors)",
+     "p": [
+      760,
+      1040
+     ]
+    },
+    {
+     "name": "Women's restroom (corridor)",
+     "p": [
+      885,
+      1000
+     ]
+    },
+    {
+     "name": "Courtyard doors",
+     "p": [
+      660,
+      675
      ]
     }
    ],
@@ -430,6 +475,84 @@
      [
       902,
       960
+     ]
+    ],
+    [
+     [
+      545,
+      1090
+     ],
+     [
+      585,
+      1085
+     ],
+     [
+      636,
+      1016
+     ]
+    ],
+    [
+     [
+      400,
+      1140
+     ],
+     [
+      480,
+      1164
+     ]
+    ],
+    [
+     [
+      716,
+      860
+     ],
+     [
+      665,
+      735
+     ],
+     [
+      660,
+      675
+     ]
+    ],
+    [
+     [
+      760,
+      1016
+     ],
+     [
+      760,
+      1040
+     ]
+    ],
+    [
+     [
+      885,
+      1016
+     ],
+     [
+      885,
+      1000
+     ]
+    ],
+    [
+     [
+      860,
+      1016
+     ],
+     [
+      860,
+      1050
+     ]
+    ],
+    [
+     [
+      1154,
+      1016
+     ],
+     [
+      1154,
+      1050
      ]
     ]
    ],
