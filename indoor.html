@@ -163,15 +163,16 @@ function reroute(){ ROUTE=null; if(!FIX||!DEST) return; const F=floor(FIX.floor)
   const here=destsOf(FIX.floor), there=destsOf(DEST.floor), T=floor(DEST.floor); let best=null;
   const same=/^(Door|Stair|Elevator)/.test(DEST.name)&&here.find(d=>d.name===DEST.name); if(same) best={...plan(same.p),via:same.name};     // the destination is itself a stair: use that one
   if(!best) for(const kind of [/^Door/,/^Stair/,/^Elevator/]){ for(const c of here.filter(d=>kind.test(d.name)&&there.some(x=>x.name===d.name))){ const p=plan(c.p), t=there.find(x=>x.name===c.name), tp=pathsOf(DEST.floor), r2=tp.length?route(t.p,DEST.p,tp,T.m_per_px):null;
-      const after=legsOf(r2?r2.pts:[t.p,DEST.p],T.m_per_px||0,0).total, cost=p.total+after;          // whole trip: this plan's leg plus what is left on the other plan
-      if(!best||cost<best.cost) best={...p,via:c.name,after,cost}; } if(best) break; }
+      const after=legsOf(r2?r2.pts:[t.p,DEST.p],T.m_per_px||0,0).total, blind=!REFS.some(r=>r.floor===DEST.floor&&Math.hypot(r.x-t.p[0],r.y-t.p[1])*(T.m_per_px||0.1)<9), cost=p.total+after+(blind?20:0);   // a door with no surveyed photos beyond it costs 20 m: you could not re-fix there          // whole trip: this plan's leg plus what is left on the other plan
+      if(!best||cost<best.cost) best={...p,via:c.name,after,cost,blind}; } if(best) break; }
   if(!best){ ROUTE={pts:[a],legs:[],steps:[],total:0,mapped:false,noLink:true}; return; }
   const door=/^Door/.test(best.via); best.steps.push({turn:door?`THROUGH ${best.via.toUpperCase()}, THEN SHOOT AGAIN`:`TAKE ${best.via.toUpperCase()} TO FLOOR ${T.label}`,m:0,vertical:true}); best.toFloor=T.label; best.door=door; ROUTE=best; }
 
 /* ---------- go ---------- */
 $('capGo').onchange=async e=>{ const file=e.target.files[0]; e.target.value=''; if(!file) return; if(!REFS.length){ $('goStatus').innerHTML='<span class="warn">No reference photos on this phone yet. Open Survey and add some, or import a pack.</span>'; return; }
   $('goStatus').textContent='Matching on this phone…'; $('cands').innerHTML=''; try{ const t0=performance.now(), {im,f35}=await loadPhoto(file), q=await VPR.features(im), fPx=PG.focalPx(q.w,q.h,f35).f;
-    lastRes=await VPR.locate(q,REFS,fPx); const ms=Math.round(performance.now()-t0), best=lastRes[0], mpp=floor(best.ref.floor).m_per_px||0.1;
+    lastRes=await VPR.locate(q,REFS,fPx);
+    const ms=Math.round(performance.now()-t0), best=lastRes[0], mpp=floor(best.ref.floor).m_per_px||0.1;
     const far=lastRes.find(c=>c.ref.floor!==best.ref.floor||Math.hypot(c.ref.x-best.ref.x,c.ref.y-best.ref.y)*mpp>3), next=far?far.inliers:0;
     const conf=best.inliers>=25&&best.inliers>=1.6*next?'high':best.inliers>=14&&best.inliers>=1.3*next?'medium':'low';
     $('goStatus').innerHTML=best.inliers<10?`<span class="warn">No surveyed photo matches this view (best: ${best.inliers} matching points). Aim at something with more detail, or add a reference photo here.</span>`
@@ -190,12 +191,13 @@ function updateGo(){ reroute(); if(!FIX||!DEST){ $('goinfo').innerHTML=`<span cl
   $('goinfo').innerHTML=`<div class="big">${sc?'~'+Math.round(R.total)+' m · ':''}${R.steps[0]?R.steps[0].turn:''}</div><div>${DEST.name}${other?` <span class="mut">· ${floor(DEST.floor).name}, via ${R.via}</span>`:''}</div>
    <div class="mut">${R.steps.map((x,i)=>`${i+1}. ${x.turn}${sc&&!x.vertical?' '+x.m+' m':''}`).join(' → ')}</div>
    ${other&&R.after?`<div class="mut">Then about ${Math.round(R.after)} m more on "${floor(DEST.floor).name}".</div>`:''}
+   ${other&&R.blind?'<div class="warn">No survey photos on the far side of that door: the next photo may not match.</div>':''}
    ${other&&/^Elevator/.test(R.via)?'<div class="warn">No stair is marked on both plans, so this uses the elevator. In a fire, use stairs.</div>':''}
    ${R.mapped?(R.offPath>8?`<div class="warn">You or the destination are about ${Math.round(R.offPath)} m from the nearest drawn path.</div>`:''):'<div class="warn">No drawn path connects these, so this is a straight line through walls. Add walkable paths in Survey.</div>'}`; }
 $('go').onclick=async()=>{ if(!FIX||!DEST){ updateGo(); return; } if(ROUTE.noLink) return; $('syncinfo').textContent='sending…'; const F=floor(FIX.floor), a=toLL([FIX.x,FIX.y],F), end=toLL(ROUTE.pts[ROUTE.pts.length-1],F), other=DEST.floor!==FIX.floor;
-  const st=await PGSync.publish({fix:{lat:a.lat,lon:a.lon,ring:4,heading:(F.up_bearing_deg+FIX.heading)%360,floor:F.label,src:'indoor-photo',indoor:true,conf:FIX.conf},
+  const st=await PGSync.publish({fix:{lat:a.lat,lon:a.lon,ring:4,heading:(F.up_bearing_deg+FIX.heading)%360,floor:F.label,src:'indoor-photo',indoor:true,conf:FIX.conf,plan:FIX.floor,px:[Math.round(FIX.x),Math.round(FIX.y)]},
     dest:{name:(other?(ROUTE.door?`${ROUTE.via} → `:`${ROUTE.via} → floor ${ROUTE.toFloor}: `):'')+DEST.name,lat:end.lat,lon:end.lon},
-    route:ROUTE.mapped?{pts:ROUTE.pts.slice(0,14).map(p=>toLL(p,F)),steps:ROUTE.steps.slice(0,8),total:Math.round(ROUTE.total)}:null,
+    route:ROUTE.mapped?{px:ROUTE.pts.slice(0,14).map(p=>[Math.round(p[0]),Math.round(p[1])]),pts:ROUTE.pts.slice(0,14).map(p=>toLL(p,F)),steps:ROUTE.steps.slice(0,8),total:Math.round(ROUTE.total)}:null,
     dests:destsOf(FIX.floor).slice(0,12).map(d=>({name:d.name.slice(0,28),...toLL(d.p,F)}))});
   $('syncinfo').textContent=`sent to room "${PGSync.ROOM}" · app relay ${st.api?'✔':'✘'} · ntfy relay ${st.ntfy?'✔':'✘'}. On the glasses: face the way you shot, then press ALIGN.`; };
 
