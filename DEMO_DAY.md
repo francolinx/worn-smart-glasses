@@ -4,6 +4,7 @@
 Code freeze is **Sat 21 Nov, 2:00 PM**. Table demos start **2:15 PM**. Room **A 105**, 285 Jay St.
 
 Read this file top to bottom once. Then do "Path A". Everything else is optional.
+For the background (what was decided, what was measured, what a judge will ask), read [`CONTEXT_FOR_REX.md`](CONTEXT_FOR_REX.md).
 
 ---
 
