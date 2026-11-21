@@ -49,8 +49,11 @@ GPS does not work indoors and there is no skyline, so indoor mode recognises the
 3. The fix goes to the glasses the same way as outdoors. A service worker caches the app, so solving works with no connection;
    the hand-off to the glasses still needs one.
 
-The bundled plan is the City Tech Academic Complex first floor (source: The Theater at City Tech, `AC_layout.pdf`). Its scale and
-north are approximate (see `pack/indoor/default.json`), so indoor distances are ±15% and straight-line; walls are not considered.
+Bundled plans for the City Tech Academic Complex (`pack/indoor/default.json`): the first-floor venue map (The Theater at City Tech,
+`AC_layout.pdf`) and the fire-egress sign at Elevator Bank B on each of floors 1 to 8 (photographed by the team), with every labelled
+stair and exit as a destination and the signs' dashed egress lines as walkable paths. One reference set spans all floors, so a photo
+also identifies the floor. A destination on another floor routes to the nearest stair both floors share. Scale and north are
+approximate on every plan, so distances are rough; the floor-6 sign's floor number is assumed from the order the photos were taken.
 Indoor matching has only been run on synthetic test images so far: right match and right turn direction on shifted, dimmed,
 rotated copies, and a clean "no match" on an unseen view. Real rooms with repeated furniture will be harder.
 
