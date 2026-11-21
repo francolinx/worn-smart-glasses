@@ -14,11 +14,9 @@
   async function publish(state) {
     state.t = Date.now(); state.v = 1; const body = JSON.stringify(state);
     try { localStorage.setItem(KEY, body); } catch (_) {}
-    const out = await Promise.allSettled([
-      fetch(API, { method: 'POST', headers: { 'content-type': 'application/json' }, body }).then(r => { if (!r.ok) throw 0; }),
-      fetch(NTFY, { method: 'POST', body, headers: { Title: 'point-and-go' } }).then(r => { if (!r.ok) throw 0; })
-    ]);
-    status.api = out[0].status === 'fulfilled'; status.ntfy = out[1].status === 'fulfilled';
+    const ok = p => p.then(r => !!r.ok, () => false);                    // no Promise.allSettled: old WebViews lack it
+    const out = await Promise.all([ok(fetch(API, { method: 'POST', headers: { 'content-type': 'application/json' }, body })), ok(fetch(NTFY, { method: 'POST', body, headers: { Title: 'point-and-go' } }))]);
+    status.api = out[0]; status.ntfy = out[1];
     return status;
   }
   function subscribe(cb) {
