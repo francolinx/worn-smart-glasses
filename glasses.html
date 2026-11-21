@@ -46,7 +46,12 @@
 const $ = id => document.getElementById(id), params = new URLSearchParams(location.search);
 const AHEAD = 20, norm180 = PG.wrap180;
 let state = null, dests = [], destIdx = -1, mapOn = false, pack = null, SCH = null;
-fetch('pack/indoor/schematic.json').then(r => r.json()).then(j => { SCH = j.plans; }).catch(() => {});
+/* floors with traced walls come from schematic.json; every other plan gets a schematic built from its surveyed corridors, stairs and exits */
+Promise.all([fetch('pack/indoor/schematic.json').then(r => r.json()).catch(() => ({ plans: {} })), fetch('pack/indoor/default.json').then(r => r.json()).catch(() => ({ floors: [] }))]).then(([j, d]) => { const P = j.plans || {};
+  for (const f of d.floors) if (!P[f.id] && f.m_per_px) P[f.id] = { mpp: f.m_per_px, up: f.up_bearing_deg, walls: [], solid: [], furn: [], corr: f.paths || [], floorLabel: f.label,
+    exits: (f.dests || []).filter(x => /^(Stair|Exit)/.test(x.name)).map(x => ({ p: x.p, t: x.name.replace(/^Exit.*/, 'EXIT').toUpperCase() })),
+    labels: (f.dests || []).filter(x => !/^(Stair|Exit)/.test(x.name)).map(x => ({ t: x.name.replace('Elevator Bank B', 'ELEV').replace(/ \(.*/, '').toUpperCase(), p: x.p, pri: 2 })) };
+  SCH = P; });
 let rawHeading = null, absolute = false, offset = 0, aligned = false, sensorsOn = false, lastOrient = 0, shown = 0;
 
 function onOrient(e) {
@@ -115,6 +120,7 @@ function drawSchematic(g) {
   const seg = (L, col, w) => { g.strokeStyle = col; g.lineWidth = w; g.beginPath(); for (const q of L) { const a = P(q[0], q[1]), b = P(q[2], q[3]); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); } g.stroke(); };
   g.save(); g.beginPath(); g.rect(0, 84, 600, 404); g.clip(); g.lineCap = 'round'; g.lineJoin = 'round';
   for (const poly of pl.solid) { g.fillStyle = 'rgba(255,140,60,.16)'; g.strokeStyle = '#a8592a'; g.lineWidth = 2; g.beginPath(); poly.forEach((q, i) => { const a = P(q[0], q[1]); i ? g.lineTo(a[0], a[1]) : g.moveTo(a[0], a[1]); }); g.closePath(); g.fill(); g.stroke(); }
+  if (pl.corr) { const cor = (col, w) => { g.strokeStyle = col; g.lineWidth = w; for (const L of pl.corr) { g.beginPath(); L.forEach((q, i) => { const a = P(q[0], q[1]); i ? g.lineTo(a[0], a[1]) : g.moveTo(a[0], a[1]); }); g.stroke(); } }; cor('#8fdcff', 2.6 * S + 5); cor('#06141b', 2.6 * S); }   // corridors: outlined bands about 2.6 m wide
   seg(pl.furn, '#3d5560', 1.5); seg(pl.walls, '#8fdcff', 3);
   const R = route(), d = target(), boxes = [], free = (x, y, w, hh) => { if (x < 6 || x + w > 594 || y < 90 || y + hh > 484) return false; for (const b of boxes) if (x < b[0] + b[2] && x + w > b[0] && y < b[1] + b[3] && y + hh > b[1]) return false; boxes.push([x, y, w, hh]); return true; };
   boxes.push([cx - 26, cy - 30, 52, 60]);
@@ -136,6 +142,7 @@ function drawSchematic(g) {
   g.textAlign = 'center'; g.font = 'bold 34px system-ui'; g.fillStyle = col; g.fillText(top, 300, 40);
   if (s1) { g.font = '600 19px system-ui'; g.fillStyle = '#cfd8dc'; g.fillText('then ' + (s1.vertical ? s1.turn.split(',')[0].toLowerCase().replace(/\b(door a 105|stair)\b/g, m => m.toUpperCase()) : `${ICON[s1.turn] || ''} ${s1.turn.toLowerCase()}${s1.m ? ' ' + s1.m + ' m' : ''}`), 300, 70); }
   if (d) { g.font = 'bold 22px system-ui'; g.fillStyle = '#ffc400'; const nm = (d.name || '').replace(/^.*→ /, ''); g.fillText(`${R ? Math.round(R.total) + ' m · ' : ''}${nm.slice(0, 30)}`, 300, 516); }
+  if (pl.floorLabel) { g.textAlign = 'left'; g.font = 'bold 18px system-ui'; g.fillStyle = '#8fdcff'; g.fillText('FLOOR ' + pl.floorLabel, 14, 22); }
   g.textAlign = 'left';
 }
 function drawMap() {

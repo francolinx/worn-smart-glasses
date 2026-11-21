@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Point & Go · 285 Jay St, whole building</title>
+<style>
+:root{--fg:#e6e8eb;--mut:#9aa3ad;--card:rgba(16,21,29,.88);--line:#2a313b;--acc:#ffb020;--ok:#3fb950;--bad:#ff4d3d}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#070a0f;color:var(--fg);font:14px system-ui,-apple-system,sans-serif;overflow:hidden}canvas{display:block;touch-action:none}
+#top{position:fixed;left:8px;top:8px;right:8px;pointer-events:none}.chip{display:inline-block;pointer-events:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 10px;max-width:440px}
+h1{font-size:15px;margin:0}.mut{color:var(--mut);font-size:12px}.tag{display:inline-block;background:var(--bad);color:#fff;font-weight:700;font-size:11px;letter-spacing:.06em;border-radius:5px;padding:2px 6px;margin-top:4px}a{color:var(--acc)}
+#bar{position:fixed;left:0;right:0;bottom:0;padding:8px;display:flex;gap:6px;overflow-x:auto;background:linear-gradient(transparent,rgba(7,10,15,.92) 40%)}
+button{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:inherit;white-space:nowrap}button.on{border-color:var(--acc);color:var(--acc)}button.go{border-color:var(--ok);color:var(--ok);font-weight:700}
+#info{position:fixed;left:8px;right:8px;bottom:58px;max-width:440px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;display:none}#info b{color:#fff}
+</style></head><body>
+<div id="top"><div class="chip"><h1>285 Jay St · Academic Complex · floors 1 to 8</h1><div class="mut">Floor plans: the fire-egress signs at Elevator Bank B · ground: NYS orthoimagery · <a href="floor3d.html">floor 1 detail</a> · <a href="indoor.html">app</a></div>
+<div class="tag">FIRE RESCUE / POLICE · STAIRS IN RED · EXITS IN GREEN</div></div></div>
+<div id="info"></div>
+<div id="bar"><button id="bBird" class="on">Bird's eye</button><button id="bStack">Floor stack</button><button id="bSide">Section (side)</button><button id="bExp">Explode</button><button id="bRun" class="go">▶ 8th-floor corner → exit</button><button id="bNext">Next trial ▸</button><button id="bShell" class="on">Shell</button><button id="bCity" class="on">City</button></div>
+<script type="importmap">{"imports":{"three":"./js/three/three.module.min.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from './js/three/OrbitControls.js';
+const $ = id => document.getElementById(id), J = u => fetch(u).then(r => r.json());
+const [def, sat, near, runs] = await Promise.all([J('pack/indoor/default.json'), J('pack/sat_3d.json'), J('pack/near_3d.json'), J('bench/vertical_runs.json').catch(() => [])]);
+const LAT0 = sat.lat0, LON0 = sat.lon0, KX = 111320 * Math.cos(LAT0 * Math.PI / 180), KZ = 111320;
+const LL = (lat, lon, y = 0) => new THREE.Vector3((lon - LON0) * KX, y, -(lat - LAT0) * KZ);          // +X east, -Z north
+const renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(Math.min(2, devicePixelRatio)); renderer.setSize(innerWidth, innerHeight); document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x070a0f); scene.fog = new THREE.Fog(0x070a0f, 300, 700);
+const cam = new THREE.PerspectiveCamera(46, innerWidth / innerHeight, 0.5, 1500), ctl = new OrbitControls(cam, renderer.domElement); ctl.enableDamping = true; ctl.maxPolarAngle = Math.PI / 2 - 0.02; ctl.maxDistance = 520;
+scene.add(new THREE.HemisphereLight(0xcfe2ff, 0x20180f, 1.5)); const sun = new THREE.DirectionalLight(0xffffff, 1.3); sun.position.set(-80, 160, 90); scene.add(sun);
+const tl = new THREE.TextureLoader(), tex = u => { const t = tl.load(u); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
+
+/* the signs are cream floors on a navy board: make the board transparent so only the floor itself is drawn */
+const planTex = (u, mat) => { const im = new Image(); im.onload = () => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const g = c.getContext('2d'); g.drawImage(im, 0, 0);
+  const d = g.getImageData(0, 0, c.width, c.height), a = d.data; for (let i = 0; i < a.length; i += 4) if (a[i] + a[i + 1] < 250 && a[i + 2] < 190) a[i + 3] = 0; g.putImageData(d, 0, 0);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; mat.map = t; mat.opacity = .95; mat.needsUpdate = true; }; im.src = u; };
+/* ground: orthoimagery, north up */
+{ const g = new THREE.Mesh(new THREE.PlaneGeometry(sat.half_m * 2, sat.half_m * 2), new THREE.MeshBasicMaterial({ map: tex('pack/sat_3d.jpg') })); g.rotation.x = -Math.PI / 2; g.position.y = -0.05; scene.add(g); }
+/* city: nearby footprints at roof height (NYC open data) */
+const city = new THREE.Group(), shell = new THREE.Group(); scene.add(city, shell);
+const extrude = (ring, h, mat) => { const s = new THREE.Shape(); ring.forEach((p, i) => { const v = LL(p[0], p[1]); i ? s.lineTo(v.x, -v.z) : s.moveTo(v.x, -v.z); }); const g = new THREE.ExtrudeGeometry(s, { depth: h, bevelEnabled: false }); g.rotateX(-Math.PI / 2); return new THREE.Mesh(g, mat); };
+let ROOF = 45.7;
+for (const b of near) { const mine = /285 JAY/.test(b.addr || '') && b.d < 80;
+  if (mine) { if (b.d < 10) ROOF = b.h; const m = extrude(b.ring, b.h, new THREE.MeshStandardMaterial({ color: b.d < 10 ? 0x66d6ff : 0xd9652b, transparent: true, opacity: b.d < 10 ? .13 : .3, roughness: .2, depthWrite: false })); shell.add(m);
+    const e = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 30), new THREE.LineBasicMaterial({ color: b.d < 10 ? 0x8fdcff : 0xffa46b })); shell.add(e); }
+  else city.add(extrude(b.ring, b.h, new THREE.MeshStandardMaterial({ color: 0x8794a3, transparent: true, opacity: .55, roughness: .9 }))); }
+function label(text, pos, size = 1, col = '#e6f4ff') { const c = document.createElement('canvas'), g = c.getContext('2d'); g.font = 'bold 44px system-ui,sans-serif'; const w = Math.ceil(g.measureText(text).width) + 28; c.width = w; c.height = 64;
+  g.font = 'bold 44px system-ui,sans-serif'; g.fillStyle = 'rgba(7,10,15,.75)'; g.beginPath(); g.roundRect(0, 0, w, 64, 14); g.fill(); g.fillStyle = col; g.textBaseline = 'middle'; g.fillText(text, 14, 34);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false })); s.scale.set(w / 64 * 3 * size, 3 * size, 1); s.position.copy(pos); s.renderOrder = 9; scene.add(s); return s; }
+label('JAY ST', LL(LAT0, LON0 - 0.00068, 2), 1.2, '#8fdcff'); label('TILLARY ST', LL(LAT0 + 0.00062, LON0, 2), 1.2, '#8fdcff'); label('TECH PL', LL(LAT0 - 0.00062, LON0, 2), 1.2, '#8fdcff');
+
+/* floors: each fire plan sits where its "You are here" (Elevator Bank B) is, so the stack lines up on the elevator shaft */
+const FLOORS = def.floors.filter(f => /^f(1s|[2-8])$/.test(f.id)), LEVEL = { f1s: 0.4, f2: 6.5, f3: 11.4, f4: 16.3, f5: 21.2, f6: 26.1, f7: 31, f8: 35.9 };   // assumed storey heights: 6.5 m lobby, 4.9 m above
+let explode = 1; const G = {}, yOf = id => LEVEL[id] * explode;
+const local = (f, p) => new THREE.Vector3((p[0] - f.origin_px[0]) * f.m_per_px, 0, (p[1] - f.origin_px[1]) * f.m_per_px);
+const world = (f, p, dy = 0) => G[f.id].localToWorld(local(f, p).setY(dy));
+for (const f of FLOORS) { const g = new THREE.Group(); g.position.copy(LL(f.origin_ll[0], f.origin_ll[1], yOf(f.id))); g.rotation.y = -f.up_bearing_deg * Math.PI / 180; scene.add(g); G[f.id] = g; g.userData.f = f;
+  const pl = new THREE.Mesh(new THREE.PlaneGeometry(f.w * f.m_per_px, f.h * f.m_per_px), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, alphaTest: .05 })); pl.rotation.x = -Math.PI / 2; pl.position.set((f.w / 2 - f.origin_px[0]) * f.m_per_px, 0, (f.h / 2 - f.origin_px[1]) * f.m_per_px); g.add(pl); planTex(f.image, pl.material);
+  for (const path of f.paths || []) g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(path.map(p => local(f, p).setY(.25))), new THREE.LineBasicMaterial({ color: 0xffb020 })));
+  for (const d of f.dests || []) { const stair = /^Stair/.test(d.name), exit = /^Exit/.test(d.name), el = /^Elevator/.test(d.name); if (!stair && !exit && !el) continue;
+    const m = new THREE.Mesh(new THREE.SphereGeometry(exit ? 1.5 : 1.1, 14, 10), new THREE.MeshBasicMaterial({ color: stair ? 0xff3b30 : exit ? 0x3dff7a : 0x4aa3ff })); m.position.copy(local(f, d.p).setY(.6)); g.add(m); }
+  f.tag = label((f.id === 'f1s' ? '1' : f.label), new THREE.Vector3(), 1.3, '#ffd27a'); }
+/* stair and elevator shafts: the same name on consecutive floors is joined */
+const shafts = new THREE.Group(); scene.add(shafts);
+function rebuild() { for (const f of FLOORS) { G[f.id].position.y = yOf(f.id); G[f.id].updateMatrixWorld(true); f.tag.position.copy(world(f, [f.w + 40, f.h / 2], 1)); }
+  shafts.clear(); const names = new Set(FLOORS.flatMap(f => f.dests.filter(d => /^(Stair|Elevator)/.test(d.name)).map(d => d.name)));
+  for (const n of names) { const pts = FLOORS.map(f => { const d = f.dests.find(x => x.name === n); return d ? world(f, d.p, .6) : null; });
+    for (let i = 0; i < pts.length - 1; i++) if (pts[i] && pts[i + 1]) shafts.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([pts[i], pts[i + 1]]), new THREE.LineBasicMaterial({ color: /^Stair/.test(n) ? 0xff3b30 : 0x4aa3ff })));
+    const top = pts.filter(Boolean).pop(); if (top && /^Stair/.test(n)) { const s = label(n.replace('Stair ', ''), top.clone().setY(top.y + 2.2), .7, '#ff8a80'); shafts.add(s); } }
+  shell.scale.y = Math.max(1, (yOf('f8') + 9) / ROOF); if (trial) drawTrial(); }
+
+/* trials from the benchmark: a route on the start floor, down the shared stair, then to the target */
+const routeG = new THREE.Group(); scene.add(routeG); let trial = null, tIdx = 0, anim = -1, curve = null;
+const runner = new THREE.Mesh(new THREE.SphereGeometry(1.3, 18, 12), new THREE.MeshBasicMaterial({ color: 0xffffff })); runner.visible = false; scene.add(runner);
+function drawTrial() { routeG.clear(); const r = trial, F = id => FLOORS.find(f => f.id === id), a = F(r.sf), b = F(r.df); let pts = r.leg1.pts.map(p => world(a, p, .8));
+  if (r.leg2) pts = pts.concat(r.leg2.pts.map(p => world(b, p, .8))); curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.02);
+  routeG.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 300, .55, 8), new THREE.MeshBasicMaterial({ color: 0x3dff7a })));
+  const s = new THREE.Mesh(new THREE.SphereGeometry(1.6, 16, 12), new THREE.MeshBasicMaterial({ color: 0xffffff })); s.position.copy(pts[0]); routeG.add(s);
+  const e = new THREE.Mesh(new THREE.SphereGeometry(1.9, 16, 12), new THREE.MeshBasicMaterial({ color: 0xffc400 })); e.position.copy(pts[pts.length - 1]); routeG.add(e);
+  $('info').style.display = 'block'; $('info').innerHTML = `<b>Trial ${r.n}</b> · floor ${r.start_floor} → <b>${r.dest}</b> (floor ${r.dest_floor})<br>${r.via ? 'Down <b>' + r.via + '</b> · ' : ''}${r.total} m of corridor · independent check: ${r.checks.independent_m} m${r.checks.independent_via ? ' via ' + r.checks.independent_via : ''} · <b style="color:${r.ok ? '#3dff7a' : '#ff4d3d'}">${r.ok ? 'PASS' : 'FAIL'}</b><div class="mut">Start position is injected: there are no survey photos above floor 1 yet. Stair travel itself is not counted in the metres.</div>`; }
+const show = i => { if (!runs.length) return; tIdx = (i + runs.length) % runs.length; trial = runs[tIdx]; drawTrial(); anim = 0; runner.visible = true; };
+
+/* views */
+let fly = null; const flyTo = (p, t) => { fly = { p0: cam.position.clone(), t0: ctl.target.clone(), p1: p, t1: t, s: performance.now() }; };
+const C = LL(40.69552, -73.98657, 0), mid = () => C.clone().setY(yOf('f8') / 2);
+const setOn = id => ['bBird', 'bStack', 'bSide'].forEach(b => $(b).classList.toggle('on', b === id));
+$('bBird').onclick = () => { flyTo(new THREE.Vector3(C.x - 150, 190, C.z + 190), C.clone().setY(15)); setOn('bBird'); };
+$('bStack').onclick = () => { flyTo(new THREE.Vector3(C.x - 95, yOf('f8') + 55, C.z + 105), mid()); setOn('bStack'); };
+$('bSide').onclick = () => { flyTo(new THREE.Vector3(C.x - 190, yOf('f8') / 2 + 6, C.z + 4), mid()); setOn('bSide'); };
+$('bExp').onclick = e => { explode = explode === 1 ? 2.6 : 1; e.target.classList.toggle('on', explode !== 1); rebuild(); $(document.querySelector('#bar .on')?.id || 'bStack').click(); };
+$('bShell').onclick = e => { shell.visible = !shell.visible; e.target.classList.toggle('on', shell.visible); }; $('bCity').onclick = e => { city.visible = !city.visible; e.target.classList.toggle('on', city.visible); };
+$('bRun').onclick = () => { if (explode === 1) $('bExp').click(); shell.visible = false; $('bShell').classList.remove('on'); $('bStack').click(); show(0); }; $('bNext').onclick = () => show(tIdx + 1);
+rebuild(); cam.position.set(C.x - 150, 190, C.z + 190); ctl.target.copy(C.clone().setY(15));
+addEventListener('resize', () => { cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+(function loop(now) { requestAnimationFrame(loop); if (fly) { const k = Math.min(1, (now - fly.s) / 1200), e = ease(k); cam.position.lerpVectors(fly.p0, fly.p1, e); ctl.target.lerpVectors(fly.t0, fly.t1, e); if (k >= 1) fly = null; }
+  if (anim >= 0 && curve) { anim += 0.004; if (anim >= 1) anim = 0; runner.position.copy(curve.getPointAt(anim)); } ctl.update(); renderer.render(scene, cam); })(performance.now());
+window.__b = { show, click: id => $(id).click(), ready: true };
+</script></body></html>
