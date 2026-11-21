@@ -8,10 +8,10 @@
   html, body { margin: 0; padding: 0; width: 600px; height: 600px; background: #000; color: #fff;   /* black = transparent on waveguide */
     font-family: -apple-system, system-ui, sans-serif; overflow: hidden; }
   #arrowView { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding-bottom: 56px; }
-  #arrow { width: 250px; height: 250px; transition: transform .12s linear; }
+  #arrow { width: 225px; height: 225px; transition: transform .12s linear; }
   #arrow path { fill: #fff; } #arrow.ahead path { fill: #3dff7a; } #arrow.lost path { fill: #555; }
   #dist { font-size: 62px; font-weight: 700; letter-spacing: 1px; line-height: 1; }
-  #dest { font-size: 24px; color: #fff; max-width: 560px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #dest { font-size: 23px; line-height: 1.2; color: #fff; max-width: 570px; max-height: 56px; text-align: center; overflow: hidden; }
   #status { font-size: 24px; color: #aaa; min-height: 30px; } #status.ahead { color: #3dff7a; } #status.warn { color: #ffb84d; }
   #hdg { position: absolute; top: 14px; left: 16px; font-size: 18px; color: #8a8a8a; }
   #fixinfo { position: absolute; top: 14px; right: 16px; font-size: 18px; color: #8a8a8a; text-align: right; }

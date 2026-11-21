@@ -17,7 +17,7 @@ button.on{border-color:var(--acc);color:var(--acc)}button.go{border-color:var(--
 .cand{display:flex;gap:8px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:8px;margin-top:6px}.cand img{width:96px;height:72px;object-fit:cover;border-radius:6px}
 </style></head><body>
 <header><h1>Point &amp; Go <span class="mut">· indoor</span></h1><a href="index.html">outdoor</a> <a id="gl" href="glasses.html" target="_blank">glasses ▸</a></header>
-<div id="banner"></div>
+<div id="banner"></div><img id="bprev" style="display:none;position:sticky;top:44px;z-index:5;width:132px;border:3px solid var(--acc);border-radius:8px;margin:6px 10px 0">
 <div class="tabs"><button id="tGo" class="on">Go</button><button id="tSurvey">Survey (build the map pack)</button></div>
 
 <div id="vGo">
@@ -33,7 +33,7 @@ button.on{border-color:var(--acc);color:var(--acc)}button.go{border-color:var(--
 <div id="vSurvey" style="display:none">
  <div class="card"><h2>Survey: do this once per building, before you need it</h2>
   <div class="row"><label class="shoot" style="flex:1;font-size:16px;padding:12px">＋ Reference photo<input id="capRef" type="file" accept="image/*" capture="environment" style="display:none"></label>
-   <button id="addDest">＋ Destination</button><button id="addPath">＋ Walkable path</button><button id="donePath" class="go" style="display:none">Done</button></div>
+   <label style="border:1px solid var(--ok);color:var(--ok);border-radius:9px;padding:9px 12px;cursor:pointer">＋ From camera roll (many)<input id="bulk" type="file" accept="image/*" multiple style="display:none"></label><button id="addDest">＋ Destination</button><button id="addPath">＋ Walkable path</button><button id="donePath" class="go" style="display:none">Done</button></div>
   <div class="mut" style="margin-top:8px">Each reference: shoot, tap where you stood, then tap a point in the direction you faced. Stand at doorways, corners and junctions; take 3 or 4 directions per spot. More photos means better matches.</div>
   <div id="refs" style="margin-top:8px"></div>
   <div class="row" style="margin-top:10px"><button id="exp">Export pack</button><label style="border:1px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer">Import pack<input id="imp" type="file" accept="application/json,.json" style="display:none"></label>
@@ -54,7 +54,7 @@ const $=id=>document.getElementById(id);
 let FLOORS=[], CUR=null, PLAN=null, PIMG=null, REFS=[], STORE={dests:{},paths:{},custom:[]}, DESTS=[], PATHS=[], ROUTE=null, FIX=null, DEST=null, zoom=1, pending=null, lastRes=null;
 const IMGS={};
 $('gl').href='glasses.html?room='+PGSync.ROOM;
-const banner=t=>{ $('banner').textContent=t||''; $('banner').style.display=t?'block':'none'; };
+const banner=(t,img)=>{ $('banner').textContent=t||''; $('banner').style.display=t?'block':'none'; $('bprev').style.display=t&&img?'block':'none'; if(img) $('bprev').src=img; };
 const floor=id=>FLOORS.find(f=>f.id===id);
 
 /* ---------- storage (IndexedDB) ---------- */
@@ -93,8 +93,8 @@ function drawPlan(){ if(!PLAN) return; const bw=$('planbox').clientWidth, k=bw/P
   $('planNote').textContent=`${n} reference photos here (${REFS.length} in the building) · ${DESTS.length} destinations${PLAN.m_per_px?'':' · no scale'}`; }
 $('zp').onclick=()=>{ zoom=Math.min(4,zoom*1.5); drawPlan(); }; $('zm').onclick=()=>{ zoom=Math.max(1,zoom/1.5); drawPlan(); };
 pc.onclick=async e=>{ const r=pc.getBoundingClientRect(), k=pc.width/PLAN.w, p=[(e.clientX-r.left)/k,(e.clientY-r.top)/k];
-  if(pending&&pending.kind==='ref'){ if(!pending.pos){ pending.pos=p; banner('Now tap a point in the direction you were facing'); drawPlan(); return; }
-    const h=(Math.atan2(p[0]-pending.pos[0],-(p[1]-pending.pos[1]))*180/Math.PI+360)%360; REFS.push({id:'r'+Date.now(),floor:CUR,x:pending.pos[0],y:pending.pos[1],heading:h,f35:pending.f35,f:pending.f}); pending=null; banner(''); await save(); renderFloors(); renderRefs(); drawPlan(); return; }
+  if(pending&&pending.kind==='ref'){ if(!pending.pos){ pending.pos=p; banner((pending.tag||'')+'Now tap a point in the direction the camera was facing',pending.f.thumb); drawPlan(); return; }
+    const h=(Math.atan2(p[0]-pending.pos[0],-(p[1]-pending.pos[1]))*180/Math.PI+360)%360; REFS.push({id:'r'+Date.now(),floor:CUR,x:pending.pos[0],y:pending.pos[1],heading:h,f35:pending.f35,f:pending.f}); pending=null; banner(''); await save(); renderFloors(); renderRefs(); drawPlan(); nextBulk(); return; }
   if(pending&&pending.kind==='path'){ pending.pts.push(p); drawPlan(); return; }
   if(pending&&pending.kind==='dest'){ const name=prompt('Name this destination (e.g. Exit, Stair G, Room A 105)'); pending=null; banner(''); if(name){ DESTS.push({name,p}); await save(); fillDests(); } drawPlan(); return; }
   let near=null, nd=28/k; for(const d of DESTS){ const dd=Math.hypot(d.p[0]-p[0],d.p[1]-p[1]); if(dd<nd){nd=dd;near=d;} } if(near){ DEST={...near,floor:CUR}; $('dsel').value=CUR+'|'+DESTS.indexOf(near); updateGo(); drawPlan(); } };
@@ -103,6 +103,12 @@ pc.onclick=async e=>{ const r=pc.getBoundingClientRect(), k=pc.width/PLAN.w, p=[
 $('capRef').onchange=async e=>{ const file=e.target.files[0]; e.target.value=''; if(!file) return; banner('Reading the photo…'); try{ const {im,f35}=await loadPhoto(file), f=await VPR.features(im);
     if(f.n<80){ banner(''); alert('That photo has too little detail to recognise later ('+f.n+' features). Aim at signs, doors, shelves or posters.'); return; }
     pending={kind:'ref',f,f35}; banner('Tap where you were standing ('+PLAN.name+')'); $('planbox').scrollIntoView({behavior:'smooth'}); }catch(err){ banner(''); alert(err.message); } };
+/* photos taken earlier with the normal camera: place them one after another */
+let QUEUE=[], QN=0;
+$('bulk').onchange=e=>{ QUEUE=[...e.target.files]; QN=QUEUE.length; e.target.value=''; nextBulk(); };
+async function nextBulk(){ if(!QUEUE.length) return; const file=QUEUE.shift(), tag=`Photo ${QN-QUEUE.length} of ${QN}: `; banner(tag+'reading…'); try{ const {im,f35}=await loadPhoto(file), f=await VPR.features(im);
+    if(f.n<80){ alert(tag+'too little detail to recognise later ('+f.n+' features), skipped.'); banner(''); return nextBulk(); }
+    pending={kind:'ref',f,f35,tag}; banner(tag+'tap where it was taken ('+PLAN.name+')',f.thumb); $('planbox').scrollIntoView({behavior:'smooth'}); }catch(err){ alert(tag+err.message+' (HEIC photos: share them as JPEG, or use "Most Compatible")'); banner(''); nextBulk(); } }
 $('addDest').onclick=()=>{ pending={kind:'dest'}; banner('Tap the destination on the floor plan'); $('planbox').scrollIntoView({behavior:'smooth'}); };
 $('addPath').onclick=()=>{ pending={kind:'path',pts:[]}; banner('Tap along the corridor, corner by corner. Press Done when finished.'); $('donePath').style.display='inline-block'; $('planbox').scrollIntoView({behavior:'smooth'}); };
 $('donePath').onclick=async()=>{ if(pending&&pending.kind==='path'&&pending.pts.length>1){ PATHS.push(pending.pts); await save(); } pending=null; banner(''); $('donePath').style.display='none'; updateGo(); drawPlan(); };
@@ -150,10 +156,12 @@ function reroute(){ ROUTE=null; if(!FIX||!DEST) return; const F=floor(FIX.floor)
   const plan=(to)=>{ const r=paths.length?route(a,to,paths,F.m_per_px):null, pts=r?r.pts:[a,to]; return {pts,...legsOf(pts,s,FIX.heading),mapped:!!r,offPath:r?r.offPath*s:0}; };
   if(DEST.floor===FIX.floor){ ROUTE=plan(DEST.p); return; }
   const here=destsOf(FIX.floor), there=destsOf(DEST.floor), T=floor(DEST.floor); let best=null;
-  const same=/^(Stair|Elevator)/.test(DEST.name)&&here.find(d=>d.name===DEST.name); if(same) best={...plan(same.p),via:same.name};     // the destination is itself a stair: use that one
-  if(!best) for(const kind of [/^Stair/,/^Elevator/]){ for(const c of here.filter(d=>kind.test(d.name)&&there.some(x=>x.name===d.name))){ const p=plan(c.p); if(!best||p.total<best.total) best={...p,via:c.name}; } if(best) break; }
+  const same=/^(Door|Stair|Elevator)/.test(DEST.name)&&here.find(d=>d.name===DEST.name); if(same) best={...plan(same.p),via:same.name};     // the destination is itself a stair: use that one
+  if(!best) for(const kind of [/^Door/,/^Stair/,/^Elevator/]){ for(const c of here.filter(d=>kind.test(d.name)&&there.some(x=>x.name===d.name))){ const p=plan(c.p), t=there.find(x=>x.name===c.name), tp=pathsOf(DEST.floor), r2=tp.length?route(t.p,DEST.p,tp,T.m_per_px):null;
+      const after=legsOf(r2?r2.pts:[t.p,DEST.p],T.m_per_px||0,0).total, cost=p.total+after;          // whole trip: this plan's leg plus what is left on the other plan
+      if(!best||cost<best.cost) best={...p,via:c.name,after,cost}; } if(best) break; }
   if(!best){ ROUTE={pts:[a],legs:[],steps:[],total:0,mapped:false,noLink:true}; return; }
-  best.steps.push({turn:`TAKE ${best.via.toUpperCase()} TO FLOOR ${T.label}`,m:0,vertical:true}); best.toFloor=T.label; ROUTE=best; }
+  const door=/^Door/.test(best.via); best.steps.push({turn:door?`THROUGH ${best.via.toUpperCase()}, THEN SHOOT AGAIN`:`TAKE ${best.via.toUpperCase()} TO FLOOR ${T.label}`,m:0,vertical:true}); best.toFloor=T.label; best.door=door; ROUTE=best; }
 
 /* ---------- go ---------- */
 $('capGo').onchange=async e=>{ const file=e.target.files[0]; e.target.value=''; if(!file) return; if(!REFS.length){ $('goStatus').innerHTML='<span class="warn">No reference photos on this phone yet. Open Survey and add some, or import a pack.</span>'; return; }
@@ -173,14 +181,15 @@ function toLL(p,F){ const s=F.m_per_px||0.1, th=F.up_bearing_deg*PG.D2R, u=(p[0]
   const L=PG.Local(F.origin_ll[0],F.origin_ll[1]).ll(E,N); return {lat:+L[0].toFixed(6),lon:+L[1].toFixed(6)}; }      // 6 decimals = 0.1 m; keeps the relay message under ntfy's 4 KB limit
 function updateGo(){ reroute(); if(!FIX||!DEST){ $('goinfo').innerHTML=`<span class="mut">${FIX?'pick a destination':'shoot a photo first'}</span>`; return; }
   const R=ROUTE, F=floor(FIX.floor), sc=F.m_per_px, other=DEST.floor!==FIX.floor;
-  if(R.noLink){ $('goinfo').innerHTML=`<div class="big">Floor ${floor(DEST.floor).label}</div><div>${DEST.name}</div><div class="warn">You are on floor ${F.label}. No stair or elevator is marked on both plans, so there is no route. Add a "Stair …" destination with the same name on both floors.</div>`; return; }
-  $('goinfo').innerHTML=`<div class="big">${sc?'~'+Math.round(R.total)+' m · ':''}${R.steps[0]?R.steps[0].turn:''}</div><div>${DEST.name}${other?` <span class="mut">· floor ${floor(DEST.floor).label}, via ${R.via}</span>`:''}</div>
+  if(R.noLink){ $('goinfo').innerHTML=`<div class="big">${floor(DEST.floor).name}</div><div>${DEST.name}</div><div class="warn">You are on "${F.name}". No door, stair or elevator with the same name is marked on both plans, so there is no route. Add a "Door …" or "Stair …" destination with the same name on both.</div>`; return; }
+  $('goinfo').innerHTML=`<div class="big">${sc?'~'+Math.round(R.total)+' m · ':''}${R.steps[0]?R.steps[0].turn:''}</div><div>${DEST.name}${other?` <span class="mut">· ${floor(DEST.floor).name}, via ${R.via}</span>`:''}</div>
    <div class="mut">${R.steps.map((x,i)=>`${i+1}. ${x.turn}${sc&&!x.vertical?' '+x.m+' m':''}`).join(' → ')}</div>
+   ${other&&R.after?`<div class="mut">Then about ${Math.round(R.after)} m more on "${floor(DEST.floor).name}".</div>`:''}
    ${other&&/^Elevator/.test(R.via)?'<div class="warn">No stair is marked on both plans, so this uses the elevator. In a fire, use stairs.</div>':''}
    ${R.mapped?(R.offPath>8?`<div class="warn">You or the destination are about ${Math.round(R.offPath)} m from the nearest drawn path.</div>`:''):'<div class="warn">No drawn path connects these, so this is a straight line through walls. Add walkable paths in Survey.</div>'}`; }
 $('go').onclick=async()=>{ if(!FIX||!DEST){ updateGo(); return; } if(ROUTE.noLink) return; $('syncinfo').textContent='sending…'; const F=floor(FIX.floor), a=toLL([FIX.x,FIX.y],F), end=toLL(ROUTE.pts[ROUTE.pts.length-1],F), other=DEST.floor!==FIX.floor;
   const st=await PGSync.publish({fix:{lat:a.lat,lon:a.lon,ring:4,heading:(F.up_bearing_deg+FIX.heading)%360,floor:F.label,src:'indoor-photo',indoor:true,conf:FIX.conf},
-    dest:{name:(other?`${ROUTE.via} → floor ${ROUTE.toFloor}: `:'')+DEST.name,lat:end.lat,lon:end.lon},
+    dest:{name:(other?(ROUTE.door?`${ROUTE.via} → `:`${ROUTE.via} → floor ${ROUTE.toFloor}: `):'')+DEST.name,lat:end.lat,lon:end.lon},
     route:ROUTE.mapped?{pts:ROUTE.pts.slice(0,14).map(p=>toLL(p,F)),steps:ROUTE.steps.slice(0,8),total:Math.round(ROUTE.total)}:null,
     dests:destsOf(FIX.floor).slice(0,12).map(d=>({name:d.name.slice(0,28),...toLL(d.p,F)}))});
   $('syncinfo').textContent=`sent to room "${PGSync.ROOM}" · app relay ${st.api?'✔':'✘'} · ntfy relay ${st.ntfy?'✔':'✘'}. On the glasses: face the way you shot, then press ALIGN.`; };
@@ -193,6 +202,6 @@ $('tGo').onclick=()=>tab(true); $('tSurvey').onclick=()=>tab(false);
   if(s2) { unpack(s2); CUR=s2.cur; }
   else if(s1&&s1.plan){ unpack({v:1,refs:s1.refs,dests:(s1.dests||[]).filter(d=>!def.floors[0].dests.some(x=>x.name===d.name)&&!/^(Main Entrance|Elevators$)/.test(d.name)),paths:[]}); if(STORE.dests.f1) STORE.dests.f1=def.floors[0].dests.map(d=>({...d})).concat(STORE.dests.f1); }   // carry over a survey made before floors existed
   else { const pre=await fetch('pack/indoor/refs.json').then(r=>r.ok?r.json():null).catch(()=>null); if(pre) unpack(pre); }
-  if(!floor(CUR)) CUR='f1'; fillDests(); await setFloor(CUR); updateGo(); addEventListener('resize',drawPlan); if(!REFS.length) tab(false); VPR.load().catch(()=>{}); })();
+  if(!floor(CUR)) CUR=def.start||'f1'; fillDests(); await setFloor(CUR); updateGo(); addEventListener('resize',drawPlan); if(!REFS.length) tab(false); VPR.load().catch(()=>{}); })();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script></body></html>
