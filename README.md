@@ -20,6 +20,11 @@ See the surveyed floor in 3D: https://francolinx.github.io/worn-smart-glasses/fl
 50 simulated missions on the real survey photos, with the wearer's view for every leg: https://francolinx.github.io/worn-smart-glasses/benchmark.html
 (48 of 50 reached the target; in 44 every first move matched the true pose; no fix landed in the wrong place once weak matches were refused. `tools/bench_missions.py`, `tools/bench_report.py`.)
 
+Whole building, floors 1 to 8, on satellite imagery: https://francolinx.github.io/worn-smart-glasses/building3d.html
+(the fire-egress signs stacked on the footprint; stairs refitted to sit over each other, within 3.3 m. 30 routing trials from upper floors,
+checked by an independent shortest-path solver: 30 of 30 after one fix, the app no longer routes by elevator. Upper floors have no survey
+photos yet, so those trials start from an injected position. `tools/bench_vertical.py`.)
+
 Outdoors, the same idea works from the skyline: tap three rooftops in a photo and get position, heading and floor.
 
 **Venue pack:** 285 Jay St (City Tech), Downtown Brooklyn. Tillary St to the north, Jay St to the west, Bridge St to the east,

@@ -830,15 +830,15 @@
    "image": "pack/indoor/f2.jpg",
    "w": 900,
    "h": 1000,
-   "m_per_px": 0.0914,
-   "up_bearing_deg": 182,
+   "m_per_px": 0.0902,
+   "up_bearing_deg": 182.5,
    "origin_px": [
     565,
     537
    ],
    "origin_ll": [
     40.69556,
-    -73.98669
+    -73.986677
    ],
    "dests": [
     {
@@ -985,7 +985,7 @@
     ]
    ],
    "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
-   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines. Scale, rotation and position refitted so this floor's stairs sit over the same stairs on the floor-1 fire plan."
   },
   {
    "id": "f3",
@@ -994,15 +994,15 @@
    "image": "pack/indoor/f3.jpg",
    "w": 900,
    "h": 1047,
-   "m_per_px": 0.0889,
-   "up_bearing_deg": 182,
+   "m_per_px": 0.0877,
+   "up_bearing_deg": 183.6,
    "origin_px": [
     588,
     555
    ],
    "origin_ll": [
-    40.69556,
-    -73.98669
+    40.695561,
+    -73.986685
    ],
    "dests": [
     {
@@ -1149,7 +1149,7 @@
     ]
    ],
    "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
-   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines. Scale, rotation and position refitted so this floor's stairs sit over the same stairs on the floor-1 fire plan."
   },
   {
    "id": "f4",
@@ -1158,15 +1158,15 @@
    "image": "pack/indoor/f4.jpg",
    "w": 900,
    "h": 1004,
-   "m_per_px": 0.0696,
-   "up_bearing_deg": 182,
+   "m_per_px": 0.0658,
+   "up_bearing_deg": 181.2,
    "origin_px": [
     205,
     695
    ],
    "origin_ll": [
-    40.69556,
-    -73.98669
+    40.695556,
+    -73.986698
    ],
    "dests": [
     {
@@ -1310,7 +1310,7 @@
     ]
    ],
    "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
-   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines. Scale, rotation and position refitted so this floor's stairs sit over the same stairs on the floor-1 fire plan."
   },
   {
    "id": "f5",
@@ -1319,15 +1319,15 @@
    "image": "pack/indoor/f5.jpg",
    "w": 900,
    "h": 1007,
-   "m_per_px": 0.0711,
-   "up_bearing_deg": 182,
+   "m_per_px": 0.0651,
+   "up_bearing_deg": 182.0,
    "origin_px": [
     217,
     700
    ],
    "origin_ll": [
-    40.69556,
-    -73.98669
+    40.695556,
+    -73.986699
    ],
    "dests": [
     {
@@ -1471,7 +1471,7 @@
     ]
    ],
    "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
-   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines. Scale, rotation and position refitted so this floor's stairs sit over the same stairs on the floor-1 fire plan."
   },
   {
    "id": "f6",
@@ -1480,15 +1480,15 @@
    "image": "pack/indoor/f6.jpg",
    "w": 900,
    "h": 1024,
-   "m_per_px": 0.0696,
-   "up_bearing_deg": 182,
+   "m_per_px": 0.0649,
+   "up_bearing_deg": 183.0,
    "origin_px": [
     225,
     698
    ],
    "origin_ll": [
-    40.69556,
-    -73.98669
+    40.695555,
+    -73.986696
    ],
    "dests": [
     {
@@ -1615,7 +1615,7 @@
     ]
    ],
    "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
-   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines. Scale, rotation and position refitted so this floor's stairs sit over the same stairs on the floor-1 fire plan."
   },
   {
    "id": "f7",
@@ -1624,15 +1624,15 @@
    "image": "pack/indoor/f7.jpg",
    "w": 900,
    "h": 1011,
-   "m_per_px": 0.0702,
-   "up_bearing_deg": 182,
+   "m_per_px": 0.0654,
+   "up_bearing_deg": 181.5,
    "origin_px": [
     208,
     690
    ],
    "origin_ll": [
-    40.69556,
-    -73.98669
+    40.695556,
+    -73.986696
    ],
    "dests": [
     {
@@ -1759,7 +1759,7 @@
     ]
    ],
    "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
-   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines. Scale, rotation and position refitted so this floor's stairs sit over the same stairs on the floor-1 fire plan."
   },
   {
    "id": "f8",
@@ -1768,15 +1768,15 @@
    "image": "pack/indoor/f8.jpg",
    "w": 900,
    "h": 1054,
-   "m_per_px": 0.0667,
-   "up_bearing_deg": 182,
+   "m_per_px": 0.0654,
+   "up_bearing_deg": 182.0,
    "origin_px": [
     225,
     640
    ],
    "origin_ll": [
-    40.69556,
-    -73.98669
+    40.6956,
+    -73.986697
    ],
    "dests": [
     {
@@ -1865,7 +1865,7 @@
     ]
    ],
    "source": "Photo of the Elevator Bank B fire-egress sign on this floor, taken by the team on 2026-11-20",
-   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines."
+   "georef_note": "Approximate. The sign is a schematic. Scale assumes the plan's north-south extent on floor 1 is the building's ~94 m; other floors are scaled by the elevator-bank width. Up is south (loading dock, Tech Pl); right is Jay St. Paths follow the sign's dashed egress lines. Only two stairs are shared with floor 1, so the scale is taken from floor 7 and the plan is shifted to put Stairs D and E over floor 1's."
   }
  ],
  "start": "a105"
