@@ -1,0 +1,26 @@
+# Builds the MicroLumin M6 display app and publishes the APK on the `apk` branch, so nobody needs Android Studio on demo day.
+name: glasses-apk
+on:
+  push:
+    branches: [main]
+    paths: ['m6/glasses-app/**', '.github/workflows/glasses-apk.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.9' }
+      - run: gradle -p m6/glasses-app assembleDebug --no-daemon
+      - name: Publish APK on the apk branch
+        run: |
+          mkdir out && cp m6/glasses-app/app/build/outputs/apk/debug/app-debug.apk out/PointGoGlasses.apk
+          cd out && echo "Built from $GITHUB_SHA on $(date -u +%FT%TZ). Install: adb install -r PointGoGlasses.apk" > README.txt
+          git init -q -b apk && git add -A
+          git -c user.name="github-actions" -c user.email="actions@github.com" commit -q -m "PointGoGlasses.apk from $GITHUB_SHA"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" apk

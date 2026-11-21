@@ -26,6 +26,7 @@ button.on{border-color:var(--acc);color:var(--acc)}button.go{border-color:var(--
   <div class="mut" id="packline" style="margin-top:6px"></div></div>
  <div class="card"><h2>1 · Point and shoot</h2>
   <label class="shoot">📷 Point &amp; shoot<input id="capGo" type="file" accept="image/*" capture="environment" style="display:none"></label>
+  <label style="display:block;text-align:center;border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px;cursor:pointer">🕶 Use a photo taken by the glasses (pick it from Photos or Files)<input id="capLib" type="file" accept="image/*" style="display:none"></label>
   <div class="mut" style="margin-top:8px">Aim at something with detail (signs, doors, posters, furniture), not a blank wall. The photo is matched on this phone against the surveyed photos. No GPS, no compass, no upload.</div>
   <div id="goStatus" class="mut" style="margin-top:8px"></div><div id="cands"></div></div>
  <div class="card"><h2>2 · Go</h2>
@@ -177,6 +178,7 @@ function reroute(){ ROUTE=null; if(!FIX||!DEST) return; const F=floor(FIX.floor)
   const door=/^Door/.test(best.via); const TL=floor(best.toPlan).label; best.steps.push({turn:door?`THROUGH ${best.via.toUpperCase()}, THEN SHOOT AGAIN`:`TAKE ${best.via.toUpperCase()} TO FLOOR ${TL}`,m:0,vertical:true}); best.toFloor=TL; best.door=door; ROUTE=best; }
 
 /* ---------- go ---------- */
+$('capLib').onchange=e=>$('capGo').onchange(e);       // same matcher; the photo just comes from the library (MicroLumin: MLDemo > Camera, then Files sync)
 $('capGo').onchange=async e=>{ const file=e.target.files[0]; e.target.value=''; if(!file) return; if(!REFS.length){ $('goStatus').innerHTML='<span class="warn">No reference photos on this phone yet. Open Survey and add some, or import a pack.</span>'; return; }
   $('goStatus').textContent='Matching on this phone…'; $('cands').innerHTML=''; try{ const t0=performance.now(), {im,f35}=await loadPhoto(file), q=await VPR.features(im), fPx=PG.focalPx(q.w,q.h,f35).f;
     lastRes=await VPR.locate(q,REFS,fPx);

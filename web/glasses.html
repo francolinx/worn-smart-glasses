@@ -2,12 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=600, height=600, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Point & Go</title>
 <style>
-  html, body { margin: 0; padding: 0; width: 600px; height: 600px; background: #000; color: #fff;   /* black = transparent on waveguide */
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: #fff;   /* black = transparent on waveguide */
     font-family: -apple-system, system-ui, sans-serif; overflow: hidden; }
-  #arrowView { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding-bottom: 56px; }
+  /* everything is laid out on a 600x600 stage, then scaled to the display: 1:1 on Meta Ray-Ban Display, 0.8 on the 640x480 MicroLumin M6 */
+  #stage { position: absolute; left: 50%; top: 50%; width: 600px; height: 600px; margin: -300px 0 0 -300px; transform-origin: 50% 50%; overflow: hidden; }
+  #stage.mono { -webkit-filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(5); filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(5); }   /* ?mono=1 for the green-only display */
+  #arrowView > * { margin: 3px 0; }
+  #arrowView { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding-bottom: 56px; }
   #arrow { width: 225px; height: 225px; transition: transform .12s linear; }
   #arrow path { fill: #fff; } #arrow.ahead path { fill: #3dff7a; } #arrow.lost path { fill: #555; }
   #dist { font-size: 62px; font-weight: 700; letter-spacing: 1px; line-height: 1; }
@@ -15,13 +19,14 @@
   #status { font-size: 24px; color: #aaa; min-height: 30px; } #status.ahead { color: #3dff7a; } #status.warn { color: #ffb84d; }
   #hdg { position: absolute; top: 14px; left: 16px; font-size: 18px; color: #8a8a8a; }
   #fixinfo { position: absolute; top: 14px; right: 16px; font-size: 18px; color: #8a8a8a; text-align: right; }
-  #map { position: absolute; inset: 0; width: 600px; height: 600px; display: none; }
+  #map { position: absolute; top: 0; left: 0; width: 600px; height: 600px; display: none; }
   #bar { position: absolute; bottom: 12px; left: 0; right: 0; display: flex; gap: 10px; justify-content: center; }
   .focusable { background: none; border: 2px solid #444; color: #999; font-size: 18px; padding: 7px 14px; border-radius: 10px; }
   .focusable:focus { border-color: #fff; color: #fff; outline: none; }
 </style>
 </head>
 <body>
+<div id="stage">
 <div id="arrowView">
   <svg id="arrow" class="lost" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 L86 56 L62 56 L62 96 L38 96 L38 56 L14 56 Z"/></svg>
   <div id="dist">--</div>
@@ -35,6 +40,7 @@
   <button id="bCal" class="focusable" tabindex="0">ALIGN</button>
   <button id="bDest" class="focusable" tabindex="0">DEST ▸</button>
   <button id="bMap" class="focusable" tabindex="0">MAP</button>
+</div>
 </div>
 <script src="js/solver.js"></script>
 <script src="js/sync.js"></script>
@@ -134,7 +140,7 @@ function drawSchematic(g) {
     const e = pts[pts.length - 1]; boxes.push([e[0] - 16, e[1] - 16, 32, 32]); g.fillStyle = '#000'; g.strokeStyle = '#ffc400'; g.lineWidth = 5; g.beginPath(); g.arc(e[0], e[1], 12, 0, 7); g.fill(); g.stroke(); g.fillStyle = '#ffc400'; g.beginPath(); g.arc(e[0], e[1], 4.5, 0, 7); g.fill(); }
   g.font = 'bold 15px system-ui'; g.textBaseline = 'middle';
   for (const x of pl.exits) { const a = P(x.p[0], x.p[1]), w = g.measureText(x.t).width + 14; if (a[0] < 20 || a[0] > 580 || a[1] < 98 || a[1] > 474) continue; boxes.push([a[0] - w / 2, a[1] - 12, w, 24]);
-    g.fillStyle = '#ff3b30'; g.beginPath(); g.roundRect(a[0] - w / 2, a[1] - 12, w, 24, 5); g.fill(); g.fillStyle = '#fff'; g.fillText(x.t, a[0] - w / 2 + 7, a[1] + 1); }
+    g.fillStyle = '#ff3b30'; g.fillRect(a[0] - w / 2, a[1] - 12, w, 24); g.fillStyle = '#fff'; g.fillText(x.t, a[0] - w / 2 + 7, a[1] + 1); }
   g.font = '600 16px system-ui'; for (const L of pl.labels.slice().sort((a, b) => a.pri - b.pri)) { const a = P(L.p[0], L.p[1]), w = g.measureText(L.t).width; if (free(a[0] - w / 2 - 4, a[1] - 11, w + 8, 22)) { g.fillStyle = L.pri === 1 ? '#fff' : '#9fb6c2'; g.fillText(L.t, a[0] - w / 2, a[1] + 1); } }
   g.restore();
   g.fillStyle = '#fff'; g.strokeStyle = '#000'; g.lineWidth = 3; g.beginPath(); g.moveTo(cx, cy - 24); g.lineTo(cx + 15, cy + 14); g.lineTo(cx, cy + 5); g.lineTo(cx - 15, cy + 14); g.closePath(); g.stroke(); g.fill();
@@ -179,6 +185,13 @@ $('bDest').onclick = async () => {
   destIdx = (destIdx + 1) % dests.length;
 };
 $('bMap').onclick = async () => { if (!(state && state.fix.indoor)) await loadPack(); mapOn = !mapOn; $('map').style.display = mapOn ? 'block' : 'none'; $('arrowView').style.display = mapOn ? 'none' : 'flex'; $('bMap').textContent = mapOn ? 'ARROW' : 'MAP'; };
+/* fit the stage to whatever display this is; D-pad left/right moves between the three buttons (touchpad and ring on the M6 send these keys) */
+function fit() { var k = Math.min(window.innerWidth / 600, window.innerHeight / 600) || 1; $('stage').style.transform = 'scale(' + k + ')'; $('stage').style.webkitTransform = 'scale(' + k + ')'; }
+addEventListener('resize', fit); fit(); if (params.get('mono') === '1') $('stage').className = 'mono';
+document.addEventListener('keydown', e => { const B = [$('bCal'), $('bDest'), $('bMap')], i = B.indexOf(document.activeElement), kc = e.keyCode;
+  if (e.key === 'ArrowRight' || kc === 39 || e.key === 'ArrowDown' || kc === 40) { B[(i + 1 + 3) % 3].focus(); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft' || kc === 37 || e.key === 'ArrowUp' || kc === 38) { B[(i - 1 + 3) % 3].focus(); e.preventDefault(); }
+  else if ((kc === 23 || kc === 66) && document.activeElement && document.activeElement.click) document.activeElement.click(); });
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.activeElement && document.activeElement.click && document.activeElement.tagName !== 'BUTTON') $('bCal').click(); });
 $('bCal').focus();
 
