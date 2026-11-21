@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Point & Go · Floor 1 in 3D · pre-incident survey</title>
+<style>
+:root{--bg:#070a0f;--fg:#e6e8eb;--mut:#9aa3ad;--card:rgba(16,21,29,.88);--line:#2a313b;--acc:#ffb020;--ok:#3fb950;--bad:#ff4d3d}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:14px system-ui,-apple-system,sans-serif;overflow:hidden}
+canvas{display:block;touch-action:none}
+#top{position:fixed;left:0;right:0;top:0;padding:8px 10px;display:flex;gap:8px;align-items:flex-start;pointer-events:none}
+#top>*{pointer-events:auto}.chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 10px}
+h1{font-size:15px;margin:0}.mut{color:var(--mut);font-size:12px}.tag{display:inline-block;background:var(--bad);color:#fff;font-weight:700;font-size:11px;letter-spacing:.06em;border-radius:5px;padding:2px 6px;margin-top:4px}
+a{color:var(--acc)}
+#bar{position:fixed;left:0;right:0;bottom:0;padding:8px;display:flex;gap:6px;overflow-x:auto;background:linear-gradient(transparent,rgba(7,10,15,.92) 40%)}
+button{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:inherit;white-space:nowrap}
+button.on{border-color:var(--acc);color:var(--acc)}button.go{border-color:var(--ok);color:var(--ok);font-weight:700}
+#panel{position:fixed;left:8px;right:8px;bottom:58px;max-width:430px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;display:none}
+#panel img{width:100%;border-radius:8px;display:block;margin-bottom:8px;max-height:34vh;object-fit:cover}
+#panel .big{font-size:17px;font-weight:700}#x{position:absolute;right:8px;top:6px;border:0;background:none;font-size:18px;padding:4px 8px}
+#mission{position:fixed;right:8px;top:8px;max-width:300px;display:none}
+#mission ol{margin:6px 0 0;padding-left:18px}#mission li{margin:3px 0}
+#load{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:var(--mut)}
+</style></head><body>
+<div id="load">Building the floor…</div>
+<div id="top"><div class="chip"><h1>Point &amp; Go · Floor 1 · 285 Jay St</h1><div class="mut">City Tech Academic Complex · surveyed 20 Nov 2026 · <a href="indoor.html">open the app</a></div>
+ <div class="tag">FIRE RESCUE / POLICE · GPS-DENIED INTERIOR</div></div></div>
+<div id="mission" class="chip"><b>Why this exists</b>
+ <ol><li>GPS stops at the door. Smoke, stairwells and steel kill the compass too (ours was up to 90° out in this corridor).</li>
+ <li>A crew surveys the building once, on a quiet day: floor plan plus photos at each junction. That is the pack shown here.</li>
+ <li>On the call, a responder takes <b>one photo</b> through the glasses. It is matched on the phone, offline, against the pack: floor, position, facing.</li>
+ <li>The glasses show an arrow and distance to the target room, the nearest stair, or the way out. Command sees the same dot.</li></ol>
+ <div class="mut" style="margin-top:6px">Prototype. Positions are the surveyed photo spots (about 2 m), headings about 20°. Tap any coloured wedge to see what the responder's camera sees from there.</div></div>
+<div id="panel"><button id="x">✕</button><img id="pimg"><div class="big" id="pt"></div><div id="ps"></div><div class="mut" id="pm"></div></div>
+<div id="bar"><button id="bOver" class="on">Overview</button><button id="bLobby">Lobby</button><button id="bRoom">Room A 105</button><button id="bRoute" class="go">▶ Entry team: entrance → A 105</button><button id="bPhotos">All photo rings</button><button id="bWalls" class="on">Walls</button><button id="bWhy">Why</button></div>
+
+<script type="importmap">{"imports":{"three":"./js/three/three.module.min.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from './js/three/OrbitControls.js';
+const $ = id => document.getElementById(id);
+const S = 0.0617, CX = 795, CZ = 675, UP_BEARING = 92;                         // floor-1 plan px -> metres; plan-up = 92 deg true
+const W = (x, y, h = 0) => new THREE.Vector3((x - CX) * S, h, (y - CZ) * S);  // +X = south, +Z = west (Jay St), -Z = east
+const A = { x0: 823, x1: 1192, y0: 1050, y1: 1275 };                          // Room A 105 on the floor-1 plan
+const fromRoom = (ax, ay) => [A.x0 + (ax - 130) / 1140 * (A.x1 - A.x0), A.y0 + (ay - 160) / 695 * (A.y1 - A.y0)];   // a105 plan px -> floor-1 px
+const dirOf = h => new THREE.Vector3(Math.sin(h * Math.PI / 180), 0, -Math.cos(h * Math.PI / 180));
+const COMPASS = h => { const t = (h + UP_BEARING + 360) % 360; return Math.round(t) + '° ' + ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(t / 45) % 8]; };
+
+const renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(Math.min(2, devicePixelRatio)); renderer.setSize(innerWidth, innerHeight); document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x070a0f); scene.fog = new THREE.Fog(0x070a0f, 120, 260);
+const cam = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.3, 500);
+const ctl = new OrbitControls(cam, renderer.domElement); ctl.enableDamping = true; ctl.maxPolarAngle = Math.PI / 2 - 0.05; ctl.minDistance = 4; ctl.maxDistance = 160;
+scene.add(new THREE.HemisphereLight(0xbfd8ff, 0x1a1410, 1.5)); const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(-30, 60, 40); scene.add(sun);
+
+/* ---------- floor: the venue plan as the slab ---------- */
+const tl = new THREE.TextureLoader();
+const planTex = tl.load('pack/indoor/citytech_f1.png', () => { $('load').style.display = 'none'; }); planTex.colorSpace = THREE.SRGBColorSpace; planTex.anisotropy = 8;
+const slab = new THREE.Mesh(new THREE.PlaneGeometry(1590 * S, 1350 * S), new THREE.MeshBasicMaterial({ map: planTex, color: 0x9fb4c4 })); slab.rotation.x = -Math.PI / 2; slab.position.copy(W(795, 675, 0)); scene.add(slab);
+const grid = new THREE.GridHelper(400, 80, 0x16303f, 0x0f1a22); grid.position.y = -0.05; scene.add(grid);
+
+/* ---------- building ---------- */
+const walls = new THREE.Group(); scene.add(walls);
+const mat = (c, o = 1, extra = {}) => new THREE.MeshStandardMaterial({ color: c, transparent: o < 1, opacity: o, roughness: .8, ...extra });
+function box(x0, y0, x1, y1, h, m, base = 0, grp = walls) { const g = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(x1 - x0) * S, h, Math.abs(y1 - y0) * S), m); g.position.copy(W((x0 + x1) / 2, (y0 + y1) / 2, base + h / 2)); grp.add(g); return g; }
+function room(x0, y0, x1, y1, h = 3.6, c = 0x4aa3c7, gaps = []) {              // four thin walls with an outline; gaps = [[side, from, to]] door openings
+  const m = mat(c, .28), t = 3; const seg = (ax0, ay0, ax1, ay1) => box(ax0, ay0, ax1, ay1, h, m);
+  const side = (name, a, b, fixed, horiz) => { let cuts = gaps.filter(g => g[0] === name).map(g => [g[1], g[2]]).sort((p, q) => p[0] - q[0]), s = a;
+    for (const [c0, c1] of cuts) { if (c0 > s) horiz ? seg(s, fixed - t, c0, fixed + t) : seg(fixed - t, s, fixed + t, c0); s = c1; }
+    if (s < b) horiz ? seg(s, fixed - t, b, fixed + t) : seg(fixed - t, s, fixed + t, b); };
+  side('top', x0, x1, y0, true); side('bottom', x0, x1, y1, true); side('left', y0, y1, x0, false); side('right', y0, y1, x1, false); }
+function label(text, x, y, h = 5, size = 1, col = '#e6f4ff') { const c = document.createElement('canvas'), g = c.getContext('2d'); g.font = 'bold 44px system-ui,sans-serif'; const w = Math.ceil(g.measureText(text).width) + 28; c.width = w; c.height = 64;
+  g.font = 'bold 44px system-ui,sans-serif'; g.fillStyle = 'rgba(7,10,15,.72)'; g.beginPath(); g.roundRect(0, 0, w, 64, 14); g.fill(); g.fillStyle = col; g.textBaseline = 'middle'; g.fillText(text, 14, 34);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false })); s.scale.set(w / 64 * 1.5 * size, 1.5 * size, 1); s.position.copy(W(x, y, h)); s.renderOrder = 5; scene.add(s); return s; }
+
+// classrooms and service blocks (from the venue plan)
+room(823, 683, 983, 873); label('A 106', 903, 778); room(1032, 683, 1192, 873); label('A 104', 1112, 778);
+room(823, 882, 983, 993, 3.6, 0x4aa3c7, [['bottom', 865, 900]]); label('Restrooms', 903, 938, 4.6, .8);
+room(1032, 882, 1192, 993); room(1250, 1050, 1417, 1275, 3.6, 0x4aa3c7, [['top', 1270, 1300]]); label('A 103', 1333, 1162);
+room(750, 1050, 823, 1180, 3.6, 0xff5a4d, [['top', 752, 780]]); label('EXIT STAIR E', 786, 1115, 5.2, .8, '#ffb3ab');
+room(A.x0, A.y0, A.x1, A.y1, 3.6, 0x4aa3c7, [['top', 846, 874], ['top', 1146, 1174], ['bottom', A.x0, A.x1]]); label('A 105', 1007, 1162, 6.2, 1.4, '#ffd27a');
+box(778, 735, 810, 920, 3.2, mat(0x8a949e, .9)); label('Elevators B', 800, 828, 4.4, .8);
+// outer shell: Jay St and Tillary St curtain glass, east and south walls
+const glass = mat(0x66d6ff, .13, { roughness: .1, metalness: .3 });
+box(35, 1272, 1558, 1278, 11, glass); box(32, 700, 38, 1275, 11, glass); box(1555, 667, 1561, 1275, 4, mat(0x4aa3c7, .25)); box(545, 664, 1558, 670, 4, mat(0x4aa3c7, .25));
+for (let x = 80; x < 1540; x += 62) box(x, 1273, x + 3, 1277, 11, mat(0xdfe8ee, .55)); for (let y = 720; y < 1270; y += 62) box(33, y, 37, y + 3, 11, mat(0xdfe8ee, .55));
+box(823, 1271, 1192, 1279, 3.4, mat(0x7fd9c4, .5));                             // A 105 green channel glass
+label('JAY ST  (west)', 760, 1330, 1.2, 1, '#8fdcff'); label('TILLARY ST  (north)', -20, 990, 1.2, 1, '#8fdcff');
+// theater: the orange shell you see from the lobby
+const orange = mat(0xd9652b, 1, { roughness: .65 });
+const dome = new THREE.Mesh(new THREE.SphereGeometry(1, 40, 24, 0, Math.PI * 2, 0, Math.PI / 2), orange); dome.scale.set(232 * S, 15, 250 * S); dome.position.copy(W(290, 500, 0)); walls.add(dome);
+box(410, 760, 545, 1048, 9, orange); box(160, 800, 365, 965, 7.5, orange); box(75, 70, 505, 355, 12, mat(0x7a3a1c)); label('THEATER', 290, 520, 17, 1.6, '#ffc9a8');
+// lobby furniture you can recognise in the photos
+box(640 - 12, 792, 640 + 12, 900, .5, mat(0x30363d), 0); { const e = new THREE.Mesh(new THREE.BoxGeometry(1.5, .5, 9), mat(0x222a31)); e.position.copy(W(640, 846, 2.6)); e.rotation.x = -0.55; walls.add(e); const g2 = new THREE.Mesh(new THREE.BoxGeometry(1.7, 1, 9), mat(0x66d6ff, .18)); g2.position.copy(W(640, 846, 3.3)); g2.rotation.x = -0.55; walls.add(g2); }
+label('Escalator', 640, 846, 6.4, .8);
+box(500, 1078, 590, 1098, 1.1, mat(0x6b1f24)); box(512, 1066, 524, 1078, 9, mat(0xf2f2ee)); label('INFORMATION', 518, 1072, 10.2, .8);
+for (let x = 566; x <= 730; x += 27) box(x, 1060, x + 6, 1082, 1, mat(0xb8c0c8, 1, { metalness: .7, roughness: .3 }));
+for (let y = 1080; y <= 1250; y += 28) box(468, y, 492, y + 6, 1, mat(0xb8c0c8, 1, { metalness: .7, roughness: .3 }));
+box(625, 1182, 820, 1272, 3.2, mat(0x66d6ff, .12)); label('MAIN ENTRANCE', 720, 1245, 4.4, 1, '#9dffb5');
+box(736, 1000, 742, 1032, 2.4, mat(0xc9954f)); label('corridor doors', 742, 1016, 3.4, .6);
+// Room A 105 interior, placed from the survey photos
+{ const wood = mat(0xd9b77c), R = (ax0, ay0, ax1, ay1, h, m, base = 0) => { const [x0, y0] = fromRoom(ax0, ay0), [x1, y1] = fromRoom(ax1, ay1); return box(x0, y0, x1, y1, h, m, base); };
+  R(134, 285, 174, 790, 2.3, wood); R(1226, 285, 1266, 790, 2.3, wood);                                   // cabinets on both end walls
+  R(136, 190, 170, 262, 1, mat(0xb9bec4)); R(1230, 190, 1264, 262, 1, mat(0xb9bec4));                    // bins by each door
+  R(330, 162, 1070, 168, 1.3, mat(0xf7f7f7), 0.9); R(380, 163, 520, 170, 1.7, mat(0xffffff), 1.0); R(880, 163, 1020, 170, 1.7, mat(0xffffff), 1.0);   // whiteboards + screens
+  R(730, 235, 800, 270, 1.1, wood);                                                                       // lectern
+  [345, 425, 505, 585, 665, 745].forEach((ry, i) => R(265, ry, 1135, ry + 22, .74, mat(0xe9d3a6), 0)); }
+
+/* ---------- survey: stations, view wedges, photo rings ---------- */
+const COLS = [0x35c2ff, 0x3fb950, 0xffb020, 0xff6ad5, 0xb48cff, 0xff7a45, 0x2ee6c8, 0xf2e04b, 0xff4d6d, 0xffffff, 0xffffff, 0xffffff];
+const pickables = [], rings = new THREE.Group(), wedges = new THREE.Group(); scene.add(rings, wedges); let REFS = [], STATIONS = [], selected = null;
+const fixMark = new THREE.Group(); { const cone = new THREE.Mesh(new THREE.ConeGeometry(.55, 1.6, 20), new THREE.MeshBasicMaterial({ color: 0xff2a2a })); cone.rotation.x = Math.PI / 2; cone.position.set(0, 1.5, .8);
+  const ringM = new THREE.Mesh(new THREE.TorusGeometry(1.1, .09, 8, 40), new THREE.MeshBasicMaterial({ color: 0xff2a2a })); ringM.rotation.x = Math.PI / 2; ringM.position.y = .12; fixMark.add(cone, ringM); fixMark.visible = false; scene.add(fixMark); }
+const posOf = r => { const [x, y] = r.floor === 'a105' ? fromRoom(r.x, r.y) : [r.x, r.y]; return W(x, y, 0); };
+function wedge(r, col) { const g = new THREE.Shape(), a = 34 * Math.PI / 180, L = 3.4; g.moveTo(0, 0); g.absarc(0, 0, L, Math.PI / 2 - a, Math.PI / 2 + a, false); g.lineTo(0, 0);
+  const m = new THREE.Mesh(new THREE.ShapeGeometry(g, 10), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .42, side: THREE.DoubleSide, depthWrite: false })); m.rotation.x = -Math.PI / 2;
+  const h = new THREE.Group(); h.add(m); h.position.copy(posOf(r)); h.position.y = .08 + (r.k || 0) * .004; h.rotation.y = -r.heading * Math.PI / 180; m.userData.ref = r; r.wedge = m; pickables.push(m); wedges.add(h); }
+function photoPlane(r) { if (r.plane) return; const d = dirOf(r.heading), p = posOf(r).add(d.clone().multiplyScalar(4.6)); p.y = 2.4; const t = tl.load(r.photo); t.colorSpace = THREE.SRGBColorSpace;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 2.55), new THREE.MeshBasicMaterial({ map: t, side: THREE.DoubleSide })); m.position.copy(p); m.lookAt(posOf(r).setY(2.4)); m.userData.ref = r; pickables.push(m); rings.add(m); r.plane = m;
+  const fr = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), new THREE.LineBasicMaterial({ color: COLS[r.station] })); m.add(fr); }
+function select(r, fly = true) { selected = r; const st = STATIONS[r.station]; REFS.filter(q => q.station === r.station).forEach(photoPlane);
+  REFS.forEach(q => q.wedge.material.opacity = q === r ? .95 : q.station === r.station ? .5 : .25);
+  fixMark.visible = true; fixMark.position.copy(posOf(r)); fixMark.rotation.y = -r.heading * Math.PI / 180 + Math.PI;
+  $('panel').style.display = 'block'; $('pimg').src = r.photo; $('pt').textContent = 'PHOTO FIX · ' + st.name.replace(/^[SX]\d+ /, '');
+  $('ps').innerHTML = `Floor 1 · facing <b>${COMPASS(r.heading)}</b> · ${r.f.n} visual features stored`; $('pm').textContent = `Survey photo ${r.id.slice(4)} · ${r.t.slice(11)} · the phone compass said ${Math.round(r.compass)}° here (${Math.abs(((r.compass - (r.heading + UP_BEARING) + 540) % 360) - 180) > 30 ? 'wrong: steel and wiring' : 'about right'}). No GPS used.`;
+  if (fly) { const p = posOf(r), d = dirOf(r.heading); flyTo(p.clone().add(d.clone().multiplyScalar(-9)).setY(8), p.clone().add(d.multiplyScalar(3)).setY(1.6)); } }
+$('x').onclick = () => { $('panel').style.display = 'none'; };
+
+/* ---------- route: entry team, main entrance to A 105 ---------- */
+const ROUTE = [[716, 1262], [716, 1164], [716, 1016], [760, 1016], [860, 1016], [860, 1050], [868, 1075], [905, 1085]].map(p => W(p[0], p[1], .35));
+const curve = new THREE.CatmullRomCurve3(ROUTE, false, 'catmullrom', .08), tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 160, .22, 8), new THREE.MeshBasicMaterial({ color: 0x3fb950 })); scene.add(tube);
+const runner = new THREE.Mesh(new THREE.SphereGeometry(.6, 20, 14), new THREE.MeshBasicMaterial({ color: 0xffffff })); const halo = new THREE.Mesh(new THREE.TorusGeometry(1.2, .08, 8, 40), new THREE.MeshBasicMaterial({ color: 0x3fb950 })); halo.rotation.x = Math.PI / 2; runner.add(halo); scene.add(runner); runner.visible = false; let runT = -1;
+label('START', 716, 1262, 2.2, .7, '#9dffb5');
+
+/* ---------- camera moves ---------- */
+let fly = null; function flyTo(pos, tgt, ms = 1100) { fly = { p0: cam.position.clone(), t0: ctl.target.clone(), p1: pos, t1: tgt, s: performance.now(), ms }; }
+const VIEWS = { over: [W(1180, 1820, 62), W(760, 980, 0)], lobby: [W(250, 1380, 22), W(560, 1010, 2)], room: [W(1010, 1500, 17), W(1007, 1150, 1)] };
+const setOn = id => ['bOver', 'bLobby', 'bRoom'].forEach(b => $(b).classList.toggle('on', b === id));
+$('bOver').onclick = () => { flyTo(...VIEWS.over); setOn('bOver'); }; $('bLobby').onclick = () => { flyTo(...VIEWS.lobby); setOn('bLobby'); }; $('bRoom').onclick = () => { flyTo(...VIEWS.room); setOn('bRoom'); };
+$('bRoute').onclick = () => { runT = 0; runner.visible = true; $('panel').style.display = 'none'; setOn(''); };
+$('bPhotos').onclick = e => { REFS.forEach(photoPlane); e.target.classList.add('on'); };
+$('bWalls').onclick = e => { walls.visible = !walls.visible; e.target.classList.toggle('on', walls.visible); };
+$('bWhy').onclick = e => { const m = $('mission'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; e.target.classList.toggle('on', m.style.display === 'block'); };
+cam.position.copy(VIEWS.over[0]); ctl.target.copy(VIEWS.over[1]);
+
+/* ---------- picking ---------- */
+const ray = new THREE.Raycaster(), v2 = new THREE.Vector2(); let down = null;
+renderer.domElement.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => { if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return; v2.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(v2, cam);
+  const hit = ray.intersectObjects(pickables, false)[0]; if (hit) select(hit.object.userData.ref, !hit.object.geometry.parameters || !hit.object.geometry.parameters.width); });
+
+/* ---------- data ---------- */
+fetch('pack/indoor/refs.json').then(r => r.json()).then(o => { STATIONS = o.stations; REFS = o.refs; const seen = {};
+  REFS.forEach(r => { r.k = seen[r.station] = (seen[r.station] || 0) + 1; wedge(r, COLS[r.station]); });
+  STATIONS.forEach((s, i) => { const [x, y] = s.floor === 'a105' ? fromRoom(s.x, s.y) : [s.x, s.y]; if (i > 8) return; const pin = new THREE.Mesh(new THREE.CylinderGeometry(.16, .16, 3.2, 12), new THREE.MeshBasicMaterial({ color: COLS[i] })); pin.position.copy(W(x, y, 1.6)); scene.add(pin);
+    label(s.name.split(' ')[0], x, y, 3.9, .75, '#' + COLS[i].toString(16).padStart(6, '0')); });
+  const first = REFS.find(r => r.id === 'pre:p42') || REFS[0]; if (location.hash === '#fix' && first) select(first, false);
+}).catch(() => { $('load').textContent = 'Could not load the survey pack.'; $('load').style.display = 'flex'; });
+
+addEventListener('resize', () => { cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+(function loop(now) { requestAnimationFrame(loop);
+  if (fly) { const k = Math.min(1, (now - fly.s) / fly.ms), e = ease(k); cam.position.lerpVectors(fly.p0, fly.p1, e); ctl.target.lerpVectors(fly.t0, fly.t1, e); if (k >= 1) fly = null; }
+  if (runT >= 0) { runT += 0.0022; if (runT >= 1) { runT = -1; } else { const p = curve.getPointAt(runT), tg = curve.getTangentAt(runT); runner.position.copy(p).setY(1); halo.scale.setScalar(1 + .25 * Math.sin(now / 120));
+      cam.position.lerp(p.clone().add(tg.clone().multiplyScalar(-11)).setY(9), .06); ctl.target.lerp(p.clone().add(tg.multiplyScalar(4)).setY(1.2), .08); } }
+  ctl.update(); renderer.render(scene, cam); })(performance.now());
+window.__pg = { select, REFS: () => REFS, cam, VIEWS, flyTo, photoAll: () => REFS.forEach(photoPlane) };
+</script></body></html>
